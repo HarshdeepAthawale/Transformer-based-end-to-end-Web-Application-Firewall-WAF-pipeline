@@ -172,14 +172,3 @@ This directory contains comprehensive documentation for building a Transformer-b
 - [Hugging Face Transformers](https://huggingface.co/transformers/) - Transformer library
 - [PyTorch Documentation](https://pytorch.org/docs/) - Deep learning framework
 
-## Support
-
-For questions or issues:
-1. Review the specific phase documentation
-2. Check code examples in each phase
-3. Refer to test files for usage patterns
-4. Review configuration files for settings
-
----
-
-**Good luck with your implementation!** 🚀
