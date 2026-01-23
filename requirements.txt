@@ -1,0 +1,31 @@
+# Deep Learning Framework
+torch>=2.0.0
+transformers>=4.30.0
+tokenizers>=0.13.0
+
+# Data Processing
+numpy>=1.24.0
+pandas>=2.0.0
+scikit-learn>=1.3.0
+
+# Web Framework (for WAF service)
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+pydantic>=2.0.0
+
+# HTTP Client
+requests>=2.31.0
+httpx>=0.24.0
+
+# Log Processing
+python-json-logger>=2.0.7
+loguru>=0.7.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0
+tqdm>=4.65.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0

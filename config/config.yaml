@@ -1,0 +1,40 @@
+# Web Server Configuration
+web_server:
+  type: "nginx"  # or "apache"
+  log_path: "/var/log/nginx/access.log"
+  error_log_path: "/var/log/nginx/error.log"
+  log_format: "detailed"
+  
+# Application Configuration
+applications:
+  app1:
+    port: 8080
+    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+  app2:
+    port: 8081
+    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+  app3:
+    port: 8082
+    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+
+# Data Paths
+data:
+  raw_logs: "data/raw"
+  processed: "data/processed"
+  normalized: "data/normalized"
+  training: "data/training"
+  validation: "data/validation"
+  test: "data/test"
+
+# Model Configuration
+model:
+  checkpoint_dir: "models/checkpoints"
+  vocabulary_dir: "models/vocabularies"
+  deployed_dir: "models/deployed"
+
+# WAF Service
+waf_service:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 5.0
