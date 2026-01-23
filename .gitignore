@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+pip-log.txt
+pip-delete-this-directory.txt
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/*.log
+*.log
+
+# Data
+data/raw/*
+data/processed/*
+data/normalized/*
+data/training/*
+data/validation/*
+data/test/*
+!data/*/.gitkeep
+
+# Models
+models/checkpoints/*
+models/vocabularies/*
+models/deployed/*
+!models/*/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+/tmp/
+/tmp/
+
+# WAR applications (build artifacts)
+war_apps/
+*.war
+*.class
+
+# Tomcat
+/opt/tomcat9/
+
+# PID files
+*.pid
+/tmp/waf_web_apps.pid
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
