@@ -50,3 +50,21 @@ waf_service:
   port: 8000
   workers: 4
   timeout: 5.0
+
+# Log Ingestion Configuration
+ingestion:
+  batch:
+    chunk_size: 1000
+    max_lines: null  # null = no limit
+    skip_lines: 0
+  
+  streaming:
+    poll_interval: 0.1
+    follow: true
+    buffer_size: 10000
+  
+  retry:
+    max_retries: 3
+    initial_delay: 1.0
+    max_delay: 60.0
+    exponential_base: 2.0
