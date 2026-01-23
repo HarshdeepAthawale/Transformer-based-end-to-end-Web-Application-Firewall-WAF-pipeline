@@ -8,14 +8,26 @@ web_server:
 # Application Configuration
 applications:
   app1:
+    name: "Juice Shop"
+    type: "nodejs"
     port: 8080
-    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+    path: "applications/app1-juice-shop"
+    log_path: "/var/log/nginx/access.log"
+    startup: "npm start"
   app2:
+    name: "WebGoat"
+    type: "java"
     port: 8081
-    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+    path: "applications/app2-webgoat"
+    log_path: "/var/log/nginx/access.log"
+    startup: "java -jar webgoat-container/target/webgoat-*.jar --server.port=8081"
   app3:
+    name: "DVWA"
+    type: "php"
     port: 8082
-    log_path: "/opt/tomcat9/logs/localhost_access_log.txt"
+    path: "applications/app3-dvwa"
+    log_path: "/var/log/nginx/access.log"
+    startup: "php -S localhost:8082"
 
 # Data Paths
 data:

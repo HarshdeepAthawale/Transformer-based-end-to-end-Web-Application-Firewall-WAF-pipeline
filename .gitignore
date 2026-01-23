@@ -66,6 +66,9 @@ war_apps/
 # PID files
 *.pid
 /tmp/waf_web_apps.pid
+/tmp/juice-shop.pid
+/tmp/webgoat.pid
+/tmp/dvwa.pid
 
 # Test coverage
 .coverage
@@ -74,3 +77,12 @@ htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Real Applications
+applications/app1-juice-shop/node_modules/
+applications/app1-juice-shop/.git/
+applications/app2-webgoat/target/
+applications/app2-webgoat/.git/
+applications/app3-dvwa/.git/
+applications/*/logs/
+applications/*/*.log
