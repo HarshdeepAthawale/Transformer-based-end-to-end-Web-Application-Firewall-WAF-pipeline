@@ -7,10 +7,10 @@ import { useEffect, useState } from 'react'
 export function MetricsOverview() {
   const { metrics: realTimeMetrics, getFreshnessLevel } = useRealTimeData()
   const [animatedValues, setAnimatedValues] = useState({
-    requests: 2400000,
-    blocked: 1247,
-    attackRate: 2.4,
-    responseTime: 45,
+    requests: 0,
+    blocked: 0,
+    attackRate: 0,
+    responseTime: 0,
   })
 
   // Animate value changes
