@@ -1,0 +1,41 @@
+# Testing Configuration for Phase 9
+
+testing:
+  accuracy:
+    min_detection_rate: 0.70  # Minimum detection rate for malicious payloads
+    max_false_positive_rate: 0.10  # Maximum FPR on benign traffic
+    test_categories:
+      - sql_injection
+      - xss
+      - command_injection
+      - path_traversal
+      - rce
+      - xxe
+      - ssrf
+      - file_upload
+      - ldap_injection
+      - nosql_injection
+      - template_injection
+  
+  performance:
+    max_avg_latency_ms: 100  # Maximum average latency
+    max_p95_latency_ms: 200  # Maximum P95 latency
+    min_throughput_req_per_sec: 50  # Minimum throughput
+  
+  load_testing:
+    num_requests: 1000
+    concurrent: 100
+    duration_seconds: 60
+    url: "http://localhost:8000/check"
+  
+  optimization:
+    methods:
+      - quantization
+      - torchscript
+    test_speed: true
+    num_iterations: 100
+  
+  reporting:
+    output_dir: "reports"
+    format: "json"  # json or html
+    include_details: true
