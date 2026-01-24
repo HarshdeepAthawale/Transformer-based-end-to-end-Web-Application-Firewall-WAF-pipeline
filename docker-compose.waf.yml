@@ -1,0 +1,116 @@
+version: '3.8'
+
+services:
+  # WAF Service - Real-time anomaly detection
+  waf-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.waf
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    environment:
+      - MODEL_PATH=/app/models/checkpoints/best_model.pt
+      - VOCAB_PATH=/app/models/vocabularies/http_vocab.json
+      - THRESHOLD=0.5
+      - WORKERS=4
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+
+  # Nginx Reverse Proxy with WAF Integration
+  nginx:
+    image: openresty/openresty:1.21.4.1-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./scripts/nginx_waf.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./logs:/var/log/nginx
+    depends_on:
+      waf-service:
+        condition: service_healthy
+      juice-shop:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend Application - OWASP Juice Shop
+  juice-shop:
+    build:
+      context: ./applications/app1-juice-shop
+      dockerfile: Dockerfile
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - juice-shop-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Optional: Monitoring service
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+
+  # Optional: Grafana for dashboards
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+
+volumes:
+  juice-shop-data:
+  prometheus-data:
+  grafana-data:
+
+networks:
+  default:
+    name: waf-network

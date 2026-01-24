@@ -50,6 +50,9 @@ waf_service:
   port: 8000
   workers: 4
   timeout: 5.0
+  model_path: "models/checkpoints/best_model.pt"
+  vocab_path: "models/vocabularies/http_vocab.json"
+  threshold: 0.5
 
 # Log Ingestion Configuration
 ingestion:
@@ -98,6 +101,28 @@ training:
   loss:
     type: "weighted_mse"  # Options: "mse", "weighted_mse", "focal", "contrastive", "combined"
     false_positive_weight: 2.0  # For weighted_mse
+
+# Integration Configuration
+integration:
+  waf_service:
+    host: "0.0.0.0"
+    port: 8000
+    workers: 4
+    timeout: 5.0
+    model_path: "models/checkpoints/best_model.pt"
+    vocab_path: "models/vocabularies/http_vocab.json"
+    threshold: 0.5
+
+  web_server:
+    type: "nginx"  # or "apache"
+    integration_method: "reverse_proxy"  # or "module", "sidecar"
+    block_on_anomaly: true
+    fail_open: true  # Allow requests if WAF service unavailable
+
+  logging:
+    log_anomalies: true
+    log_all_requests: false
+    log_file: "logs/waf_detections.log"
   
   early_stopping:
     enabled: true

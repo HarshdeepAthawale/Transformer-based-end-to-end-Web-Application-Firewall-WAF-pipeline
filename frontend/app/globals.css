@@ -1,0 +1,199 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+:root {
+  /* Font Stack - Cloudflare-style Inter typography */
+  --font-inter: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-jetbrains-mono: 'JetBrains Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', 'Source Code Pro', 'Monaco', 'Consolas', 'Courier New', monospace;
+
+  /* Light Mode - Security-focused color palette */
+  --background: #ffffff;
+  --foreground: #0a0e27;
+  --card: #f8f9fa;
+  --card-foreground: #0a0e27;
+  --popover: #ffffff;
+  --popover-foreground: #0a0e27;
+  --primary: #000000; /* Black: Information, monitoring data */
+  --primary-foreground: #ffffff;
+  --secondary: #ea580c; /* Orange: Medium threats, warnings */
+  --secondary-foreground: #ffffff;
+  --muted: #cbd5e1;
+  --muted-foreground: #475569;
+  --accent: #f59e0b; /* Amber: Low threats, monitoring alerts */
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626; /* Red: Critical threats, blocked attacks */
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #f1f5f9;
+  --ring: #000000;
+  --chart-1: #dc2626; /* Red: Critical threats */
+  --chart-2: #ea580c; /* Orange: Medium threats */
+  --chart-3: #f59e0b; /* Amber: Low threats */
+  --chart-4: #16a34a; /* Green: Safe traffic */
+  --chart-5: #7c3aed; /* Purple: Security policies */
+  --radius: 0.625rem;
+  /* Security-specific colors */
+  --security-critical: #dc2626; /* Critical threats */
+  --security-high: #ea580c; /* High risk */
+  --security-medium: #f59e0b; /* Medium risk */
+  --security-low: #16a34a; /* Low risk/Safe */
+  --security-info: #000000; /* Information */
+  --security-config: #7c3aed; /* Configuration */
+  --sidebar: #f8fafc;
+  --sidebar-foreground: #0a0e27;
+  --sidebar-primary: #000000;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e2e8f0;
+  --sidebar-accent-foreground: #0a0e27;
+  --sidebar-border: #e2e8f0;
+  --sidebar-ring: #000000;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-security-critical: var(--security-critical);
+  --color-security-high: var(--security-high);
+  --color-security-medium: var(--security-medium);
+  --color-security-low: var(--security-low);
+  --color-security-info: var(--security-info);
+  --color-security-config: var(--security-config);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground font-normal;
+  }
+
+  /* Cloudflare-style typography system */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+  }
+
+  /* Strong emphasis for primary headings */
+  h1, h2 {
+    @apply font-bold;
+  }
+
+  /* Labels and UI metadata - medium weight */
+  label, small, .text-muted-foreground, .text-sm, .text-xs {
+    @apply font-medium;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+
+@layer utilities {
+  .animate-slide-in {
+    animation: slide-in 0.5s ease-out;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite;
+  }
+
+
+  /* Security-focused typography */
+  .security-text-critical {
+    @apply font-medium text-red-600;
+  }
+
+  .security-text-high {
+    @apply font-medium text-amber-600;
+  }
+
+  .security-text-medium {
+    @apply font-medium text-muted-foreground;
+  }
+
+  .security-text-info {
+    @apply font-medium text-muted-foreground;
+  }
+
+  .security-text-technical {
+    @apply font-mono text-muted-foreground text-sm;
+  }
+
+  .security-ip-address {
+    @apply font-mono text-security-info bg-security-info/10 px-1.5 py-0.5 rounded text-xs;
+  }
+
+  .security-endpoint {
+    @apply font-mono text-security-config bg-security-config/10 px-1.5 py-0.5 rounded text-xs;
+  }
+
+  .security-hash {
+    @apply font-mono text-muted-foreground text-xs bg-muted/50 px-1 py-0.5 rounded;
+  }
+
+  .security-text-metric {
+    @apply font-semibold text-foreground text-2xl;
+  }
+
+  .security-text-label {
+    @apply font-medium text-muted-foreground text-sm;
+  }
+}
