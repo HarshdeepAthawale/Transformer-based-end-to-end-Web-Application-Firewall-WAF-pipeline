@@ -36,6 +36,8 @@ data/normalized/*
 data/training/*
 data/validation/*
 data/test/*
+data/benign/*.json
+data/malicious/*.json
 !data/*/.gitkeep
 
 # Models
