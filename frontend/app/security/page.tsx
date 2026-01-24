@@ -4,12 +4,11 @@ import { useEffect, useState } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { Card } from '@/components/ui/card'
-import { useState as useReactState } from 'react'
 import { CheckCircle, AlertCircle, Lock, Key, Shield, Loader2, XCircle } from 'lucide-react'
 import { securityApi, SecurityCheck } from '@/lib/api'
 
 export default function SecurityPage() {
-  const [timeRange, setTimeRange] = useReactState('24h')
+  const [timeRange, setTimeRange] = useState('24h')
   const [securityChecks, setSecurityChecks] = useState<SecurityCheck[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

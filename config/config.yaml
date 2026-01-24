@@ -143,3 +143,23 @@ evaluation:
   threshold_method: "f1_maximize"  # Options: "f1_maximize", "target_fpr", "roc_optimal"
   use_malicious_payloads: true
   report_dir: "reports"
+
+# API Server Configuration
+api_server:
+  host: "0.0.0.0"
+  port: 3001
+  workers: 4
+  database:
+    url: "sqlite:///./data/waf_dashboard.db"
+  websocket:
+    enabled: true
+    ping_interval: 30
+  data_retention:
+    metrics_days: 30
+    traffic_days: 7
+    alerts_days: 90
+    threats_days: 90
+  cors_origins: ["http://localhost:3000", "http://localhost:3001"]
+  log_ingestion:
+    enabled: true
+    log_path: "/var/log/nginx/access.log"  # Update with your log path
