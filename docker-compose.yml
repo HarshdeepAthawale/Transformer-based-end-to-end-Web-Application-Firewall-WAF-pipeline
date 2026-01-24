@@ -1,0 +1,33 @@
+# Transformer-based WAF Pipeline - Docker Compose
+# Mount project from SSD; run training via: docker compose run --rm train <args>
+
+services:
+  train:
+    build: .
+    image: waf-pipeline-train:latest
+    container_name: waf-train
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    # Override CMD when running: docker compose run --rm train python scripts/train_model.py ...
+    command: ["python", "scripts/train_model.py", "--help"]
+
+  # Optional: shell for debugging
+  shell:
+    build: .
+    image: waf-pipeline-train:latest
+    container_name: waf-shell
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    profiles:
+      - debug
+    command: ["bash"]
