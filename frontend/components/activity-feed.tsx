@@ -18,9 +18,15 @@ export function ActivityFeed() {
         if (response.success) {
           setActivities(response.data)
         }
-      } catch (err) {
-        console.error('[ActivityFeed] Failed to fetch activities:', err)
-        setError('Failed to load activities')
+      } catch (err: any) {
+        // Only show error if it's not a network error (backend not running)
+        if (err?.isNetworkError) {
+          console.debug('[ActivityFeed] Backend not available')
+          setError(null) // Don't show error for network issues
+        } else {
+          console.error('[ActivityFeed] Failed to fetch activities:', err)
+          setError('Failed to load activities')
+        }
       } finally {
         setIsLoading(false)
       }

@@ -27,18 +27,11 @@ class TestWAFServiceIntegration:
 
     @pytest.fixture(scope="class")
     def waf_service(self):
-        """Start WAF service for testing"""
-        # Initialize with real model
-        model_path = "models/checkpoints/best_model.pt"
-        vocab_path = "models/vocabularies/http_vocab.json"
-
-        # Skip if model files don't exist
-        if not Path(model_path).exists() or not Path(vocab_path).exists():
-            pytest.skip("Model or vocabulary files not found")
-
+        """Start WAF service for testing - placeholder mode (ML removed)"""
+        # Initialize in placeholder mode (no ML dependencies)
         initialize_waf_service(
-            model_path=model_path,
-            vocab_path=vocab_path,
+            model_path=None,
+            vocab_path=None,
             threshold=0.5
         )
 
@@ -55,8 +48,9 @@ class TestWAFServiceIntegration:
         data = response.json()
         assert data["status"] == "healthy"
         assert data["service"] == "waf"
-        assert data["model_loaded"] == True
-        assert "vocab_size" in data
+        assert data["model_loaded"] == False  # ML removed - placeholder mode
+        assert "mode" in data
+        assert data["mode"] == "placeholder"
         assert "device" in data
         assert "threshold" in data
 
@@ -243,18 +237,10 @@ class TestWAFServiceEndToEnd:
 
     @pytest.fixture(scope="class")
     def server_process(self):
-        """Start WAF service server for end-to-end testing"""
-        model_path = "models/checkpoints/best_model.pt"
-        vocab_path = "models/vocabularies/http_vocab.json"
-
-        if not Path(model_path).exists() or not Path(vocab_path).exists():
-            pytest.skip("Model files not found")
-
-        # Start server process
+        """Start WAF service server for end-to-end testing - placeholder mode"""
+        # Start server process in placeholder mode (no ML dependencies)
         cmd = [
             sys.executable, "scripts/start_waf_service.py",
-            "--model_path", model_path,
-            "--vocab_path", vocab_path,
             "--host", "127.0.0.1",
             "--port", "8888",
             "--workers", "1"
@@ -312,23 +298,17 @@ class TestWAFServiceEndToEnd:
 
 
 def test_waf_service_initialization():
-    """Test WAF service initialization"""
-    model_path = "models/checkpoints/best_model.pt"
-    vocab_path = "models/vocabularies/http_vocab.json"
-
-    if not Path(model_path).exists() or not Path(vocab_path).exists():
-        pytest.skip("Model files not found")
-
-    # Should not raise exception
+    """Test WAF service initialization - placeholder mode"""
+    # Initialize in placeholder mode (no ML dependencies)
     initialize_waf_service(
-        model_path=model_path,
-        vocab_path=vocab_path,
+        model_path=None,
+        vocab_path=None,
         threshold=0.5
     )
 
     # Import and check
     from integration.waf_service import waf_service
     assert waf_service is not None
-    assert hasattr(waf_service, 'tokenizer')
-    assert hasattr(waf_service, 'model')
-    assert hasattr(waf_service, 'scorer')
+    assert hasattr(waf_service, 'check_request')
+    assert hasattr(waf_service, 'get_metrics')
+    # ML components removed - no tokenizer, model, or scorer

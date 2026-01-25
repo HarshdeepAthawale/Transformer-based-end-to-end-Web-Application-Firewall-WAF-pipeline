@@ -32,8 +32,24 @@ export function useRealTimeData() {
         setConnectionStatus('connected')
       }
     } catch (err) {
-      console.error('[useRealTimeData] Failed to fetch metrics:', err)
-      setError(err instanceof ApiError ? err.message : 'Failed to fetch metrics')
+      // Check if it's a network error (backend not running)
+      const isNetworkError = err instanceof ApiError && 
+        (err.status === 0 || (err as any).isNetworkError)
+      
+      if (isNetworkError) {
+        // Network errors are expected if backend isn't running
+        // Don't log as error, just set offline status
+        console.debug('[useRealTimeData] Backend not available, will retry')
+        setError(null) // Don't show error for connection issues
+      } else if (err instanceof ApiError && err.status !== 0) {
+        // Actual API error (not network)
+        console.error('[useRealTimeData] Failed to fetch metrics:', err)
+        setError(err.message)
+      } else {
+        // Other errors
+        console.debug('[useRealTimeData] Error fetching metrics:', err)
+        setError(null)
+      }
       setIsOnline(false)
       setConnectionStatus('disconnected')
     } finally {
@@ -43,40 +59,50 @@ export function useRealTimeData() {
 
   // WebSocket connection and real-time updates
   useEffect(() => {
-    let reconnectTimeout: NodeJS.Timeout
+    // Update connection status based on WebSocket manager state
+    const updateConnectionStatus = () => {
+      const status = wsManager.connectionStatus
+      setConnectionStatus(status)
+      setIsOnline(status === 'connected')
+    }
 
+    // Initial connection attempt (non-blocking)
     const connectWebSocket = async () => {
       try {
         setConnectionStatus('connecting')
-        await wsManager.connect()
-        setConnectionStatus('connected')
-        setIsOnline(true)
-
-        // Subscribe to real-time metrics updates
-        wsManager.subscribe('metrics', (data: RealTimeMetrics) => {
-          setMetrics(data)
-          setLastUpdate(new Date(data.timestamp || Date.now()))
-          setIsOnline(true)
-          setError(null)
+        // Don't await - let it connect in background
+        wsManager.connect().then(() => {
+          updateConnectionStatus()
+        }).catch(() => {
+          // Connection failed - WebSocket manager will handle reconnection
+          // This is expected if backend isn't running, so don't log as error
+          updateConnectionStatus()
         })
-
-        // Subscribe to connection status updates
-        wsManager.subscribe('connection', (status: 'connected' | 'disconnected') => {
-          setConnectionStatus(status)
-          setIsOnline(status === 'connected')
-        })
-
       } catch (err) {
-        console.error('[useRealTimeData] WebSocket connection failed:', err)
-        setConnectionStatus('disconnected')
-        setIsOnline(false)
-
-        // Attempt to reconnect after delay
-        reconnectTimeout = setTimeout(connectWebSocket, 5000)
+        // Silently handle - WebSocket manager will retry
+        updateConnectionStatus()
       }
     }
 
+    // Subscribe to real-time metrics updates
+    const handleMetricsUpdate = (data: RealTimeMetrics) => {
+      setMetrics(data)
+      setLastUpdate(new Date(data.timestamp || Date.now()))
+      setIsOnline(true)
+      setError(null)
+      updateConnectionStatus()
+    }
+
+    // Subscribe to metrics updates
+    wsManager.subscribe('metrics', handleMetricsUpdate)
+
+    // Initial connection attempt
     connectWebSocket()
+
+    // Monitor connection status periodically
+    const statusCheckInterval = setInterval(() => {
+      updateConnectionStatus()
+    }, 2000) // Check every 2 seconds
 
     // Fallback polling every 30 seconds if WebSocket fails
     const pollingInterval = setInterval(() => {
@@ -89,9 +115,10 @@ export function useRealTimeData() {
     fetchMetrics()
 
     return () => {
-      clearTimeout(reconnectTimeout)
+      clearInterval(statusCheckInterval)
       clearInterval(pollingInterval)
-      wsManager.disconnect()
+      wsManager.unsubscribe('metrics')
+      // Don't disconnect - let other components use the connection
     }
   }, [fetchMetrics])
 

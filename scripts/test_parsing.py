@@ -10,9 +10,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.parsing.pipeline import ParsingPipeline
-from src.parsing.log_parser import LogParser
-from src.parsing.normalizer import RequestNormalizer
+from backend.ml.parsing.pipeline import ParsingPipeline
+from backend.ml.parsing.log_parser import LogParser
+from backend.ml.parsing.normalizer import RequestNormalizer
 from loguru import logger
 
 
@@ -37,7 +37,7 @@ def test_normalizer():
     """Test request normalizer"""
     logger.info("Testing normalizer...")
     
-    from src.parsing.log_parser import HTTPRequest
+    from backend.ml.parsing.log_parser import HTTPRequest
     
     request = HTTPRequest(
         method="GET",

@@ -6,10 +6,10 @@ from pathlib import Path
 import tempfile
 import gzip
 
-from src.ingestion.batch_reader import BatchLogReader
-from src.ingestion.log_formats import LogFormatDetector, LogFormat
-from src.ingestion.stream_reader import StreamLogReader
-from src.ingestion.log_queue import LogQueue
+from backend.ml.ingestion.batch_reader import BatchLogReader
+from backend.ml.ingestion.log_formats import LogFormatDetector, LogFormat
+from backend.ml.ingestion.stream_reader import StreamLogReader
+from backend.ml.ingestion.log_queue import LogQueue
 
 
 def test_format_detection():

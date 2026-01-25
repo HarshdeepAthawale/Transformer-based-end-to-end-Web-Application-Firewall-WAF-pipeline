@@ -2,9 +2,9 @@
 Unit tests for parsing system
 """
 import pytest
-from src.parsing.log_parser import LogParser, HTTPRequest
-from src.parsing.normalizer import RequestNormalizer
-from src.parsing.pipeline import ParsingPipeline
+from backend.ml.parsing.log_parser import LogParser, HTTPRequest
+from backend.ml.parsing.normalizer import RequestNormalizer
+from backend.ml.parsing.pipeline import ParsingPipeline
 
 
 def test_nginx_parsing():

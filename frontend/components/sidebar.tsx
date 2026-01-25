@@ -14,6 +14,13 @@ import {
   Eye,
   Zap,
   Lock,
+  Ban,
+  Globe,
+  Bot,
+  FileSearch,
+  FileText,
+  Users,
+  ClipboardList,
 } from 'lucide-react'
 
 export function Sidebar() {
@@ -28,6 +35,13 @@ export function Sidebar() {
     { icon: AlertTriangle, label: 'Threats', href: '/threats' },
     { icon: Zap, label: 'Performance', href: '/performance' },
     { icon: Lock, label: 'Security', href: '/security' },
+    { icon: Ban, label: 'IP Management', href: '/ip-management' },
+    { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
+    { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
+    { icon: FileSearch, label: 'Threat Intel', href: '/threat-intelligence' },
+    { icon: ClipboardList, label: 'Security Rules', href: '/security-rules' },
+    { icon: Users, label: 'Users', href: '/users' },
+    { icon: FileText, label: 'Audit Logs', href: '/audit-logs' },
   ]
 
   const isActive = (href: string) => {

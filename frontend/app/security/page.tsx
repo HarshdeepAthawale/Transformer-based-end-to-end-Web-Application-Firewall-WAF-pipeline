@@ -6,6 +6,7 @@ import { Header } from '@/components/header'
 import { Card } from '@/components/ui/card'
 import { CheckCircle, AlertCircle, Lock, Key, Shield, Loader2, XCircle } from 'lucide-react'
 import { securityApi, SecurityCheck } from '@/lib/api'
+import { ErrorBoundary } from '@/components/error-boundary'
 
 export default function SecurityPage() {
   const [timeRange, setTimeRange] = useState('24h')
@@ -33,9 +34,15 @@ export default function SecurityPage() {
         if (scoreResponse.success) {
           setSecurityScore(scoreResponse.data.score)
         }
-      } catch (err) {
-        console.error('[SecurityPage] Failed to fetch security data:', err)
-        setError('Failed to load security data')
+      } catch (err: any) {
+        // Only show error if it's not a network error (backend not running)
+        if (err?.isNetworkError) {
+          console.debug('[SecurityPage] Backend not available')
+          setError(null) // Don't show error for network issues
+        } else {
+          console.error('[SecurityPage] Failed to fetch security data:', err)
+          setError('Failed to load security data')
+        }
       } finally {
         setIsLoading(false)
       }
@@ -102,7 +109,8 @@ export default function SecurityPage() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header timeRange={timeRange} onTimeRangeChange={setTimeRange} />
         <main className="flex-1 overflow-auto">
-          <div className="p-6 space-y-6">
+          <ErrorBoundary>
+            <div className="p-6 space-y-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Security Settings</h2>
               <p className="text-muted-foreground">Manage security policies and compliance settings</p>
@@ -176,7 +184,8 @@ export default function SecurityPage() {
                 ))}
               </div>
             </Card>
-          </div>
+            </div>
+          </ErrorBoundary>
         </main>
       </div>
     </div>
