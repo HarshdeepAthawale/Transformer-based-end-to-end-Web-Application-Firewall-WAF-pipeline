@@ -11,7 +11,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.ingestion.ingestion import LogIngestionSystem
+from backend.ml.ingestion.ingestion import LogIngestionSystem
 from loguru import logger
 import time
 

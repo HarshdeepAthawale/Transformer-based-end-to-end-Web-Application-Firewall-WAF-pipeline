@@ -28,6 +28,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 # Copy project (respects .dockerignore)
 COPY config/ config/
+COPY backend/ backend/
 COPY src/ src/
 COPY scripts/ scripts/
 COPY tests/ tests/

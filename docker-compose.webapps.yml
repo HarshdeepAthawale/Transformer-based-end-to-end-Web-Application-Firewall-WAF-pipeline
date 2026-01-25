@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # App 1: OWASP Juice Shop
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    container_name: waf-juice-shop
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - juice-shop-data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - waf-network
+
+  # App 2: OWASP WebGoat
+  webgoat:
+    image: webgoat/goatandwolf:latest
+    container_name: waf-webgoat
+    ports:
+      - "8081:8080"
+    environment:
+      - JAVA_OPTS=-Xmx512m
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/WebGoat/login"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    networks:
+      - waf-network
+
+  # App 3: DVWA (Damn Vulnerable Web Application)
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: waf-dvwa
+    ports:
+      - "8082:80"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    volumes:
+      - dvwa-data:/var/lib/mysql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - waf-network
+
+volumes:
+  juice-shop-data:
+  dvwa-data:
+
+networks:
+  waf-network:
+    name: waf-webapps-network

@@ -11,8 +11,8 @@ import argparse
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from src.parsing.pipeline import ParsingPipeline
-from src.ingestion.ingestion import LogIngestionSystem
+from backend.ml.parsing.pipeline import ParsingPipeline
+from backend.ml.ingestion.ingestion import LogIngestionSystem
 from loguru import logger
 from datetime import datetime
 

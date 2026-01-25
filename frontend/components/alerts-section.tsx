@@ -18,9 +18,15 @@ export function AlertsSection() {
         if (response.success) {
           setAlerts(response.data)
         }
-      } catch (err) {
-        console.error('[AlertsSection] Failed to fetch alerts:', err)
-        setError('Failed to load alerts')
+      } catch (err: any) {
+        // Only show error if it's not a network error (backend not running)
+        if (err?.isNetworkError) {
+          console.debug('[AlertsSection] Backend not available')
+          setError(null) // Don't show error for network issues
+        } else {
+          console.error('[AlertsSection] Failed to fetch alerts:', err)
+          setError('Failed to load alerts')
+        }
       } finally {
         setIsLoading(false)
       }
