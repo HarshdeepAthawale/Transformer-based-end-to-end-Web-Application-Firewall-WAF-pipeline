@@ -32,11 +32,12 @@ isProject: false
 
 This project implements a complete **Transformer-based Web Application Firewall (WAF)** system with:
 
-- **ML Pipeline**: DistilBERT-based anomaly detection
+- **ML Pipeline**: DistilBERT-based anomaly detection (integrated in `backend/ml/`)
 - **Backend API**: FastAPI server with comprehensive WAF middleware
 - **Frontend Dashboard**: Next.js real-time monitoring interface
 - **Advanced Features**: IP management, geo-fencing, bot detection, threat intelligence
 - **Continuous Learning**: Incremental fine-tuning and model updates
+- **Unified Structure**: All components consolidated in `backend/` folder for better organization
 
 ## Architecture Overview
 
@@ -62,7 +63,16 @@ flowchart TB
     Normalizer --> Tokenizer[Tokenizer]
     Tokenizer --> Training[Model Training]
     Training --> Model
+    
+    subgraph Backend[Backend Structure]
+        ML[backend/ml/]
+        Routes[backend/routes/]
+        Services[backend/services/]
+        Middleware[backend/middleware/]
+    end
 ```
+
+**Note**: All ML components are now integrated into `backend/ml/` structure for unified codebase organization.
 
 ## Component Analysis
 
@@ -70,11 +80,11 @@ flowchart TB
 
 #### ✅ Completed Components:
 
-- **Log Ingestion** (`src/ingestion/`): Batch and streaming log readers
-- **Request Parsing** (`src/parsing/`): HTTP log parser, normalizer, serializer
-- **Tokenization** (`src/tokenization/`): HTTP-aware tokenizer, vocabulary builder, sequence preparator
-- **Model Architecture** (`src/model/`): DistilBERT-based AnomalyDetector
-- **Training Pipeline** (`src/training/`): Complete trainer with early stopping, multiple loss functions, evaluator
+- **Log Ingestion** (`backend/ml/ingestion/`): Batch and streaming log readers
+- **Request Parsing** (`backend/ml/parsing/`): HTTP log parser, normalizer, serializer
+- **Tokenization** (`backend/ml/tokenization/`): HTTP-aware tokenizer, vocabulary builder, sequence preparator
+- **Model Architecture** (`backend/ml/model/`): DistilBERT-based AnomalyDetector
+- **Training Pipeline** (`backend/ml/training/`): Complete trainer with early stopping, multiple loss functions, evaluator
 
 #### ⚠️ Gaps Identified:
 
@@ -88,11 +98,12 @@ flowchart TB
 
 #### ✅ Completed Components:
 
-- **WAF Service** (`src/integration/waf_service.py`): Full FastAPI service with async inference
+- **WAF Service** (`backend/ml/waf_service.py`): Full FastAPI service with async inference (integrated into backend)
 - **WAF Middleware** (`backend/middleware/waf_middleware.py`): Request interception and blocking
-- **WAF Factory** (`backend/core/waf_factory.py`): Centralized service creation
+- **WAF Factory** (`backend/core/waf_factory.py`): Centralized service creation with ML model loading
 - **Async Processing**: Thread pool executor, timeout handling, batch processing
 - **Model Optimization**: Quantization support, TorchScript support
+- **Backend Integration**: All ML components now integrated into `backend/ml/` structure
 
 #### ⚠️ Gaps Identified:
 
@@ -147,12 +158,12 @@ flowchart TB
 
 #### ✅ Completed Components:
 
-- **Data Collector** (`src/learning/data_collector.py`): Incremental data collection
-- **Fine-Tuning** (`src/learning/fine_tuning.py`): Complete fine-tuning pipeline
-- **Version Manager** (`src/learning/version_manager.py`): Model versioning
-- **Hot Swap** (`src/learning/hot_swap.py`): Model hot-swapping
-- **Validator** (`src/learning/validator.py`): Model validation before deployment
-- **Scheduler** (`src/learning/scheduler.py`): Periodic update scheduling
+- **Data Collector** (`backend/ml/learning/data_collector.py`): Incremental data collection
+- **Fine-Tuning** (`backend/ml/learning/fine_tuning.py`): Complete fine-tuning pipeline
+- **Version Manager** (`backend/ml/learning/version_manager.py`): Model versioning
+- **Hot Swap** (`backend/ml/learning/hot_swap.py`): Model hot-swapping
+- **Validator** (`backend/ml/learning/validator.py`): Model validation before deployment
+- **Scheduler** (`backend/ml/learning/scheduler.py`): Periodic update scheduling
 
 #### ⚠️ Gaps Identified:
 
@@ -224,15 +235,17 @@ flowchart TB
 
 | Phase 10: Deployment | ⚠️ Partial | 70% | Dev ready, needs production setup |
 
-## Overall Project Completion: **~85%**
+## Overall Project Completion: **~90%**
 
 ### Strengths:
 
-1. **Comprehensive Architecture**: All major components implemented
-2. **Code Quality**: Well-structured, modular, follows best practices
-3. **Feature Completeness**: Advanced features (IP management, geo-fencing, etc.) implemented
-4. **Documentation**: Extensive documentation in `docs/` directory
-5. **Real-time Capabilities**: WebSocket integration for live updates
+1. **Comprehensive Architecture**: All major components implemented and integrated
+2. **Unified Codebase**: All ML components consolidated in `backend/ml/` structure
+3. **Code Quality**: Well-structured, modular, follows best practices
+4. **Feature Completeness**: Advanced features (IP management, geo-fencing, etc.) implemented
+5. **Documentation**: Extensive documentation in `docs/` directory
+6. **Real-time Capabilities**: WebSocket integration for live updates
+7. **Backend Integration**: ML components fully integrated with backend services
 
 ### Critical Gaps:
 
@@ -345,21 +358,24 @@ flowchart TB
 ### Model Training:
 
 - `scripts/train_model.py` - Main training script
-- `scripts/build_vocabulary.py` - Vocabulary builder
-- `scripts/prepare_training_dataset.py` - Dataset preparation
-- `src/training/train.py` - Training pipeline
+- `scripts/generate_vocabulary.py` - Vocabulary builder
+- `scripts/generate_training_data.py` - Dataset preparation
+- `backend/ml/training/train.py` - Training pipeline
 
 ### WAF Service:
 
-- `src/integration/waf_service.py` - WAF service implementation
+- `backend/ml/waf_service.py` - WAF service implementation (integrated into backend)
 - `backend/middleware/waf_middleware.py` - Request interception
-- `backend/core/waf_factory.py` - Service creation
+- `backend/core/waf_factory.py` - Service creation with ML model loading
 
 ### Testing:
 
-- `scripts/test_waf_detection.py` - WAF detection tests
+- `scripts/test_ml_detection.py` - ML detection tests (updated imports)
 - `tests/payloads/malicious_payloads.py` - Test payloads
-- `scripts/test_model_inference.py` - Model inference tests
+- `tests/integration/test_ml_pipeline.py` - ML pipeline integration tests
+- `tests/integration/test_training.py` - Training pipeline tests
+- `tests/unit/test_parsing.py` - Parsing unit tests (updated imports)
+- `tests/unit/test_ingestion.py` - Ingestion unit tests (updated imports)
 
 ## Recommendations
 
@@ -369,8 +385,52 @@ flowchart TB
 4. **Security**: Integrate authentication before production use
 5. **Monitoring**: Set up proper monitoring and alerting
 
+## Recent Changes (Integration Update)
+
+### ✅ Completed Integration (Latest):
+
+- **Unified Structure**: All `src/` components moved to `backend/ml/` for unified codebase
+- **Import Updates**: All imports updated from `src.*` to `backend.ml.*` across:
+  - Backend services and middleware
+  - All training and testing scripts
+  - All test files (unit and integration)
+  - Example scripts
+- **WAF Service**: Integrated into backend structure (`backend/ml/waf_service.py`)
+- **Utilities**: Rate limiter and other utils moved to `backend/utils/`
+- **WAF Factory**: Updated to load ML models from `backend.ml.waf_service`
+- **Log Processor**: Updated to use `backend.ml` imports
+- **All Scripts**: Training, data generation, and testing scripts updated
+- **All Tests**: Unit and integration tests updated with new paths
+
+### Benefits of Integration:
+
+1. **Single Source of Truth**: All code in one `backend/` directory
+2. **Easier Navigation**: ML components clearly organized under `backend/ml/`
+3. **Better Imports**: Consistent `backend.*` import structure
+4. **Simplified Deployment**: Single backend package to deploy
+5. **Improved Maintainability**: Related code grouped together
+
+### New Structure:
+
+```
+backend/
+├── ml/                    # All ML components (NEW)
+│   ├── ingestion/        # Log ingestion
+│   ├── parsing/           # Request parsing
+│   ├── tokenization/      # Tokenization
+│   ├── model/             # Model architecture
+│   ├── training/          # Training pipeline
+│   ├── learning/          # Continuous learning
+│   └── waf_service.py    # WAF service
+├── routes/                # API routes
+├── services/              # Business logic
+├── middleware/            # Request middleware
+├── tasks/                 # Background tasks
+└── utils/                 # Utilities
+```
+
 ## Conclusion
 
-The project is **85% complete** with excellent architecture and comprehensive feature set. The main blocker is the **missing trained model**. Once the model is trained and validated, the system should be fully functional. The codebase is production-ready in terms of structure, but needs integration testing, security hardening, and production deployment configuration.
+The project is **~90% complete** with excellent architecture and comprehensive feature set. The codebase has been **fully integrated** with all ML components consolidated in the `backend/` folder. The main blocker remains the **missing trained model**. Once the model is trained and validated, the system should be fully functional. The codebase is production-ready in terms of structure and organization, but needs integration testing, security hardening, and production deployment configuration.
 
-**Estimated Time to Production-Ready**: 4-6 weeks with focused effort on model training, testing, and production hardening.
+**Estimated Time to Production-Ready**: 3-5 weeks with focused effort on model training, testing, and production hardening.

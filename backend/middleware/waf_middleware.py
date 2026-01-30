@@ -41,6 +41,7 @@ class WAFMiddleware(BaseHTTPMiddleware):
             '/openapi.json',
             '/api/debug/routes',
             '/api/waf/check',  # Don't check WAF check endpoint itself
+            '/api/waf/check/batch',  # Batch check endpoint
             '/api/waf/stats',
             '/api/waf/config',
             '/api/waf/model-info',

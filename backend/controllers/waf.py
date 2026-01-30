@@ -117,28 +117,41 @@ def update_config(threshold: float, waf_service: Any = None) -> Dict:
 def get_model_info(waf_service: Any = None) -> Dict:
     svc = waf_service or get_waf_service()
     root = _project_root()
-    model_path = root / "models" / "checkpoints" / "best_model.pt"
-    vocab_path = root / "models" / "vocabularies" / "http_vocab.json"
+    # HuggingFace transformer model path
+    model_dir = root / "models" / "waf-distilbert"
+    model_file = model_dir / "model.safetensors"
+    config_file = model_dir / "config.json"
+    tokenizer_file = model_dir / "tokenizer.json"
+
     init_error = None
     if svc is None:
-        if not model_path.exists():
-            init_error = f"Model file not found: {model_path}"
-        elif not vocab_path.exists():
-            init_error = f"Vocab file not found: {vocab_path}"
+        if not model_dir.exists():
+            init_error = f"Model directory not found: {model_dir}"
+        elif not model_file.exists():
+            init_error = f"Model file not found: {model_file}"
+        elif not config_file.exists():
+            init_error = f"Config file not found: {config_file}"
         else:
             init_error = "WAF service failed to initialize (check logs for details)"
+
+    # Get metrics if service is available
+    metrics = svc.get_metrics() if svc and hasattr(svc, "get_metrics") else {}
+
     return {
         "success": True,
         "data": {
-            "model_loaded": svc is not None,
-            "model_path": str(model_path),
-            "vocab_path": str(vocab_path),
-            "model_exists": model_path.exists(),
-            "vocab_exists": vocab_path.exists(),
+            "model_loaded": svc is not None and svc.is_loaded if svc else False,
+            "model_type": "distilbert-base-uncased (fine-tuned)",
+            "model_path": str(model_dir),
+            "model_exists": model_file.exists(),
+            "config_exists": config_file.exists(),
+            "tokenizer_exists": tokenizer_file.exists(),
             "threshold": svc.threshold if svc else 0.5,
+            "device": metrics.get("device", "unknown"),
             "version": "1.0.0",
             "initialization_error": init_error,
             "project_root": str(root),
+            "metrics": metrics,
         },
         "timestamp": datetime.utcnow().isoformat(),
     }
