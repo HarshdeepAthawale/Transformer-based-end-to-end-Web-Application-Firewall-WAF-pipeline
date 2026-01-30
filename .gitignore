@@ -44,6 +44,10 @@ data/malicious/*.json
 models/checkpoints/*
 models/vocabularies/*
 models/deployed/*
+models/waf-distilbert/checkpoint-*/*
+models/waf-distilbert/*.safetensors
+models/waf-distilbert/*.pt
+models/waf-distilbert/*.pth
 !models/*/.gitkeep
 
 # OS
