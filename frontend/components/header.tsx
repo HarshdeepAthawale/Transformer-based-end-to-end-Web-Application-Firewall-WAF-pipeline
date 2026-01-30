@@ -1,14 +1,13 @@
 'use client'
 
 import { ChevronDown, Search, Bell, Settings } from 'lucide-react'
-import { StatusIndicator } from './status-indicator'
 
 interface HeaderProps {
-  timeRange: string
-  onTimeRangeChange: (range: string) => void
+  timeRange?: string
+  onTimeRangeChange?: (range: string) => void
 }
 
-export function Header({ timeRange, onTimeRangeChange }: HeaderProps) {
+export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: HeaderProps) {
   const timeRanges = [
     { label: '1h', value: '1h' },
     { label: '6h', value: '6h' },

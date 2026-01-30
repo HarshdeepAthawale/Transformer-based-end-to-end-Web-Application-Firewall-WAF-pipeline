@@ -3,15 +3,19 @@
 .gitignore
 .gitattributes
 
-# Python
+# Python virtual environments (IMPORTANT - these are large!)
+venv/
+.venv/
+env/
+ENV/
+.env/
+
+# Python cache
 __pycache__
 *.py[cod]
 *$py.class
 *.so
 .Python
-env/
-venv/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -27,6 +31,9 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # IDE
 .vscode/
@@ -67,11 +74,11 @@ logs/*
 reports/*
 !reports/.gitkeep
 
-# Frontend (not needed for training)
+# Frontend (built separately)
 frontend/
 node_modules/
 
-# Applications (not needed for training)
+# Applications (demo apps - not needed)
 applications/
 
 # Documentation
@@ -79,15 +86,46 @@ docs/
 *.md
 !README.md
 
-# Plans
-.cursor/plans/
+# Plans and IDE
+.cursor/
 
 # Test files
+tests/
 test_*.py
 *_test.py
+conftest.py
 
-# Docker files (except the one we're using)
-docker-compose.yml
-docker-compose.waf.yml
-Dockerfile
-Dockerfile.waf
+# Notebooks (not needed for production)
+notebooks/
+*.ipynb
+.ipynb_checkpoints/
+
+# Backup folders
+*_backup/
+src_backup/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Large model checkpoints (keep only deployed model)
+models/checkpoints/
+models/*/checkpoint-*
+models/*/training_args/
+
+# Jupyter/IPython
+.ipython/
+.jupyter/
+
+# Coverage
+.coverage
+htmlcov/
+.tox/
+
+# Docker files themselves
+Dockerfile*
+!backend/Dockerfile
+docker-compose*.yml
+docker/

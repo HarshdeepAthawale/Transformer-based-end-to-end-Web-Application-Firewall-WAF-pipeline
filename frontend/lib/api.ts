@@ -100,9 +100,9 @@ export interface ApiResponse<T> {
 }
 
 export interface WebSocketMessage {
-  type: 'metrics' | 'alert' | 'activity' | 'threat' | 'traffic'
+  type: 'metrics' | 'alert' | 'activity' | 'threat' | 'traffic' | 'connection' | 'subscribed' | 'unsubscribed'
   data: any
-  timestamp: string
+  timestamp?: string
 }
 
 // API Error class
