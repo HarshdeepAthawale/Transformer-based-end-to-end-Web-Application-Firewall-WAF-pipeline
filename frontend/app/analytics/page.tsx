@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { Card } from '@/components/ui/card'
@@ -13,6 +14,7 @@ import { ErrorBoundary } from '@/components/error-boundary'
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d']
 
 export default function AnalyticsPage() {
+  const pathname = usePathname()
   const [timeRange, setTimeRange] = useState('24h')
   const [analyticsData, setAnalyticsData] = useState<ChartDataPoint[]>([])
   const [summary, setSummary] = useState<Record<string, any>>({})
@@ -25,6 +27,10 @@ export default function AnalyticsPage() {
       try {
         setIsLoading(true)
         setError(null)
+        // Clear previous data when navigating to this page
+        setAnalyticsData([])
+        setSummary({})
+
         const [overviewResponse, summaryResponse] = await Promise.all([
           analyticsApi.getOverview(timeRange),
           analyticsApi.getSummary(timeRange)
@@ -70,7 +76,7 @@ export default function AnalyticsPage() {
     return () => {
       wsManager.unsubscribe('metrics')
     }
-  }, [timeRange])
+  }, [pathname, timeRange])
 
   // Prepare pie chart data for attack types
   const attackTypeData = [

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { Card } from '@/components/ui/card'
@@ -14,12 +15,13 @@ import { threatsApi, ThreatData, wsManager } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
 
 export default function ThreatsPage() {
+  const pathname = usePathname()
   const [timeRange, setTimeRange] = useState('24h')
   const [threats, setThreats] = useState<ThreatData[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [threatStats, setThreatStats] = useState<Record<string, number>>({})
-  
+
   // Filtering state
   const [searchQuery, setSearchQuery] = useState('')
   const [severityFilter, setSeverityFilter] = useState<string>('all')
@@ -34,6 +36,10 @@ export default function ThreatsPage() {
       try {
         setIsLoading(true)
         setError(null)
+        // Clear previous data when navigating to this page
+        setThreats([])
+        setThreatStats({})
+
         const [threatsResponse, statsResponse] = await Promise.all([
           threatsApi.getByTimeRange(timeRange),
           threatsApi.getStats(timeRange)
@@ -70,7 +76,7 @@ export default function ThreatsPage() {
     return () => {
       wsManager.unsubscribe('threat')
     }
-  }, [timeRange])
+  }, [pathname, timeRange])
 
   // Filter threats
   const filteredThreats = useMemo(() => {

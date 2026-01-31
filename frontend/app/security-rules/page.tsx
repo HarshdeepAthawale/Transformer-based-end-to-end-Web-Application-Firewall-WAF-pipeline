@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { ErrorBoundary } from '@/components/error-boundary'
@@ -14,6 +15,7 @@ import { securityRulesApi, SecurityRule } from '@/lib/api'
 import { Shield, Plus, Search, FileText, AlertCircle } from 'lucide-react'
 
 export default function SecurityRulesPage() {
+  const pathname = usePathname()
   const [rules, setRules] = useState<SecurityRule[]>([])
   const [owaspRules, setOwaspRules] = useState<SecurityRule[]>([])
   const [activeTab, setActiveTab] = useState<'custom' | 'owasp'>('custom')
@@ -32,9 +34,14 @@ export default function SecurityRulesPage() {
   const [newOwaspCategory, setNewOwaspCategory] = useState('')
 
   useEffect(() => {
+    // Clear previous data when navigating to this page
+    setRules([])
+    setOwaspRules([])
+    setError(null)
+
     fetchRules()
     fetchOwaspRules()
-  }, [])
+  }, [pathname])
 
   const fetchRules = async () => {
     setLoading(true)

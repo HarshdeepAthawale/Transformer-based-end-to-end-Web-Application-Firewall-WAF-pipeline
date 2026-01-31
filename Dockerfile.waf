@@ -21,8 +21,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy source code
-COPY src/ ./src/
+COPY backend/ ./backend/
+COPY config/ ./config/
 COPY scripts/start_waf_service.py ./scripts/
+COPY models/ ./models/
 
 # Create necessary directories
 RUN mkdir -p /app/models /app/config /app/logs

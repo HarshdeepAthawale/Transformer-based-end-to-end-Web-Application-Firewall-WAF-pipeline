@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useMemo, useRef, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { Card } from '@/components/ui/card'
@@ -111,6 +112,7 @@ function formatTimeIST(timestamp: string | Date): string {
 }
 
 export default function TrafficPage() {
+  const pathname = usePathname()
   const [timeRange, setTimeRange] = useState('24h')
   const [trafficData, setTrafficData] = useState<TrafficData[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -194,6 +196,11 @@ export default function TrafficPage() {
 
   // Fetch traffic data and set up real-time updates
   useEffect(() => {
+    // Reset state when navigating to this page
+    setIsLoading(true)
+    setError(null)
+
+    // Fetch fresh data
     fetchTraffic()
 
     // Subscribe to real-time traffic updates via WebSocket
@@ -202,13 +209,13 @@ export default function TrafficPage() {
         // Check if this log already exists (avoid duplicates)
         const exists = prev.some(t => t.timestamp === newTraffic.timestamp)
         if (exists) return prev
-        
+
         // Add new log at the top, keep latest 500 entries
         const updated = [newTraffic, ...prev.slice(0, 499)]
         setLastUpdateTime(new Date())
         return updated
       })
-      
+
       // Auto-scroll if user is near top
       if (shouldAutoScrollRef.current && tableContainerRef.current) {
         tableContainerRef.current.scrollTop = 0
@@ -236,7 +243,7 @@ export default function TrafficPage() {
       clearInterval(pollingInterval)
       clearInterval(backupPollingInterval)
     }
-  }, [fetchTraffic, isRealTime])
+  }, [pathname, fetchTraffic, isRealTime])
 
   // Filter and sort traffic data
   const filteredAndSortedData = useMemo(() => {

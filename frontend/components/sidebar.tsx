@@ -12,7 +12,6 @@ import {
   X,
   Home,
   Eye,
-  Zap,
   Lock,
   Ban,
   Globe,
@@ -33,8 +32,7 @@ export function Sidebar() {
     { icon: BarChart3, label: 'Analytics', href: '/analytics' },
     { icon: Eye, label: 'Traffic', href: '/traffic' },
     { icon: AlertTriangle, label: 'Threats', href: '/threats' },
-    { icon: Zap, label: 'Performance', href: '/performance' },
-    { icon: Lock, label: 'Security', href: '/security' },
+    
     { icon: Ban, label: 'IP Management', href: '/ip-management' },
     { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
     { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
