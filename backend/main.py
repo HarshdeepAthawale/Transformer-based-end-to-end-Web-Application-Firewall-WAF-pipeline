@@ -1,6 +1,7 @@
 """
 FastAPI Application Entry Point
 """
+
 import time
 from contextlib import asynccontextmanager
 
@@ -12,7 +13,15 @@ from loguru import logger
 
 from backend.config import config
 from backend.database import init_db, close_db
-from backend.routes import metrics, alerts, activities, charts, traffic, threats, security, analytics
+from backend.routes import (
+    metrics,
+    alerts,
+    activities,
+    charts,
+    traffic,
+    threats,
+    analytics,
+)
 from backend.routes import health, test, debug
 from backend.websocket import router as websocket_router
 
@@ -38,6 +47,7 @@ async def lifespan(app: FastAPI):
     # Create WAF service via core factory and store in app state
     try:
         from backend.core.waf_factory import create_waf_service
+
         app.state.waf_service = create_waf_service()
         if app.state.waf_service:
             logger.info("WAF service created and stored in app.state")
@@ -49,6 +59,7 @@ async def lifespan(app: FastAPI):
 
     # Start background workers
     from backend.tasks.scheduler import start_background_workers
+
     try:
         start_background_workers()
         logger.info("Background workers started")
@@ -68,7 +79,7 @@ app = FastAPI(
     title="WAF Dashboard API",
     description="API server for Transformer-based WAF Dashboard",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # CORS middleware
@@ -83,6 +94,7 @@ app.add_middleware(
 # Rate limiting - after CORS, before WAF
 try:
     from backend.middleware.rate_limit_middleware import RateLimitMiddleware
+
     app.add_middleware(RateLimitMiddleware)
 except Exception as e:
     logger.warning(f"Rate limit middleware not available: {e}")
@@ -105,6 +117,7 @@ except Exception as e:
 # Audit logging middleware
 try:
     from backend.middleware.audit_middleware import AuditMiddleware
+
     app.add_middleware(AuditMiddleware)
 except ImportError:
     logger.warning("Audit middleware not available")
@@ -153,6 +166,15 @@ app.include_router(health.router)
 app.include_router(test.router)
 app.include_router(debug.router)
 
+# Test target router - goes through WAF middleware (not in /api/ path)
+try:
+    from backend.routes import test_target
+
+    app.include_router(test_target.router, tags=["test-target"])
+    logger.info("✓ Registered routes: /test/*")
+except ImportError as e:
+    logger.warning(f"Test target routes not available: {e}")
+
 # Include routers
 app.include_router(metrics.router, prefix="/api/metrics", tags=["metrics"])
 app.include_router(alerts.router, prefix="/api/alerts", tags=["alerts"])
@@ -160,12 +182,13 @@ app.include_router(activities.router, prefix="/api/activities", tags=["activitie
 app.include_router(charts.router, prefix="/api/charts", tags=["charts"])
 app.include_router(traffic.router, prefix="/api/traffic", tags=["traffic"])
 app.include_router(threats.router, prefix="/api/threats", tags=["threats"])
-app.include_router(security.router, prefix="/api/security", tags=["security"])
+
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 
 # WAF service routes (includes /middleware-metrics)
 try:
     from backend.routes import waf
+
     app.include_router(waf.router, prefix="/api/waf", tags=["waf"])
     logger.info("✓ Registered routes: /api/waf")
 except ImportError as e:
@@ -204,10 +227,11 @@ if config.WEBSOCKET_ENABLED:
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "backend.main:app",
         host=config.API_HOST,
         port=config.API_PORT,
         workers=1,  # Use 1 worker for development
-        reload=True
+        reload=True,
     )

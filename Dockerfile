@@ -29,18 +29,13 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy project (respects .dockerignore)
 COPY config/ config/
 COPY backend/ backend/
-COPY src/ src/
 COPY scripts/ scripts/
-COPY tests/ tests/
-COPY examples/ examples/
 COPY data/ data/
 COPY models/ models/
-COPY docs/ docs/
-COPY summaries/ summaries/
 COPY README.md .
 
 # Ensure output dirs exist
 RUN mkdir -p reports logs
 
-# Default: run training help (override via docker run / compose)
-CMD ["python", "scripts/train_model.py", "--help"]
+# Default: run the backend API server
+CMD ["uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "3001"]

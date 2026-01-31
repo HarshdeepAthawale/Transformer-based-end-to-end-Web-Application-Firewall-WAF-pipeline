@@ -44,10 +44,12 @@ data/malicious/*.json
 models/checkpoints/*
 models/vocabularies/*
 models/deployed/*
+models/waf-distilbert-backup-*/
 models/waf-distilbert/checkpoint-*/*
 models/waf-distilbert/*.safetensors
 models/waf-distilbert/*.pt
 models/waf-distilbert/*.pth
+models/waf-model-finetuned-*/
 !models/*/.gitkeep
 
 # OS
@@ -60,6 +62,12 @@ Thumbs.db
 *.backup
 /tmp/
 /tmp/
+
+# Model artifacts and training files
+waf-model-finetuned/
+*.tokenizer.json
+training_args.bin
+trainer_state.json
 
 # WAR applications (build artifacts)
 war_apps/
@@ -83,6 +91,22 @@ htmlcov/
 
 # Jupyter
 .ipynb_checkpoints/
+*.ipynb
+
+# Archived scripts
+scripts/archived/
+
+# Attack payload repositories
+PayloadsAllTheThings/
+
+# Monitoring data
+monitoring/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/**/*.db
 
 # Real Applications
 applications/app1-juice-shop/node_modules/

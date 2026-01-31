@@ -53,6 +53,15 @@ class WAFMiddleware(BaseHTTPMiddleware):
         # Skip WAF for certain paths
         if request.url.path in self.skip_paths:
             return await call_next(request)
+
+        # Skip WAF for all internal dashboard API paths
+        # These are authenticated internal endpoints, not external application traffic
+        if request.url.path.startswith('/api/'):
+            return await call_next(request)
+
+        # Skip WebSocket connections
+        if request.url.path.startswith('/ws'):
+            return await call_next(request)
         
         # Skip if WAF is disabled
         if not config.WAF_ENABLED:
@@ -264,6 +273,8 @@ class WAFMiddleware(BaseHTTPMiddleware):
         try:
             from backend.database import SessionLocal
             from backend.services.traffic_service import TrafficService
+            from backend.services.threat_service import ThreatService
+            from backend.models.threats import ThreatSeverity
             from backend.services.websocket_service import broadcast_update_sync
             
             # Get request metadata
@@ -315,6 +326,53 @@ class WAFMiddleware(BaseHTTPMiddleware):
                     )
                     # Broadcast update
                     broadcast_update_sync("traffic", traffic_log.to_dict())
+
+                    # If blocked, also create a threat record
+                    if result.get('is_anomaly', False):
+                        try:
+                            threat_service = ThreatService(db)
+                            anomaly_score = result.get('anomaly_score', 0.0)
+
+                            # Determine severity based on anomaly score
+                            if anomaly_score >= 0.9:
+                                severity = ThreatSeverity.CRITICAL
+                            elif anomaly_score >= 0.7:
+                                severity = ThreatSeverity.HIGH
+                            elif anomaly_score >= 0.5:
+                                severity = ThreatSeverity.MEDIUM
+                            else:
+                                severity = ThreatSeverity.LOW
+
+                            # Classify threat type based on patterns in URL/body
+                            threat_type = self._classify_threat_type(path, query_params, body)
+
+                            # Create payload string
+                            payload_parts = []
+                            if query_params:
+                                payload_parts.append(f"Query: {str(query_params)[:200]}")
+                            if body:
+                                payload_parts.append(f"Body: {str(body)[:200]}")
+                            payload = " | ".join(payload_parts) if payload_parts else path
+
+                            threat = threat_service.create_threat(
+                                type=threat_type,
+                                severity=severity,
+                                source_ip=client_ip,
+                                endpoint=path,
+                                method=method,
+                                blocked=True,
+                                anomaly_score=anomaly_score,
+                                details=f"Detected via ML model (score: {anomaly_score:.4f})",
+                                payload=payload,
+                                user_agent=user_agent,
+                                country_code=None,  # Could add geo lookup here
+                                processing_time_ms=int(processing_time)
+                            )
+                            # Broadcast threat update
+                            broadcast_update_sync("threat", threat.to_dict())
+                        except Exception as e:
+                            logger.error(f"Failed to create threat record: {e}")
+
                 except Exception as e:
                     logger.error(f"Failed to store traffic log: {e}")
                 finally:
@@ -325,6 +383,71 @@ class WAFMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.debug(f"Traffic logging not available: {e}")
     
+    def _classify_threat_type(self, path: str, query_params: dict, body) -> str:
+        """Classify the type of threat based on request content"""
+        # Convert to lowercase strings for pattern matching
+        full_content = f"{path} {str(query_params)} {str(body)}".lower()
+
+        # SQL Injection patterns
+        if any(pattern in full_content for pattern in [
+            'union', 'select', 'insert', 'update', 'delete', 'drop', 'alter',
+            'exec', 'execute', '--', '/*', '*/', 'xp_', 'sp_',
+            "' or '", '" or "', '1=1', '1=2', 'waitfor', 'benchmark'
+        ]):
+            return "SQL Injection"
+
+        # XSS patterns
+        if any(pattern in full_content for pattern in [
+            '<script', 'javascript:', 'onerror=', 'onload=', 'onclick=',
+            'alert(', 'prompt(', 'confirm(', '<img', '<iframe', '<svg',
+            'document.cookie', 'document.write'
+        ]):
+            return "Cross-Site Scripting (XSS)"
+
+        # Command Injection patterns
+        if any(pattern in full_content for pattern in [
+            ';cat', ';ls', ';whoami', '|cat', '|ls', '$(', '`',
+            '/etc/passwd', '/etc/shadow', 'cmd.exe', 'powershell'
+        ]):
+            return "Command Injection"
+
+        # Path Traversal patterns
+        if any(pattern in full_content for pattern in [
+            '../', '..\\', '%2e%2e', 'file://', '/etc/', '/proc/',
+            'c:\\', 'd:\\'
+        ]):
+            return "Path Traversal"
+
+        # XXE patterns
+        if any(pattern in full_content for pattern in [
+            '<!doctype', '<!entity', 'system "', 'public "',
+            '<?xml'
+        ]):
+            return "XML External Entity (XXE)"
+
+        # LDAP Injection patterns
+        if any(pattern in full_content for pattern in [
+            '*(', '))', '*)(', '(cn=', '(uid=', '(|', '(&'
+        ]):
+            return "LDAP Injection"
+
+        # NoSQL Injection patterns
+        if any(pattern in full_content for pattern in [
+            '$gt', '$lt', '$ne', '$regex', '$where', '{$',
+            'javascript:', 'mongodb'
+        ]):
+            return "NoSQL Injection"
+
+        # SSRF patterns
+        if any(pattern in full_content for pattern in [
+            'localhost', '127.0.0.1', '169.254', 'metadata',
+            'http://', 'https://', 'file://', 'ftp://'
+        ]):
+            return "Server-Side Request Forgery (SSRF)"
+
+        # Default
+        return "Unknown Attack"
+
     def get_metrics(self) -> Dict:
         """Get WAF middleware metrics"""
         with self.metrics_lock:

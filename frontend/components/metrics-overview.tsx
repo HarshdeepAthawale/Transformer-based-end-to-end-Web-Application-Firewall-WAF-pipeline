@@ -11,9 +11,7 @@ export function MetricsOverview() {
     requests: 0,
     blocked: 0,
     attackRate: 0,
-    responseTime: 0,
     threatsPerMinute: 0,
-    activeConnections: 0,
   })
   const [previousMetrics, setPreviousMetrics] = useState<RealTimeMetrics | null>(null)
 
@@ -47,9 +45,7 @@ export function MetricsOverview() {
         requests: prev.requests + (realTimeMetrics.requests - prev.requests) * 0.1,
         blocked: prev.blocked + (realTimeMetrics.blocked - prev.blocked) * 0.1,
         attackRate: prev.attackRate + (realTimeMetrics.attackRate - prev.attackRate) * 0.1,
-        responseTime: prev.responseTime + (realTimeMetrics.responseTime - prev.responseTime) * 0.1,
         threatsPerMinute: prev.threatsPerMinute + (realTimeMetrics.threatsPerMinute - prev.threatsPerMinute) * 0.1,
-        activeConnections: prev.activeConnections + (realTimeMetrics.activeConnections - prev.activeConnections) * 0.1,
       }))
     }, 100)
 
@@ -60,7 +56,6 @@ export function MetricsOverview() {
   const requestsTrend = getTrend(realTimeMetrics.requests, previousMetrics?.requests || null)
   const blockedTrend = getTrend(realTimeMetrics.blocked, previousMetrics?.blocked || null)
   const attackRateTrend = getTrend(realTimeMetrics.attackRate, previousMetrics?.attackRate || null)
-  const responseTimeTrend = getTrend(realTimeMetrics.responseTime, previousMetrics?.responseTime || null)
 
   const metrics = [
     {
@@ -106,19 +101,7 @@ export function MetricsOverview() {
       priority: animatedValues.attackRate > 10 ? 'critical' : 'normal',
       isLive: true,
     },
-    {
-      label: 'Response Time',
-      value: `${Math.round(animatedValues.responseTime)}ms`,
-      change: responseTimeTrend.change,
-      trend: responseTimeTrend.trend,
-      icon: Zap,
-      color: 'text-muted-foreground',
-      bgColor: 'bg-card',
-      borderColor: 'border-l-border',
-      glowColor: '',
-      priority: animatedValues.responseTime > 1000 ? 'critical' : 'normal',
-      isLive: true,
-    },
+    
   ]
 
   return (

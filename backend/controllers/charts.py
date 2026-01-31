@@ -1,4 +1,5 @@
 """Charts controller."""
+
 from datetime import datetime
 from sqlalchemy.orm import Session
 
@@ -17,11 +18,4 @@ def get_threats(db: Session, range_str: str) -> dict:
     service = ChartsService(db)
     start_time, _ = parse_time_range(range_str)
     data = service.get_threats_chart_data(start_time)
-    return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}
-
-
-def get_performance(db: Session, range_str: str) -> dict:
-    service = ChartsService(db)
-    start_time, _ = parse_time_range(range_str)
-    data = service.get_performance_chart_data(start_time)
     return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}

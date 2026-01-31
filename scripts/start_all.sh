@@ -6,6 +6,19 @@ set -e
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
+# Load environment variables
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | xargs)
+fi
+
+# Default URLs if not set in environment
+FRONTEND_URL=${FRONTEND_URL:-"http://localhost:3000"}
+API_SERVER_URL=${API_SERVER_URL:-"http://localhost:3001"}
+WAF_SERVICE_URL=${WAF_SERVICE_URL:-"http://localhost:8000"}
+JUICE_SHOP_URL=${JUICE_SHOP_URL:-"http://localhost:8080"}
+WEBGOAT_URL=${WEBGOAT_URL:-"http://localhost:8081"}
+DVWA_URL=${DVWA_URL:-"http://localhost:8082"}
+
 echo "=========================================="
 echo "Starting WAF Platform - All Services"
 echo "=========================================="

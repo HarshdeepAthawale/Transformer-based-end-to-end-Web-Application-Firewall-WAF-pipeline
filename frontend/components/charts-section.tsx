@@ -106,7 +106,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-sm font-medium text-foreground mb-2">{`Time: ${label}`}</p>
         {payload.map((entry: any, index: number) => (
           <p key={index} className="text-sm" style={{ color: entry.color }}>
-            {`${entry.name}: ${entry.value}${entry.dataKey === 'latency' || entry.dataKey === 'cpu' || entry.dataKey === 'memory' ? '%' : ''}`}
+            {`${entry.name}: ${entry.value}`}
           </p>
         ))}
       </div>
@@ -118,7 +118,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 export function ChartsSection({ timeRange }: ChartsSectionProps) {
   const [requestData, setRequestData] = useState<ChartDataPoint[]>([])
   const [threatData, setThreatData] = useState<ChartDataPoint[]>([])
-  const [performanceData, setPerformanceData] = useState<ChartDataPoint[]>([])
+  
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [trafficCounts, setTrafficCounts] = useState<Map<string, { requests: number; blocked: number; allowed: number }>>(new Map())
@@ -176,6 +176,11 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
 
   // Fetch chart data on mount and when timeRange changes
   useEffect(() => {
+    // Clear previous data on timeRange change
+    setRequestData([])
+    setThreatData([])
+    setTrafficCounts(new Map())
+
     const fetchChartData = async () => {
       try {
         setIsLoading(true)
@@ -185,10 +190,9 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
         if (timeRange === '1h' || timeRange === '24h') {
           await fetchRealTimeTraffic()
         } else {
-          const [requestsResponse, threatsResponse, performanceResponse] = await Promise.all([
+          const [requestsResponse, threatsResponse] = await Promise.all([
             chartsApi.getRequests(timeRange),
             chartsApi.getThreats(timeRange),
-            chartsApi.getPerformance(timeRange),
           ])
 
           if (requestsResponse.success) {
@@ -199,7 +203,7 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
             const aggregated = aggregateByMinute(threatsResponse.data)
             setThreatData(aggregated.slice(-60))
           }
-          if (performanceResponse.success) setPerformanceData(performanceResponse.data)
+
         }
 
       } catch (err: any) {
@@ -230,7 +234,7 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
       // Update request data when new traffic arrives
       const now = new Date()
       const minuteKey = roundToMinute(now.toISOString())
-      
+
       setTrafficCounts(prev => {
         const existing = prev.get(minuteKey) || { requests: 0, blocked: 0, allowed: 0 }
         const updated = new Map(prev)
@@ -241,11 +245,11 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
         })
         return updated
       })
-      
+
       setRequestData(prev => {
         const minuteKey = roundToMinute(now.toISOString())
         const existingIndex = prev.findIndex(p => roundToMinute(p.time || '') === minuteKey)
-        
+
         if (existingIndex >= 0) {
           // Update existing minute
           const updated = [...prev]
@@ -275,10 +279,10 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
       const now = new Date()
       const minuteKey = roundToMinute(now.toISOString())
       const threatType = data.type?.toLowerCase() || 'other'
-      
+
       setThreatData(prev => {
         const existingIndex = prev.findIndex(p => roundToMinute(p.time || '') === minuteKey)
-        
+
         if (existingIndex >= 0) {
           const updated = [...prev]
           const existing = updated[existingIndex]
@@ -303,28 +307,13 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
       })
     }
 
-    const handlePerformanceUpdate = (data: any) => {
-      const now = new Date().toISOString()
-      setPerformanceData(prev => {
-        const newPoint: ChartDataPoint = {
-          time: now,
-          cpu: data.cpu || 0,
-          memory: data.memory || 0,
-          latency: data.latency || 0,
-        }
-        return [...prev.slice(-59), newPoint] // Keep last 60 points
-      })
-    }
-
     wsManager.subscribe('traffic', handleTrafficUpdate)
     wsManager.subscribe('threat', handleThreatUpdate)
-    wsManager.subscribe('performance', handlePerformanceUpdate)
 
     return () => {
       clearInterval(pollingInterval)
       wsManager.unsubscribe('traffic')
       wsManager.unsubscribe('threat')
-      wsManager.unsubscribe('performance')
     }
   }, [timeRange, fetchRealTimeTraffic])
 
@@ -501,56 +490,10 @@ export function ChartsSection({ timeRange }: ChartsSectionProps) {
             <Bar dataKey="xss" stackId="a" fill="#ea580c" name="XSS Attacks" />
             <Bar dataKey="ddos" stackId="a" fill="#f59e0b" name="DDoS Attacks" />
             <Bar dataKey="other" stackId="a" fill="#7c3aed" name="Other Threats" />
-          </BarChart>
+</BarChart>
         </ResponsiveContainer>
       </div>
-
-        {/* Performance Metrics */}
-        <div className="bg-card rounded-lg border border-border p-4 md:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-2">
-            <h2 className="text-lg font-semibold text-foreground security-text-metric">System Performance</h2>
-            <button className="px-3 py-1 text-xs bg-muted text-muted-foreground rounded-md hover:bg-muted/80">
-              Settings
-            </button>
-          </div>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={performanceData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-            <XAxis dataKey="time" stroke="#6b7280" fontSize={12} />
-            <YAxis stroke="#6b7280" fontSize={12} />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="latency"
-              stroke="#2563eb"
-              strokeWidth={2}
-              name="Response Time (ms)"
-              dot={{ fill: '#2563eb', strokeWidth: 1, r: 3 }}
-              activeDot={{ r: 5, stroke: '#2563eb', strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="cpu"
-              stroke="#16a34a"
-              strokeWidth={2}
-              name="CPU Usage %"
-              dot={{ fill: '#16a34a', strokeWidth: 1, r: 3 }}
-              activeDot={{ r: 5, stroke: '#16a34a', strokeWidth: 2 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="memory"
-              stroke="#f59e0b"
-              strokeWidth={2}
-              name="Memory Usage %"
-              dot={{ fill: '#f59e0b', strokeWidth: 1, r: 3 }}
-              activeDot={{ r: 5, stroke: '#f59e0b', strokeWidth: 2 }}
-            />
-          </LineChart>
-          </ResponsiveContainer>
-        </div>
       </div>
     </div>
-  )
+   )
 }

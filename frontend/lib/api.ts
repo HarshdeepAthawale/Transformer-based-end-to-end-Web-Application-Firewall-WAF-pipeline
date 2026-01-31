@@ -36,10 +36,8 @@ export interface RealTimeMetrics {
   requests: number
   blocked: number
   attackRate: number
-  responseTime: number
   threatsPerMinute: number
   uptime: number
-  activeConnections: number
   timestamp: string
 }
 
@@ -52,9 +50,6 @@ export interface ChartDataPoint {
   xss?: number
   ddos?: number
   other?: number
-  latency?: number
-  cpu?: number
-  memory?: number
   date?: string
 }
 
@@ -83,14 +78,7 @@ export interface ThreatData {
   details?: string
 }
 
-export interface SecurityCheck {
-  id: number
-  name: string
-  status: 'pass' | 'fail' | 'warning'
-  message: string
-  lastChecked: string
-  details?: string
-}
+
 
 export interface ApiResponse<T> {
   success: boolean
@@ -198,9 +186,6 @@ export const chartsApi = {
 
   getThreats: (timeRange: string): Promise<ApiResponse<ChartDataPoint[]>> =>
     apiRequest(`/api/charts/threats?range=${timeRange}`),
-
-  getPerformance: (timeRange: string): Promise<ApiResponse<ChartDataPoint[]>> =>
-    apiRequest(`/api/charts/performance?range=${timeRange}`),
 }
 
 // Traffic API
@@ -230,17 +215,7 @@ export const threatsApi = {
     apiRequest(`/api/threats/stats?range=${timeRange}`),
 }
 
-// Security API
-export const securityApi = {
-  getChecks: (): Promise<ApiResponse<SecurityCheck[]>> =>
-    apiRequest('/api/security/checks'),
 
-  runCheck: (checkId: number): Promise<ApiResponse<SecurityCheck>> =>
-    apiRequest(`/api/security/checks/${checkId}/run`, { method: 'POST' }),
-
-  getComplianceScore: (): Promise<ApiResponse<{ score: number; total: number }>> =>
-    apiRequest('/api/security/compliance-score'),
-}
 
 // Analytics API
 export const analyticsApi = {

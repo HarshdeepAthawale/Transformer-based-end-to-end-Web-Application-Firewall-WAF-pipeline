@@ -1,0 +1,145 @@
+# Full testing setup with all 3 vulnerable apps routed through WAF
+# Usage: docker-compose -f docker-compose.full-test.yml up
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: waf
+      POSTGRES_PASSWORD: wafpassword
+      POSTGRES_DB: waf_dashboard
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U waf"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - waf-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - waf-network
+
+  # Backend API with WAF ML Model
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://waf:wafpassword@postgres:5432/waf_dashboard
+      - REDIS_URL=redis://redis:6379
+      - WAF_ENABLED=true
+      - WAF_THRESHOLD=0.5
+      - WAF_FAIL_OPEN=true
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:3001,http://localhost:8080,http://localhost:8081,http://localhost:8082
+    volumes:
+      - ./models:/app/models:ro
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - waf-network
+
+  # Frontend Dashboard
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_WS_URL=ws://localhost:3001/ws/
+    depends_on:
+      - backend
+    networks:
+      - waf-network
+
+  # ============ VULNERABLE WEB APPLICATIONS ============
+
+  # App 1: OWASP Juice Shop (Node.js)
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    container_name: waf-juice-shop
+    ports:
+      - "8080:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - waf-network
+
+  # App 2: OWASP WebGoat (Java)
+  webgoat:
+    image: webgoat/webgoat:latest
+    container_name: waf-webgoat
+    ports:
+      - "8081:8080"
+    environment:
+      - WEBGOAT_HOST=0.0.0.0
+      - WEBGOAT_PORT=8080
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/WebGoat"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    networks:
+      - waf-network
+
+  # App 3: DVWA (PHP)
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    container_name: waf-dvwa
+    ports:
+      - "8082:80"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=p@ssw0rd
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - waf-network
+
+volumes:
+  postgres_data:
+
+networks:
+  waf-network:
+    name: waf-test-network

@@ -11,10 +11,8 @@ export function useRealTimeData() {
     requests: 0,
     blocked: 0,
     attackRate: 0,
-    responseTime: 0,
     threatsPerMinute: 0,
     uptime: 0,
-    activeConnections: 0,
     timestamp: new Date().toISOString(),
   })
   const [error, setError] = useState<string | null>(null)
