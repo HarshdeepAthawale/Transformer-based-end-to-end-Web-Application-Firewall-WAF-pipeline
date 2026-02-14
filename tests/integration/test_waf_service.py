@@ -15,9 +15,9 @@ import tempfile
 import shutil
 from unittest.mock import patch
 
-# Add src to path for imports
+# Add project root to path for imports
 import sys
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from integration.waf_service import app, initialize_waf_service
 
@@ -243,7 +243,8 @@ class TestWAFServiceEndToEnd:
             sys.executable, "scripts/start_waf_service.py",
             "--host", "127.0.0.1",
             "--port", "8888",
-            "--workers", "1"
+            "--workers", "1",
+            "--placeholder"
         ]
 
         process = subprocess.Popen(

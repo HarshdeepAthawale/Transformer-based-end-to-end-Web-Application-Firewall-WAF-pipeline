@@ -50,8 +50,7 @@ waf_service:
   port: 8000
   workers: 4
   timeout: 5.0
-  model_path: "models/checkpoints/best_model.pt"
-  vocab_path: "models/vocabularies/http_vocab.json"
+  model_path: "models/waf-anomaly"
   threshold: 0.5
 
 # Log Ingestion Configuration
@@ -109,8 +108,7 @@ integration:
     port: 8000
     workers: 4
     timeout: 5.0
-    model_path: "models/checkpoints/best_model.pt"
-    vocab_path: "models/vocabularies/http_vocab.json"
+    model_path: "models/waf-anomaly"
     threshold: 0.5
 
   web_server:

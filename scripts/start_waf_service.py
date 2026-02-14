@@ -12,9 +12,9 @@ import yaml
 import uvicorn
 from loguru import logger
 
-# Add src to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
-sys.path.insert(0, str(Path(__file__).parent.parent))
+# Add project root to path
+_project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(_project_root))
 
 # Set TMPDIR to avoid PyTorch cache issues
 os.environ['TMPDIR'] = '/tmp'
@@ -41,11 +41,12 @@ def main():
     )
     parser.add_argument(
         "--model_path",
-        help="Path to model checkpoint (overrides config)"
+        help="Path to HuggingFace model directory (overrides config)"
     )
     parser.add_argument(
-        "--vocab_path",
-        help="Path to vocabulary file (overrides config)"
+        "--placeholder",
+        action="store_true",
+        help="Run in placeholder mode (no ML model, for testing)"
     )
     parser.add_argument(
         "--threshold",
@@ -87,27 +88,32 @@ def main():
     waf_config = config.get('integration', {}).get('waf_service', {})
     training_config = config.get('training', {})
 
-    # Determine paths
-    model_path = args.model_path or waf_config.get('model_path', 'models/checkpoints/best_model.pt')
-    vocab_path = args.vocab_path or waf_config.get('vocab_path', 'models/vocabularies/http_vocab.json')
     threshold = args.threshold or waf_config.get('threshold', training_config.get('anomaly', {}).get('threshold', 0.5))
     device = args.device or ("cuda" if os.environ.get('CUDA_AVAILABLE', '').lower() == 'true' else None)
 
-    # Validate paths
-    if not Path(model_path).exists():
-        logger.error(f"Model checkpoint not found: {model_path}")
-        sys.exit(1)
+    # Resolve model path
+    model_path = args.model_path or waf_config.get('model_path', 'models/waf-anomaly')
+    model_dir = _project_root / model_path if not Path(model_path).is_absolute() else Path(model_path)
 
-    if not Path(vocab_path).exists():
-        logger.error(f"Vocabulary file not found: {vocab_path}")
-        sys.exit(1)
+    # Check for valid HuggingFace model (config.json + tokenizer.json or model.safetensors)
+    def _model_valid(p: Path) -> bool:
+        if not p.is_dir():
+            return False
+        has_config = (p / "config.json").exists()
+        has_tokenizer = (p / "tokenizer.json").exists()
+        has_weights = (p / "model.safetensors").exists() or (p / "pytorch_model.bin").exists()
+        return has_config and has_tokenizer and has_weights
+
+    use_placeholder = args.placeholder
+    if not use_placeholder and not _model_valid(model_dir):
+        logger.warning(f"Model not found at {model_dir} (need config.json, tokenizer.json, model weights). Using placeholder mode.")
+        use_placeholder = True
 
     # Initialize WAF service
-    logger.info("Initializing WAF service with real model...")
+    logger.info("Initializing WAF service..." + (" (placeholder mode)" if use_placeholder else ""))
     try:
         initialize_waf_service(
-            model_path=model_path,
-            vocab_path=vocab_path,
+            model_path=None if use_placeholder else str(model_dir),
             threshold=threshold,
             device=device
         )

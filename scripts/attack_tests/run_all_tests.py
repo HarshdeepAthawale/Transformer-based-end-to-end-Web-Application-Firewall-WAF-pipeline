@@ -248,6 +248,17 @@ def generate_report(results: list):
 
 
 def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="Run WAF attack test suite")
+    parser.add_argument(
+        "--min-rate",
+        type=float,
+        default=60.0,
+        help="Minimum detection rate (%% as float, e.g. 80) to pass. Default: 60",
+    )
+    args = parser.parse_args()
+    min_rate = args.min_rate
+
     print_banner()
 
     print("\n" + "=" * 70)
@@ -288,9 +299,10 @@ def main():
     overall_rate = generate_report(results)
 
     print(f"\nTest completed at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"Minimum required rate: {min_rate}%")
 
     # Exit with appropriate code
-    if overall_rate >= 60:
+    if overall_rate >= min_rate:
         sys.exit(0)
     else:
         sys.exit(1)

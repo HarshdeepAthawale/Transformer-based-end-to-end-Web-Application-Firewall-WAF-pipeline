@@ -5,11 +5,15 @@ Provides threat detection for HTTP requests.
 import asyncio
 import threading
 import time
+import json
 from pathlib import Path
 from typing import Optional, Dict, Any, List
+from urllib.parse import parse_qs, urlparse
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from loguru import logger
+
+from backend.parsing import ParsingPipeline
 
 
 class WAFClassifier:
@@ -48,6 +52,12 @@ class WAFClassifier:
             "total_processing_time_ms": 0.0,
         }
         self._metrics_lock = threading.Lock()
+
+        # Parsing pipeline for request normalization
+        self._pipeline = ParsingPipeline(
+            include_headers=True,
+            include_body=True,
+        )
 
         # Set device
         if device:
@@ -189,6 +199,33 @@ class WAFClassifier:
 
         return results
 
+    def _to_process_dict(
+        self,
+        method: str,
+        path: str,
+        query_params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, Any]] = None,
+        body: Optional[Any] = None,
+    ) -> Dict[str, Any]:
+        """Build dict for process_dict, ensuring path and query_params are separate."""
+        query_params = dict(query_params) if query_params else {}
+        if "?" in path:
+            parsed = urlparse(path)
+            path = parsed.path or "/"
+            if not query_params and parsed.query:
+                for k, v in parse_qs(parsed.query).items():
+                    query_params[k] = v[0] if v else ""
+        body_str = None
+        if body is not None:
+            body_str = json.dumps(body) if isinstance(body, dict) else str(body)
+        return {
+            "method": method,
+            "path": path,
+            "query_params": query_params,
+            "headers": headers or {},
+            "body": body_str,
+        }
+
     def check_request(self, request_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Check an HTTP request for threats.
@@ -199,26 +236,16 @@ class WAFClassifier:
         Returns:
             Classification result with request reconstruction
         """
-        # Reconstruct HTTP request text
-        method = request_data.get("method", "GET")
-        path = request_data.get("path", "/")
-        headers = request_data.get("headers", {})
-        body = request_data.get("body", "")
-
-        # Build request string (similar to raw HTTP)
-        lines = [f"{method} {path} HTTP/1.1"]
-        for key, value in headers.items():
-            lines.append(f"{key}: {value}")
-        if body:
-            lines.append("")
-            lines.append(body if isinstance(body, str) else str(body))
-
-        request_text = "\n".join(lines)
-
-        # Classify
+        process_dict = self._to_process_dict(
+            method=request_data.get("method", "GET"),
+            path=request_data.get("path", "/"),
+            query_params=request_data.get("query_params"),
+            headers=request_data.get("headers"),
+            body=request_data.get("body"),
+        )
+        request_text = self._pipeline.process_dict(process_dict)
         result = self.classify(request_text)
         result["request_text_length"] = len(request_text)
-
         return result
 
     def _build_request_text(
@@ -296,14 +323,15 @@ class WAFClassifier:
         """
         start_time = time.perf_counter()
 
-        # Build request text from components
-        request_text = self._build_request_text(
+        # Normalize and serialize via parsing pipeline
+        process_dict = self._to_process_dict(
             method=method,
             path=path,
             query_params=query_params,
             headers=headers,
             body=body,
         )
+        request_text = self._pipeline.process_dict(process_dict)
 
         # Run sync classify in thread pool to avoid blocking event loop
         try:
