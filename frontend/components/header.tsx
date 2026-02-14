@@ -1,6 +1,9 @@
 'use client'
 
-import { ChevronDown, Search, Bell, Settings } from 'lucide-react'
+import Link from 'next/link'
+import { ChevronDown, Search, Settings } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { NotificationCenter } from '@/components/notification-center'
 
 interface HeaderProps {
   timeRange?: string
@@ -17,29 +20,45 @@ export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: Head
   ]
 
   return (
-    <header className="border-b border-border bg-card/40 backdrop-blur-sm sticky top-0 z-30">
+    <header
+      className="border-b-2 sticky top-0 z-30"
+      style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+    >
       <div className="px-6 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6 flex-1">
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1
+            className="text-2xl font-bold"
+            style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+          >
+            Dashboard
+          </h1>
         </div>
 
         <div className="flex items-center gap-4">
           {/* Search */}
-          <div className="hidden md:flex items-center gap-2 bg-input rounded-lg px-4 py-2">
-            <Search size={18} className="text-muted-foreground" />
+          <div
+            className="hidden md:flex items-center gap-2 rounded-none px-4 py-2 border-2"
+            style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+          >
+            <Search size={18} style={{ color: 'var(--positivus-gray-dark)' }} />
             <input
               type="text"
               placeholder="Search threats..."
-              className="bg-transparent border-none outline-none text-sm text-foreground placeholder-muted-foreground w-48"
+              className="bg-transparent border-none outline-none text-sm w-48 placeholder-[var(--positivus-gray-dark)]"
+              style={{ color: 'var(--positivus-black)' }}
             />
           </div>
 
           {/* Time Range Dropdown */}
-          <div className="flex items-center gap-2 bg-input rounded-lg px-3 py-2">
+          <div
+            className="flex items-center gap-2 rounded-none px-3 py-2 border-2"
+            style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+          >
             <select
               value={timeRange}
               onChange={(e) => onTimeRangeChange(e.target.value)}
-              className="bg-transparent border-none outline-none text-sm text-foreground cursor-pointer"
+              className="bg-transparent border-none outline-none text-sm cursor-pointer"
+              style={{ color: 'var(--positivus-black)' }}
             >
               {timeRanges.map((range) => (
                 <option key={range.value} value={range.value}>
@@ -47,20 +66,24 @@ export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: Head
                 </option>
               ))}
             </select>
-            <ChevronDown size={16} className="text-muted-foreground pointer-events-none" />
+            <ChevronDown size={16} style={{ color: 'var(--positivus-gray-dark)' }} className="pointer-events-none" />
           </div>
 
+          {/* Theme Toggle */}
+          <ThemeToggle />
 
-          {/* Notification Bell */}
-          <button className="p-2 hover:bg-input rounded-lg transition-colors relative">
-            <Bell size={20} className="text-foreground" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-destructive rounded-full" />
-          </button>
+          {/* Notification Center */}
+          <NotificationCenter />
 
           {/* Settings */}
-          <button className="p-2 hover:bg-input rounded-lg transition-colors">
-            <Settings size={20} className="text-foreground" />
-          </button>
+          <Link
+            href="/settings"
+            className="p-2 rounded-none transition-colors hover:bg-accent"
+            style={{ color: 'var(--positivus-black)' }}
+            aria-label="Settings"
+          >
+            <Settings size={20} />
+          </Link>
         </div>
       </div>
     </header>

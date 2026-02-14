@@ -20,6 +20,7 @@ JWT_ALGORITHM = "HS256"
 JWT_EXPIRY = getattr(config, 'JWT_EXPIRY', 3600)  # 1 hour
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 def create_access_token(user_id: int, username: str, role: UserRole) -> str:
@@ -69,6 +70,22 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """Get current user if token provided; otherwise return None (allow unauthenticated access)"""
+    if not credentials:
+        return None
+    payload = verify_token(credentials.credentials)
+    if not payload:
+        return None
+    user = db.query(User).filter(User.id == payload.get("user_id")).first()
+    if not user or not user.is_active:
+        return None
+    return user
+
+
 def require_role(required_role: UserRole):
     """Dependency to require specific role"""
     async def role_checker(current_user: User = Depends(get_current_user)):
@@ -80,6 +97,21 @@ def require_role(required_role: UserRole):
             )
         return current_user
     return role_checker
+
+
+def optional_admin():
+    """Dependency: returns User if admin token present, else None. Allows unauthenticated access for dev."""
+    async def checker(current_user: Optional[User] = Depends(get_current_user_optional)) -> Optional[User]:
+        if current_user is None:
+            return None
+        user_role = UserRole(current_user.role)
+        if user_role != UserRole.ADMIN:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Requires admin role"
+            )
+        return current_user
+    return checker
 
 
 def require_any_role(*roles: UserRole):

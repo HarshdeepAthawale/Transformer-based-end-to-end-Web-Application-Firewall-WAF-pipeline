@@ -9,6 +9,7 @@ from typing import Dict, List
 from backend.models.metrics import Metrics
 from backend.models.traffic import TrafficLog
 from backend.models.threats import Threat
+from backend.services.charts_service import ChartsService
 
 
 class AnalyticsService:
@@ -18,36 +19,9 @@ class AnalyticsService:
         self.db = db
     
     def get_overview(self, start_time: datetime) -> List[Dict]:
-        """Get analytics overview"""
-        # Get aggregated metrics
-        metrics = self.db.query(
-            func.sum(Metrics.total_requests).label('total_requests'),
-            func.sum(Metrics.blocked_requests).label('blocked_requests'),
-            func.avg(Metrics.attack_rate).label('avg_attack_rate'),
-            func.avg(Metrics.avg_response_time).label('avg_response_time')
-        )\
-        .filter(Metrics.timestamp >= start_time)\
-        .first()
-        
-        # Get threat counts
-        threat_counts = self.db.query(
-            Threat.type,
-            func.count(Threat.id).label('count')
-        )\
-        .filter(Threat.timestamp >= start_time)\
-        .group_by(Threat.type)\
-        .all()
-        
-        return [
-            {
-                "time": start_time.isoformat(),
-                "total_requests": int(metrics.total_requests or 0),
-                "blocked_requests": int(metrics.blocked_requests or 0),
-                "attack_rate": float(metrics.avg_attack_rate or 0),
-                "avg_response_time": float(metrics.avg_response_time or 0),
-                "threats": {threat_type: int(count) for threat_type, count in threat_counts}
-            }
-        ]
+        """Get analytics overview as time-series (requests, blocked, allowed per time bucket)"""
+        charts_service = ChartsService(self.db)
+        return charts_service.get_requests_chart_data(start_time)
     
     def get_trends(self, metric: str, start_time: datetime) -> List[Dict]:
         """Get trends for a specific metric"""
@@ -108,13 +82,25 @@ class AnalyticsService:
         .group_by(Threat.type)\
         .all()
         
+        threat_map = {t: int(c) for t, c in threat_types}
+        sql_injection = sum(int(c) for t, c in threat_types if t and ('sql' in t.lower() or 'injection' in t.lower()))
+        xss = sum(int(c) for t, c in threat_types if t and ('xss' in t.lower() or 'cross-site' in t.lower()))
+        ddos = sum(int(c) for t, c in threat_types if t and ('ddos' in t.lower() or 'dos' in t.lower()))
+        other = sum(int(c) for t, c in threat_types if t and 'sql' not in t.lower() and 'injection' not in t.lower() and 'xss' not in t.lower() and 'cross-site' not in t.lower() and 'ddos' not in t.lower() and 'dos' not in t.lower())
+        
+        block_rate = (blocked_requests / total_requests * 100) if total_requests > 0 else 0
         return {
             "total_requests": total_requests,
             "blocked_requests": blocked_requests,
             "allowed_requests": total_requests - blocked_requests,
-            "block_rate": (blocked_requests / total_requests * 100) if total_requests > 0 else 0,
+            "block_rate": block_rate,
+            "attack_rate": block_rate,
             "total_threats": total_threats,
-            "threat_types": {threat_type: int(count) for threat_type, count in threat_types},
+            "threat_types": threat_map,
+            "sql_injection": sql_injection,
+            "xss": xss,
+            "ddos": ddos,
+            "other": other,
             "time_range": {
                 "start": start_time.isoformat(),
                 "end": datetime.utcnow().isoformat()

@@ -163,13 +163,13 @@ export default function ThreatIntelligencePage() {
                 </Card>
                 <Card className="p-4">
                   <div className="text-sm text-muted-foreground">Critical</div>
-                  <div className="text-2xl font-bold mt-1 text-destructive">
+                  <div className="text-2xl font-bold mt-1">
                     {threats.filter(t => t.severity === 'critical').length}
                   </div>
                 </Card>
                 <Card className="p-4">
                   <div className="text-sm text-muted-foreground">High</div>
-                  <div className="text-2xl font-bold mt-1 text-orange-500">
+                  <div className="text-2xl font-bold mt-1">
                     {threats.filter(t => t.severity === 'high').length}
                   </div>
                 </Card>

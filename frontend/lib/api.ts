@@ -1,7 +1,7 @@
 // API service layer for WAF Dashboard backend integration
 
-// Base API configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+// Base API configuration - empty string uses Next.js proxy (see next.config.mjs rewrites)
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 // WebSocket URL - note: the backend route is /ws/ so the full path is ws://localhost:3001/ws/
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || (typeof window !== 'undefined' 
   ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:3001/ws/`
@@ -543,6 +543,70 @@ export const auditApi = {
 
   getLog: (logId: number): Promise<ApiResponse<AuditLog>> =>
     apiRequest(`/api/audit/logs/${logId}`),
+}
+
+// Settings API (account preferences)
+export interface AccountSettings {
+  theme?: string
+  default_time_range?: string
+  notifications?: boolean
+  email_alerts?: boolean
+  auto_block_threats?: boolean
+  alert_severity_critical?: boolean
+  alert_severity_high?: boolean
+  alert_severity_medium?: boolean
+  webhook_url?: string
+  alert_emails?: string
+}
+
+export interface RetentionSettings {
+  metrics_days: number
+  traffic_days: number
+  alerts_days: number
+  threats_days: number
+}
+
+export const settingsApi = {
+  get: (): Promise<ApiResponse<AccountSettings>> =>
+    apiRequest('/api/settings'),
+
+  update: (payload: Partial<AccountSettings>): Promise<ApiResponse<AccountSettings>> =>
+    apiRequest('/api/settings', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  getRetention: (): Promise<ApiResponse<RetentionSettings>> =>
+    apiRequest('/api/settings/retention'),
+}
+
+// API Keys (current user)
+export interface ApiKeyMeta {
+  id: string
+  name: string
+  prefix: string
+  created_at: string
+}
+
+export interface ApiKeyCreated {
+  key: string
+  id: string
+  name: string
+  created_at: string
+}
+
+export const apiKeysApi = {
+  list: (): Promise<ApiResponse<ApiKeyMeta[]>> =>
+    apiRequest('/api/users/me/keys'),
+
+  create: (params: { name?: string }): Promise<ApiResponse<ApiKeyCreated>> =>
+    apiRequest('/api/users/me/keys', {
+      method: 'POST',
+      body: JSON.stringify({ name: params.name || '' }),
+    }),
+
+  revoke: (keyId: string): Promise<ApiResponse<{ revoked: string }>> =>
+    apiRequest(`/api/users/me/keys/${keyId}`, { method: 'DELETE' }),
 }
 
 export const wafApi = {

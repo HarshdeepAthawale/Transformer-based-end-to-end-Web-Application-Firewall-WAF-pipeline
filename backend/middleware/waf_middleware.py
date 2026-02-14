@@ -327,7 +327,7 @@ class WAFMiddleware(BaseHTTPMiddleware):
                     # Broadcast update
                     broadcast_update_sync("traffic", traffic_log.to_dict())
 
-                    # If blocked, also create a threat record
+                    # If blocked, also create a threat record and alert
                     if result.get('is_anomaly', False):
                         try:
                             threat_service = ThreatService(db)
@@ -344,7 +344,7 @@ class WAFMiddleware(BaseHTTPMiddleware):
                                 severity = ThreatSeverity.LOW
 
                             # Classify threat type based on patterns in URL/body
-                            threat_type = self._classify_threat_type(path, query_params, body)
+                            threat_type_str = self._classify_threat_type(path, query_params, body)
 
                             # Create payload string
                             payload_parts = []
@@ -355,7 +355,7 @@ class WAFMiddleware(BaseHTTPMiddleware):
                             payload = " | ".join(payload_parts) if payload_parts else path
 
                             threat = threat_service.create_threat(
-                                type=threat_type,
+                                type=threat_type_str,
                                 severity=severity,
                                 source_ip=client_ip,
                                 endpoint=path,
@@ -370,6 +370,43 @@ class WAFMiddleware(BaseHTTPMiddleware):
                             )
                             # Broadcast threat update
                             broadcast_update_sync("threat", threat.to_dict())
+
+                            # Create alert and broadcast for in-app notifications
+                            from backend.services.alert_service import AlertService
+                            from backend.models.alerts import AlertType, AlertSeverity
+
+                            alert_type = AlertType.CRITICAL if severity in (ThreatSeverity.CRITICAL, ThreatSeverity.HIGH) else (
+                                AlertType.WARNING if severity == ThreatSeverity.MEDIUM else AlertType.INFO
+                            )
+                            alert_severity = AlertSeverity.HIGH if severity in (ThreatSeverity.CRITICAL, ThreatSeverity.HIGH) else (
+                                AlertSeverity.MEDIUM if severity == ThreatSeverity.MEDIUM else AlertSeverity.LOW
+                            )
+                            title = f"WAF blocked {threat_type_str}"
+                            description = f"{method} {path} from {client_ip} (score: {anomaly_score:.4f})"
+
+                            alert_service = AlertService(db)
+                            alert = alert_service.create_alert(
+                                type=alert_type,
+                                severity=alert_severity,
+                                title=title,
+                                description=description,
+                                source="waf",
+                                icon="alert-circle",
+                                related_ip=client_ip,
+                                related_endpoint=path,
+                                related_threat_id=threat.id,
+                                actions=["view_threat", "dismiss"],
+                            )
+                            broadcast_update_sync("alert", alert.to_dict())
+
+                            # Outbound notifications (email, webhook)
+                            try:
+                                from backend.controllers import settings as settings_ctrl
+                                from backend.services.notification_service import maybe_send_notifications
+                                settings = settings_ctrl.get_settings(db)
+                                maybe_send_notifications(db, alert, settings)
+                            except Exception as notif_err:
+                                logger.debug(f"Notification delivery skipped or failed: {notif_err}")
                         except Exception as e:
                             logger.error(f"Failed to create threat record: {e}")
 

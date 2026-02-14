@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { AlertTriangle, Shield, Target, Loader2, AlertCircle, Search, Eye, Ban, Download } from 'lucide-react'
+import { Shield, Loader2, AlertCircle, Search, Eye, Ban, Download } from 'lucide-react'
 import { threatsApi, ThreatData, wsManager } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
 
@@ -211,52 +211,32 @@ export default function ThreatsPage() {
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-red-500/10 rounded-lg">
-                      <AlertTriangle className="w-6 h-6 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">Critical Threats</p>
-                      <p className="text-2xl font-bold">{criticalCount}</p>
-                    </div>
+                  <div>
+                    <p className="text-muted-foreground text-sm">Critical Threats</p>
+                    <p className="text-2xl font-bold">{criticalCount}</p>
                   </div>
                 </Card>
 
                 <Card className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-orange-500/10 rounded-lg">
-                      <Target className="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">Total Threats</p>
-                      <p className="text-2xl font-bold">{totalThreats}</p>
-                    </div>
+                  <div>
+                    <p className="text-muted-foreground text-sm">Total Threats</p>
+                    <p className="text-2xl font-bold">{totalThreats}</p>
                   </div>
                 </Card>
 
                 <Card className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-green-500/10 rounded-lg">
-                      <Shield className="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">Blocked</p>
-                      <p className="text-2xl font-bold">{blockedCount}</p>
-                    </div>
+                  <div>
+                    <p className="text-muted-foreground text-sm">Blocked</p>
+                    <p className="text-2xl font-bold">{blockedCount}</p>
                   </div>
                 </Card>
 
                 <Card className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-blue-500/10 rounded-lg">
-                      <Shield className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="text-muted-foreground text-sm">Block Rate</p>
-                      <p className="text-2xl font-bold">
-                        {totalThreats > 0 ? ((blockedCount / totalThreats) * 100).toFixed(1) : 0}%
-                      </p>
-                    </div>
+                  <div>
+                    <p className="text-muted-foreground text-sm">Block Rate</p>
+                    <p className="text-2xl font-bold">
+                      {totalThreats > 0 ? ((blockedCount / totalThreats) * 100).toFixed(1) : 0}%
+                    </p>
                   </div>
                 </Card>
               </div>

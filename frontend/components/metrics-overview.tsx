@@ -68,11 +68,7 @@ export function MetricsOverview() {
       change: requestsTrend.change,
       trend: requestsTrend.trend,
       icon: BarChart3,
-      color: 'text-muted-foreground',
-      bgColor: 'bg-card',
-      borderColor: 'border-l-border',
-      glowColor: '',
-      priority: 'normal',
+      priority: 'normal' as const,
       isLive: true,
     },
     {
@@ -81,11 +77,7 @@ export function MetricsOverview() {
       change: blockedTrend.change,
       trend: blockedTrend.trend,
       icon: Shield,
-      color: 'text-muted-foreground',
-      bgColor: 'bg-card',
-      borderColor: 'border-l-border',
-      glowColor: '',
-      priority: 'normal',
+      priority: 'normal' as const,
       isLive: true,
     },
     {
@@ -94,58 +86,64 @@ export function MetricsOverview() {
       change: attackRateTrend.change,
       trend: attackRateTrend.trend,
       icon: AlertTriangle,
-      color: 'text-muted-foreground',
-      bgColor: 'bg-card',
-      borderColor: 'border-l-border',
-      glowColor: '',
       priority: animatedValues.attackRate > 10 ? 'critical' : 'normal',
       isLive: true,
     },
-    
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {metrics.map((metric, index) => {
         const Icon = metric.icon
         const TrendIcon = metric.trend === 'up' ? ArrowUpRight : ArrowDownRight
         const trendColor = metric.trend === 'up'
-          ? (metric.priority === 'critical' ? 'text-security-critical' : 'text-security-low')
-          : 'text-security-low'
+          ? (metric.priority === 'critical' ? 'var(--destructive)' : 'var(--positivus-green)')
+          : 'var(--positivus-green)'
 
         return (
           <div
             key={metric.label}
-            className={`${metric.bgColor} rounded-lg ${metric.borderColor} p-6 border border-l-4 relative group`}
-            style={{ animationDelay: `${index * 0.1}s` }}
+            className="p-6 border-2 relative group rounded-md flex flex-col min-h-[140px]"
+            style={{
+              backgroundColor: 'var(--positivus-white)',
+              borderColor: 'var(--positivus-gray)',
+              animationDelay: `${index * 0.1}s`,
+            }}
           >
-            <div className="flex items-start justify-between mb-3">
-              <div className={`p-2 rounded-md bg-muted ${metric.color}`}>
-                <Icon size={20} />
+            <div className="flex items-center justify-between mb-4">
+              <div
+                className="p-2 rounded-md shrink-0"
+                style={{ backgroundColor: 'var(--positivus-green-bg)' }}
+              >
+                <Icon size={20} style={{ color: 'var(--positivus-green)' }} />
               </div>
-              <div className="flex items-center gap-2">
-                <div className={`flex items-center gap-1 text-sm font-medium ${trendColor}`}>
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex items-center gap-1 text-sm font-medium shrink-0" style={{ color: trendColor }}>
                   {metric.trend !== 'neutral' && <TrendIcon size={14} />}
                   {metric.change}
                 </div>
                 <button
                   onClick={refresh}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded hover:bg-accent shrink-0"
                   title="Refresh"
+                  style={{ color: 'var(--positivus-gray-dark)' }}
                 >
-                  <RefreshCw size={12} className="text-muted-foreground" />
+                  <RefreshCw size={12} />
                 </button>
               </div>
             </div>
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">{metric.label}</p>
-              <p className={`text-2xl font-semibold text-foreground ${
-                metric.priority === 'critical' ? 'text-foreground' : ''
-              }`}>{metric.value}</p>
+            <div className="space-y-1 flex-1">
+              <p className="text-sm font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>{metric.label}</p>
+              <p className="text-2xl font-semibold leading-tight" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
+                {metric.value}
+              </p>
               {metric.isLive && (
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <p className="text-xs text-muted-foreground">Real-time</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <div
+                    className="w-2 h-2 rounded-full animate-pulse shrink-0"
+                    style={{ backgroundColor: 'var(--positivus-green)' }}
+                  />
+                  <p className="text-xs" style={{ color: 'var(--positivus-gray-dark)' }}>Real-time</p>
                 </div>
               )}
             </div>

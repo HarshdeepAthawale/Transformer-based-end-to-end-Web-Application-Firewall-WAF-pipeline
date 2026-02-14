@@ -51,6 +51,15 @@ class Config:
     # Log ingestion
     LOG_INGESTION_ENABLED: bool = os.getenv("LOG_INGESTION_ENABLED", "true").lower() == "true"
     LOG_PATH: Optional[str] = os.getenv("LOG_PATH")
+
+    # Alert notifications (email)
+    SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST", None)
+    SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))
+    SMTP_USER: Optional[str] = os.getenv("SMTP_USER", None)
+    SMTP_PASSWORD: Optional[str] = os.getenv("SMTP_PASSWORD", None)
+    SMTP_USE_TLS: bool = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
+    ALERT_FROM_EMAIL: str = os.getenv("ALERT_FROM_EMAIL", "waf-alerts@localhost")
+    DASHBOARD_BASE_URL: str = os.getenv("DASHBOARD_BASE_URL", "http://localhost:3000")
     
     @classmethod
     def load_from_yaml(cls, config_path: Optional[str] = None):

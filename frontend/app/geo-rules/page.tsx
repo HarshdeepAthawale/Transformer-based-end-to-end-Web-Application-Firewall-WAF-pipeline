@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { ErrorBoundary } from '@/components/error-boundary'
@@ -10,13 +10,24 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
+import { Globe as GlobeVisualization } from '@/components/ui/globe'
+import { getCountryCoordinates } from '@/lib/country-coordinates'
 import { geoApi, GeoRule, GeoStats } from '@/lib/api'
 import { Globe, Plus, Search, MapPin, AlertCircle } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 
+const STATS_RANGE_OPTIONS = [
+  { value: '1h', label: 'Last 1 hour' },
+  { value: '24h', label: 'Last 24 hours' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+] as const
+type StatsRange = (typeof STATS_RANGE_OPTIONS)[number]['value']
+
 export default function GeoRulesPage() {
   const [rules, setRules] = useState<GeoRule[]>([])
   const [stats, setStats] = useState<GeoStats[]>([])
+  const [statsRange, setStatsRange] = useState<StatsRange>('24h')
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -30,8 +41,11 @@ export default function GeoRulesPage() {
 
   useEffect(() => {
     fetchRules()
-    fetchStats()
   }, [])
+
+  useEffect(() => {
+    fetchStats()
+  }, [statsRange])
 
   const fetchRules = async () => {
     setLoading(true)
@@ -50,7 +64,7 @@ export default function GeoRulesPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await geoApi.getStats('24h')
+      const response = await geoApi.getStats(statsRange)
       if (response.success && Array.isArray(response.data)) {
         setStats(response.data)
       } else {
@@ -95,6 +109,30 @@ export default function GeoRulesPage() {
     rule.country_code.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  const globeMarkers = useMemo(() => {
+    if (!Array.isArray(stats) || stats.length === 0) return []
+    const maxThreat = Math.max(1, ...stats.map((s) => s.threat_count))
+    const minSize = 0.02
+    const maxSize = 0.14
+    const markers: { location: [number, number]; size: number }[] = []
+    for (const stat of stats) {
+      const coords = getCountryCoordinates(stat.country_code)
+      if (!coords) continue
+      const size = minSize + (stat.threat_count / maxThreat) * (maxSize - minSize)
+      markers.push({ location: coords, size })
+    }
+    return markers
+  }, [stats])
+
+  const globeConfig = useMemo(
+    () => ({
+      markerColor: [251 / 255, 80 / 255, 21 / 255] as [number, number, number],
+      glowColor: [1, 0.3, 0.1] as [number, number, number],
+      markers: globeMarkers,
+    }),
+    [globeMarkers]
+  )
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -123,10 +161,55 @@ export default function GeoRulesPage() {
                 </Card>
               )}
 
+              <Card>
+                <div className="p-6">
+                  <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold">Attack origins</h3>
+                    </div>
+                    <Select
+                      value={statsRange}
+                      onValueChange={(v) => setStatsRange(v as StatsRange)}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATS_RANGE_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Where attacks and malicious requests are coming from. Marker size reflects threat count.
+                  </p>
+                  {globeMarkers.length > 0 ? (
+                    <div className="relative w-full min-h-[400px] rounded-lg overflow-hidden bg-muted/30">
+                      <GlobeVisualization
+                        className="absolute inset-0 top-0 left-0"
+                        config={globeConfig}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center min-h-[400px] rounded-lg bg-muted/30 text-muted-foreground text-sm">
+                      <MapPin className="h-12 w-12 mb-2 opacity-50" />
+                      <p>No geographic data for the selected period.</p>
+                      <p className="mt-1">Traffic or threats with country attribution will appear here.</p>
+                    </div>
+                  )}
+                </div>
+              </Card>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card>
                   <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Geographic Statistics (24h)</h3>
+                    <h3 className="text-lg font-semibold mb-4">
+                      Geographic Statistics ({statsRange === '1h' ? '1h' : statsRange === '24h' ? '24h' : statsRange === '7d' ? '7d' : '30d'})
+                    </h3>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={Array.isArray(stats) ? stats.slice(0, 10) : []}>
                         <CartesianGrid strokeDasharray="3 3" />

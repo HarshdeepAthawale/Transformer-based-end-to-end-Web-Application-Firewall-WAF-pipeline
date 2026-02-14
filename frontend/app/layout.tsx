@@ -1,10 +1,12 @@
 import React from "react"
 import type { Metadata } from 'next'
-import { Inter, JetBrains_Mono } from 'next/font/google'
+import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
+import { ThemeProvider } from 'next-themes'
+import { AuthSessionProvider } from '@/components/providers/session-provider'
 import './globals.css'
 
-// Configure Inter font for Cloudflare-style typography
+// Configure Inter font for clean, readable typography
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
@@ -20,9 +22,17 @@ const jetbrainsMono = JetBrains_Mono({
   preload: true,
 })
 
+// Space Grotesk - Positivus landing page typography
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space-grotesk',
+  display: 'swap',
+  preload: true,
+})
+
 export const metadata: Metadata = {
-  title: 'WAF Dashboard - Real-Time Security Monitoring',
-  description: 'Professional Web Application Firewall monitoring dashboard with real-time threat detection and analytics',
+  title: 'WAF - Web Application Firewall | Secure Your Digital Presence',
+  description: 'Professional Web Application Firewall with AI-powered threat detection. Protect your applications from attacks with real-time security monitoring and analytics',
   generator: 'v0.app',
   icons: {
     icon: '/icon.svg',
@@ -36,10 +46,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className={`font-sans antialiased bg-background text-foreground`}>
-        {children}
-        <Analytics />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="waf-theme">
+          <AuthSessionProvider>
+            {children}
+          </AuthSessionProvider>
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   )

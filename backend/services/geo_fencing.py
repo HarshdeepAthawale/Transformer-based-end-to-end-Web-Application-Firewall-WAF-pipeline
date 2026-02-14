@@ -178,7 +178,7 @@ class GeoFencingService:
         for source_ip, threat_count in threat_stats:
             # Try to get country from traffic logs
             traffic_log = self.db.query(TrafficLog)\
-                .filter(TrafficLog.source_ip == source_ip)\
+                .filter(TrafficLog.ip == source_ip)\
                 .filter(TrafficLog.timestamp >= start_time)\
                 .filter(TrafficLog.country_code.isnot(None))\
                 .first()

@@ -21,3 +21,7 @@ class UserUpdateRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+
+class ApiKeyCreateRequest(BaseModel):
+    name: str = ""

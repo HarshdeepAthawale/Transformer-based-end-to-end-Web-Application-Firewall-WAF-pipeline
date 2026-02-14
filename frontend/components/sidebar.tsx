@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
+import Link from 'next/link'
 import {
   Shield,
   BarChart3,
@@ -26,24 +28,28 @@ export function Sidebar() {
   const [isOpen, setIsOpen] = useState(true)
   const pathname = usePathname()
   const router = useRouter()
+  const { data: session } = useSession()
+  const isAdmin = (session?.user as { role?: string })?.role === 'admin'
 
-  const menuItems = [
-    { icon: Home, label: 'Overview', href: '/' },
-    { icon: BarChart3, label: 'Analytics', href: '/analytics' },
-    { icon: Eye, label: 'Traffic', href: '/traffic' },
-    { icon: AlertTriangle, label: 'Threats', href: '/threats' },
-    
-    { icon: Ban, label: 'IP Management', href: '/ip-management' },
-    { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
-    { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
-    { icon: FileSearch, label: 'Threat Intel', href: '/threat-intelligence' },
-    { icon: ClipboardList, label: 'Security Rules', href: '/security-rules' },
-    { icon: Users, label: 'Users', href: '/users' },
-    { icon: FileText, label: 'Audit Logs', href: '/audit-logs' },
-  ]
+  const menuItems = useMemo(() => {
+    const items = [
+      { icon: Home, label: 'Overview', href: '/dashboard' },
+      { icon: BarChart3, label: 'Analytics', href: '/analytics' },
+      { icon: Eye, label: 'Traffic', href: '/traffic' },
+      { icon: AlertTriangle, label: 'Threats', href: '/threats' },
+      { icon: Ban, label: 'IP Management', href: '/ip-management' },
+      { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
+      { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
+      { icon: FileSearch, label: 'Threat Intel', href: '/threat-intelligence' },
+      { icon: ClipboardList, label: 'Security Rules', href: '/security-rules' },
+      { icon: Users, label: 'Users', href: '/users', adminOnly: true },
+      { icon: FileText, label: 'Audit Logs', href: '/audit-logs' },
+    ]
+    return items.filter((item) => !(item as { adminOnly?: boolean }).adminOnly || isAdmin)
+  }, [isAdmin])
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/'
+    if (href === '/dashboard') return pathname === '/dashboard'
     return pathname.startsWith(href)
   }
 
@@ -51,7 +57,8 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card text-foreground rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 rounded-none border-2"
+        style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)', color: 'var(--positivus-black)' }}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -66,18 +73,22 @@ export function Sidebar() {
       <aside
         className={`${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
-        } fixed lg:relative w-64 h-screen bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-300 z-40 lg:z-0 shadow-lg lg:shadow-none`}
+        } fixed lg:relative w-64 h-screen flex flex-col transition-transform duration-300 z-40 lg:z-0 shadow-lg lg:shadow-none`}
+        style={{ backgroundColor: 'var(--positivus-white)', borderRight: '2px solid var(--positivus-gray)' }}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-sidebar-border flex items-center gap-3">
-            <div className="p-2 bg-black rounded-lg">
-              <Shield size={24} className="text-white" />
+        <Link href="/" className="p-6 flex items-center gap-3 hover:opacity-80 transition-opacity" style={{ borderBottom: '2px solid var(--positivus-gray)' }}>
+          <div
+            className="p-2 rounded-none"
+            style={{ backgroundColor: 'var(--positivus-green-bg)' }}
+          >
+            <Shield size={24} style={{ color: 'var(--positivus-green)' }} />
           </div>
           <div>
-            <h1 className="font-bold text-sidebar-foreground">WAF</h1>
-            <p className="text-xs text-sidebar-foreground/60">Dashboard</p>
+            <h1 className="font-bold" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>WAF</h1>
+            <p className="text-xs" style={{ color: 'var(--positivus-gray-dark)' }}>Dashboard</p>
           </div>
-        </div>
+        </Link>
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
@@ -88,38 +99,42 @@ export function Sidebar() {
               <button
                 key={item.label}
                 onClick={() => router.push(item.href)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors group ${
-                  active
-                    ? 'bg-black text-white'
-                    : 'text-sidebar-foreground hover:bg-sidebar-accent'
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-none transition-colors group ${
+                  active ? '' : 'hover:bg-accent'
                 }`}
+                style={{
+                  backgroundColor: active ? 'var(--positivus-green)' : 'transparent',
+                  color: 'var(--positivus-black)',
+                }}
               >
                 <Icon
                   size={20}
-                  className={`transition-colors ${
-                    active
-                      ? 'text-white'
-                      : 'text-sidebar-foreground/70 group-hover:text-black'
-                  }`}
+                  style={{ color: active ? 'var(--positivus-black)' : 'var(--positivus-gray-dark)' }}
+                  className="group-hover:transition-colors"
                 />
-                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-sm font-medium" style={{ fontFamily: 'var(--font-space-grotesk)' }}>{item.label}</span>
               </button>
             )
           })}
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-sidebar-border space-y-2">
+        <div className="p-4 space-y-2" style={{ borderTop: '2px solid var(--positivus-gray)' }}>
           <button
             onClick={() => router.push('/settings')}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors group"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-none transition-colors hover:bg-[var(--positivus-green-bg)]"
+            style={{ color: 'var(--positivus-black)' }}
           >
-            <Settings size={20} className="text-sidebar-foreground/70" />
-            <span className="text-sm font-medium">Settings</span>
+            <Settings size={20} style={{ color: 'var(--positivus-gray-dark)' }} />
+            <span className="text-sm font-medium" style={{ fontFamily: 'var(--font-space-grotesk)' }}>Settings</span>
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors group">
-            <LogOut size={20} className="text-sidebar-foreground/70" />
-            <span className="text-sm font-medium">Logout</span>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-none transition-colors hover:bg-[var(--positivus-green-bg)]"
+            style={{ color: 'var(--positivus-black)' }}
+          >
+            <LogOut size={20} style={{ color: 'var(--positivus-gray-dark)' }} />
+            <span className="text-sm font-medium" style={{ fontFamily: 'var(--font-space-grotesk)' }}>Logout</span>
           </button>
         </div>
       </aside>

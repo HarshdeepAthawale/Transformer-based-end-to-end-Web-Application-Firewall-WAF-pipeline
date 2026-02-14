@@ -96,13 +96,13 @@ export default function AuditLogsPage() {
                 </Card>
                 <Card className="p-4">
                   <div className="text-sm text-muted-foreground">Successful</div>
-                  <div className="text-2xl font-bold mt-1 text-green-500">
+                  <div className="text-2xl font-bold mt-1">
                     {logs.filter(l => l.success).length}
                   </div>
                 </Card>
                 <Card className="p-4">
                   <div className="text-sm text-muted-foreground">Failed</div>
-                  <div className="text-2xl font-bold mt-1 text-destructive">
+                  <div className="text-2xl font-bold mt-1">
                     {logs.filter(l => !l.success).length}
                   </div>
                 </Card>

@@ -47,7 +47,7 @@ def init_db():
     from backend.models import (
         metrics, alerts, traffic, threats, activities,
         ip_blacklist, ip_reputation, geo_rules, bot_signatures,
-        threat_intel, security_rules, users, audit_log
+        threat_intel, security_rules, users, audit_log, settings
     )
     
     # Create all tables

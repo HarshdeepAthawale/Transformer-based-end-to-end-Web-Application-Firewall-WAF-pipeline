@@ -198,6 +198,7 @@ except Exception as e:
 
 # Advanced feature routes - register individually for better error handling
 advanced_routes = [
+    ("settings", "/api/settings", "settings"),
     ("ip_management", "/api/ip", "ip-management"),
     ("geo_rules", "/api/geo", "geo-fencing"),
     ("bot_detection", "/api/bots", "bot-detection"),
