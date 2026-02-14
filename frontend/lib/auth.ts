@@ -17,23 +17,30 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        // Only harshdeepathawale27@gmail.com has admin access (via credentials)
-        const adminEmail = 'harshdeepathawale27@gmail.com'
-        const adminPassword = process.env.ADMIN_PASSWORD ?? ''
-        if (
-          credentials.email === adminEmail &&
-          credentials.password === adminPassword &&
-          adminPassword
-        ) {
+        const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+        try {
+          const res = await fetch(`${baseUrl}/api/users/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: credentials.email,
+              password: credentials.password,
+            }),
+          })
+          if (!res.ok) return null
+          const json = await res.json()
+          const user = json?.data?.user
+          if (!user) return null
           return {
-            id: 'admin',
-            email: adminEmail,
-            name: 'Admin',
+            id: String(user.id),
+            email: user.email ?? credentials.email,
+            name: user.full_name ?? user.username ?? credentials.email,
             image: null,
-            role: 'admin',
+            role: user.role ?? 'viewer',
           }
+        } catch {
+          return null
         }
-        return null
       },
     }),
   ],

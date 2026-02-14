@@ -43,8 +43,7 @@ class ChartsService:
                     ),
                     func.count(TrafficLog.id).label("requests"),
                     func.sum(TrafficLog.was_blocked).label("blocked"),
-                    func.count(TrafficLog.id)
-                    - func.sum(TrafficLog.was_blocked).label("allowed"),
+                    (func.count(TrafficLog.id) - func.coalesce(func.sum(TrafficLog.was_blocked), 0)).label("allowed"),
                 )
                 .filter(TrafficLog.timestamp >= start_time)
                 .group_by("time")

@@ -25,6 +25,12 @@ class Metrics(Base):
     attack_rate = Column(Float, default=0.0, nullable=False)  # Percentage
     threats_per_minute = Column(Float, default=0.0, nullable=False)
 
+    # Performance metrics (required by DB schema)
+    avg_response_time = Column(Float, default=0.0, nullable=False)
+    avg_processing_time = Column(Float, default=0.0, nullable=False)
+    cpu_usage = Column(Float, default=0.0, nullable=False)
+    memory_usage = Column(Float, default=0.0, nullable=False)
+
     # Connection metrics
     active_connections = Column(Integer, default=0, nullable=False)
 

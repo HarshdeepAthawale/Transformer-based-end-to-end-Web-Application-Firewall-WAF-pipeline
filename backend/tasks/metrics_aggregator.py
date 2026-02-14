@@ -97,6 +97,13 @@ class MetricsAggregator:
             avg_processing_time = float(traffic_stats.avg_processing_time or 0)
 
             # Create metrics snapshot
+            try:
+                cpu_pct = psutil.cpu_percent()
+                mem_pct = psutil.virtual_memory().percent
+            except Exception:
+                cpu_pct = 0.0
+                mem_pct = 0.0
+
             metrics_service = MetricsService(db)
             metrics = metrics_service.create_metrics_snapshot(
                 {
@@ -105,7 +112,11 @@ class MetricsAggregator:
                     "allowed_requests": allowed_requests,
                     "attack_rate": attack_rate,
                     "threats_per_minute": threats_per_minute,
-                    "active_connections": 0,  # Simplified since performance monitoring removed
+                    "avg_response_time": avg_processing_time,
+                    "avg_processing_time": avg_processing_time,
+                    "cpu_usage": cpu_pct,
+                    "memory_usage": mem_pct,
+                    "active_connections": 0,
                     "uptime_seconds": int(time.time() - self._start_time),
                 }
             )

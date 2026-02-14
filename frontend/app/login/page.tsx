@@ -8,6 +8,7 @@ import { Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { usersApi } from '@/lib/api'
 
 type AuthMode = 'signin' | 'signup'
 
@@ -41,9 +42,38 @@ function LoginForm() {
         router.push(callbackUrl)
         router.refresh()
       } else {
-        // Sign up - for demo we redirect to sign in with message
-        // In production, call your backend to create user
-        setError('Sign up is coming soon. Use Sign in with Google.')
+        if (!name.trim()) {
+          setError('Name is required')
+          return
+        }
+        if (password.length < 8) {
+          setError('Password must be at least 8 characters')
+          return
+        }
+        try {
+          await usersApi.createUser({
+            username: email,
+            email,
+            password,
+            full_name: name.trim(),
+          })
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error ? err.message : 'Failed to create account. Please try again.'
+          setError(msg)
+          return
+        }
+        const result = await signIn('credentials', {
+          email,
+          password,
+          redirect: false,
+        })
+        if (result?.error) {
+          setError('Account created but sign in failed. Please try signing in.')
+          return
+        }
+        router.push(callbackUrl)
+        router.refresh()
       }
     } catch {
       setError('Something went wrong')
@@ -128,6 +158,7 @@ function LoginForm() {
                   placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required
                   className="mt-1 rounded-none border-2"
                   style={{
                     borderColor: 'var(--positivus-gray)',
@@ -162,7 +193,7 @@ function LoginForm() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required={mode === 'signin'}
+                required
                 className="mt-1 rounded-none border-2"
                 style={{
                   borderColor: 'var(--positivus-gray)',

@@ -285,4 +285,4 @@ All required dependencies are already in `requirements.txt`:
 
 ## Estimated Completion
 
-After implementing all phases, the project will be **~95-100% complete** according to the problem statement requirements.
+After implementing all phases, the project will be **~95-100% complete** according to the target pipeline requirements.

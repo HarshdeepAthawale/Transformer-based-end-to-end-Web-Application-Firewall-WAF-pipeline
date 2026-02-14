@@ -116,7 +116,16 @@ async function apiRequest<T>(
     })
 
     if (!response.ok) {
-      throw new ApiError(response.status, `API request failed: ${response.statusText}`)
+      let message = `API request failed: ${response.statusText}`
+      try {
+        const errBody = await response.json()
+        if (typeof errBody?.detail === 'string') {
+          message = errBody.detail
+        }
+      } catch {
+        // Ignore JSON parse errors
+      }
+      throw new ApiError(response.status, message)
     }
 
     const data = await response.json()
