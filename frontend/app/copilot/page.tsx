@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-import { Send, Bot, Search, BarChart3, Shield, FileSearch, HelpCircle, AlertTriangle } from 'lucide-react'
+import { Send, Bot, Search, BarChart3, Shield, FileSearch, HelpCircle, AlertTriangle, Square } from 'lucide-react'
 import { ChatMessage, type ChatMessageData } from '@/components/copilot/chat-message'
 import { TypingIndicator } from '@/components/copilot/typing-indicator'
 import { agentApi, type SuggestedAction } from '@/lib/agent-api'
@@ -23,6 +23,7 @@ export default function CopilotPage() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [sessionId, setSessionId] = useState<string | undefined>(undefined)
   const [currentTool, setCurrentTool] = useState<string | undefined>(undefined)
+  const abortRef = useRef<AbortController | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
   // Auto-scroll to bottom on new messages
@@ -32,8 +33,18 @@ export default function CopilotPage() {
     }
   }, [messages, isStreaming, currentTool])
 
+  const stopStreaming = () => {
+    if (abortRef.current) {
+      abortRef.current.abort()
+      abortRef.current = null
+    }
+  }
+
   const sendMessage = async (text: string) => {
     if (!text.trim() || isStreaming) return
+
+    stopStreaming()
+    abortRef.current = new AbortController()
 
     const userMsg: ChatMessageData = { role: 'user', content: text.trim() }
     setMessages(prev => [...prev, userMsg])
@@ -80,11 +91,12 @@ export default function CopilotPage() {
         },
         onDone: (data) => {
           setSessionId(data.session_id)
+          const finalContent = (data.content && data.content.length > 0) ? data.content : content
           setMessages(prev => {
             const updated = [...prev]
             updated[assistantIdx] = {
               ...updated[assistantIdx],
-              content,
+              content: finalContent,
               intent: data.intent || intent,
               experienceId: data.experience_id,
               toolsUsed: [...toolsUsed],
@@ -105,19 +117,45 @@ export default function CopilotPage() {
             return updated
           })
         },
-      })
+        onAbort: () => {
+          if (content) {
+            setMessages(prev => {
+              const updated = [...prev]
+              updated[assistantIdx] = { ...updated[assistantIdx], content: content + '\n\n_Cancelled_' }
+              return updated
+            })
+          }
+        },
+      }, abortRef.current.signal)
     } catch (err) {
-      setMessages(prev => {
-        const updated = [...prev]
-        updated[assistantIdx] = {
-          ...updated[assistantIdx],
-          content: content || 'Failed to connect to the AI agent. Please check that the backend is running.',
-        }
-        return updated
-      })
+      const isAborted = err instanceof Error && err.name === 'AbortError'
+      if (!isAborted) {
+        const errMsg = err instanceof Error ? err.message : 'Unknown error'
+        const isNetwork =
+          errMsg.toLowerCase().includes('fetch') ||
+          errMsg.toLowerCase().includes('network') ||
+          errMsg.toLowerCase().includes('failed to fetch')
+        const display =
+          content ||
+          (isNetwork
+            ? 'Failed to connect to the AI agent. Please check that the backend is running on port 3001.'
+            : `Error: ${errMsg}`)
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[assistantIdx] = { ...updated[assistantIdx], content: display }
+          return updated
+        })
+      } else if (content) {
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[assistantIdx] = { ...updated[assistantIdx], content: content + '\n\n_Cancelled_' }
+          return updated
+        })
+      }
     } finally {
       setIsStreaming(false)
       setCurrentTool(undefined)
+      abortRef.current = null
     }
   }
 
@@ -133,7 +171,7 @@ export default function CopilotPage() {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
-        <main className="flex-1 flex flex-col overflow-hidden" style={{ backgroundColor: '#FAFAFA' }}>
+        <main className="flex-1 flex flex-col overflow-hidden bg-background">
           {/* Chat area */}
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:px-8">
             {isEmpty ? (
@@ -213,17 +251,32 @@ export default function CopilotPage() {
                   backgroundColor: 'var(--positivus-white)',
                 }}
               />
-              <button
-                type="submit"
-                disabled={!input.trim() || isStreaming}
-                className="px-4 py-3 rounded-none transition-opacity disabled:opacity-30"
-                style={{
-                  backgroundColor: 'var(--positivus-black)',
-                  color: 'var(--positivus-white)',
-                }}
-              >
-                <Send size={18} />
-              </button>
+              {isStreaming ? (
+                <button
+                  type="button"
+                  onClick={stopStreaming}
+                  className="px-4 py-3 rounded-none transition-opacity hover:opacity-80 flex items-center gap-2"
+                  style={{
+                    backgroundColor: '#dc2626',
+                    color: 'white',
+                  }}
+                >
+                  <Square size={14} fill="currentColor" />
+                  Stop
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={!input.trim()}
+                  className="px-4 py-3 rounded-none transition-opacity disabled:opacity-30"
+                  style={{
+                    backgroundColor: 'var(--positivus-black)',
+                    color: 'var(--positivus-white)',
+                  }}
+                >
+                  <Send size={18} />
+                </button>
+              )}
             </form>
           </div>
         </main>

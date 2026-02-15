@@ -82,7 +82,7 @@
   --positivus-white: #0a0a0a;
   --positivus-black: #ffffff;
   --positivus-gray: #0a0a0a;
-  --positivus-gray-dark: #71717a;
+  --positivus-gray-dark: #a1a1aa;
   --positivus-green: #C5E246;
   --positivus-green-bg: #1a2a0a;
   --positivus-green-light: #a8c932;
@@ -95,6 +95,8 @@
   --sidebar-border: #1a1a1a;
   --sidebar-ring: #ffffff;
   --security-info: #ffffff;
+  --destructive: #f87171;
+  --destructive-foreground: #ffffff;
   --destructive-bg: #450a0a;
 }
 

@@ -46,9 +46,9 @@ _INTENT_PATTERNS: list[tuple[AgentIntent, re.Pattern]] = [
     (
         AgentIntent.ANALYZE,
         re.compile(
-            r"\b(analy|trend|traffic\s+pattern|statistic|metric|chart|graph|"
-            r"overview|summary|dashboard|volume|rate|performance|"
-            r"how\s+many|how\s+much|compare|percentage)\b",
+            r"\b(analy\w*|trend|traffic\s+pattern|traffic\s+trend|traffic\s+analysis|"
+            r"statistic|metric|chart|graph|overview|summary|dashboard|volume|"
+            r"rate|performance|how\s+many|how\s+much|compare|percentage)\b",
             re.IGNORECASE,
         ),
     ),

@@ -101,7 +101,7 @@ class Orchestrator:
                 "steps": 0,
             }
         except Exception as e:
-            logger.error(f"Agent error: {e}", exc_info=True)
+            logger.error("Agent error: {}", str(e), exc_info=True)
             result = {
                 "content": f"An error occurred while processing your request: {str(e)}",
                 "tool_calls_made": [],
@@ -168,7 +168,7 @@ class Orchestrator:
             yield f"data: {json.dumps({'type': 'error', 'message': error_msg})}\n\n"
             full_content = error_msg
         except Exception as e:
-            logger.error(f"Streaming agent error: {e}", exc_info=True)
+            logger.error("Streaming agent error: {}", str(e), exc_info=True)
             error_msg = f"An error occurred: {str(e)}"
             yield f"data: {json.dumps({'type': 'error', 'message': error_msg})}\n\n"
             full_content = error_msg
@@ -190,5 +190,5 @@ class Orchestrator:
             steps_taken=len(tool_calls_made),
         )
 
-        # Yield done event
-        yield f"data: {json.dumps({'type': 'done', 'experience_id': exp.id, 'session_id': session_id, 'suggested_actions': suggested_actions, 'intent': intent.value})}\n\n"
+        # Yield done event (include content as fallback if frontend missed tokens)
+        yield f"data: {json.dumps({'type': 'done', 'experience_id': exp.id, 'session_id': session_id, 'suggested_actions': suggested_actions, 'intent': intent.value, 'content': full_content})}\n\n"

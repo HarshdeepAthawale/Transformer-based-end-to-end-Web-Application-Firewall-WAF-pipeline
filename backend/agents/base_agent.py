@@ -8,12 +8,22 @@ from typing import Any, AsyncIterator, List
 
 from loguru import logger
 from openai import AsyncOpenAI
+from openai import APIError
 
 from backend.agents.context import AgentContext
 from backend.agents.tools.registry import registry
 
 
 MAX_TOOL_STEPS = 6
+
+
+def _is_tool_use_error(exc: Exception) -> bool:
+    """Check if error is due to model producing invalid tool call format."""
+    err_str = str(exc).lower()
+    return (
+        "tool_use_failed" in err_str
+        or "invalid_request_error" in err_str
+    ) and "401" not in str(exc)  # Don't treat auth errors as tool issues
 
 
 class BaseAgent:
@@ -51,6 +61,22 @@ class BaseAgent:
             logger.error(f"Tool {name} failed: {e}")
             return json.dumps({"error": str(e)})
 
+    async def _completion_with_tool_fallback(
+        self, messages: list, tools: list, *, use_tools: bool = True
+    ) -> Any:
+        """Call completion; on tool_use_failed, retry without tools."""
+        kwargs: dict[str, Any] = {"model": self.model, "messages": messages}
+        if use_tools and tools:
+            kwargs["tools"] = tools
+        try:
+            return await self.client.chat.completions.create(**kwargs)
+        except APIError as e:
+            if use_tools and tools and _is_tool_use_error(e):
+                logger.warning(f"Tool-call format error from model, retrying without tools: {e}")
+                kwargs.pop("tools", None)
+                return await self.client.chat.completions.create(**kwargs)
+            raise
+
     async def run(self, user_message: str, ctx: AgentContext) -> dict:
         """Run tool-calling loop and return final response.
 
@@ -64,10 +90,10 @@ class BaseAgent:
         tool_calls_made: List[str] = []
 
         for step in range(MAX_TOOL_STEPS):
-            kwargs: dict[str, Any] = {"model": self.model, "messages": messages}
-            if tools:
-                kwargs["tools"] = tools
-            response = await self.client.chat.completions.create(**kwargs)
+            use_tools = bool(tools)
+            response = await self._completion_with_tool_fallback(
+                messages, tools, use_tools=use_tools
+            )
             choice = response.choices[0]
 
             if choice.finish_reason == "tool_calls" and choice.message.tool_calls:
@@ -110,13 +136,13 @@ class BaseAgent:
         ]
         tools = self._get_tools()
 
-        for step in range(MAX_TOOL_STEPS):
-            kwargs: dict[str, Any] = {"model": self.model, "messages": messages}
-            if tools:
-                kwargs["tools"] = tools
+        final_content: str | None = None
 
-            # Non-streaming call for tool steps
-            response = await self.client.chat.completions.create(**kwargs)
+        for step in range(MAX_TOOL_STEPS):
+            use_tools = bool(tools)
+            response = await self._completion_with_tool_fallback(
+                messages, tools, use_tools=use_tools
+            )
             choice = response.choices[0]
 
             if choice.finish_reason == "tool_calls" and choice.message.tool_calls:
@@ -133,16 +159,43 @@ class BaseAgent:
                         {"role": "tool", "tool_call_id": tc.id, "content": result_str}
                     )
             else:
+                final_content = choice.message.content or ""
                 break
 
         # Stream the final answer
-        stream_kwargs: dict[str, Any] = {
-            "model": self.model,
-            "messages": messages,
-            "stream": True,
-        }
-        stream = await self.client.chat.completions.create(**stream_kwargs)
-        async for chunk in stream:
-            delta = chunk.choices[0].delta if chunk.choices else None
-            if delta and delta.content:
-                yield delta.content
+        if final_content:
+            # Already have content (e.g. from tool-fallback retry), yield as chunks
+            for i in range(0, len(final_content), 32):
+                yield final_content[i : i + 32]
+        else:
+            # Need to get final synthesis from model (we have tool results in messages)
+            stream_kwargs: dict[str, Any] = {
+                "model": self.model,
+                "messages": messages,
+                "stream": True,
+            }
+            try:
+                stream = await self.client.chat.completions.create(**stream_kwargs)
+                async for chunk in stream:
+                    delta = chunk.choices[0].delta if chunk.choices else None
+                    if delta and delta.content:
+                        yield delta.content
+            except APIError as e:
+                if _is_tool_use_error(e):
+                    # Fallback: non-streaming completion to get final text
+                    logger.warning(f"Streaming failed, fallback to non-streaming: {e}")
+                    try:
+                        fallback = await self.client.chat.completions.create(
+                            model=self.model, messages=messages
+                        )
+                        text = (fallback.choices[0].message.content or "").strip()
+                        if text:
+                            for i in range(0, len(text), 32):
+                                yield text[i : i + 32]
+                        else:
+                            yield "I gathered the data but could not generate a summary. Please try a simpler query."
+                    except Exception as fallback_err:
+                        logger.error(f"Fallback completion failed: {fallback_err}")
+                        yield "An error occurred while generating the response. Please try again."
+                else:
+                    raise

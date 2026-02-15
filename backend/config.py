@@ -6,6 +6,10 @@ from pathlib import Path
 from typing import Optional
 import yaml
 
+# Load .env file if it exists
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 
 class Config:
     """API server configuration"""
@@ -28,7 +32,7 @@ class Config:
     # CORS
     CORS_ORIGINS: list = os.getenv(
         "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:3001"
+        "http://localhost:3000,http://localhost:3001,http://127.0.0.1:3000,http://127.0.0.1:3001"
     ).split(",")
     
     # Data retention (days)

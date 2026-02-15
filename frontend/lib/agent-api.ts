@@ -21,8 +21,9 @@ export interface StreamCallbacks {
   onIntent?: (intent: string) => void
   onToolUse?: (tool: string) => void
   onToken?: (token: string) => void
-  onDone?: (data: { experience_id: number; session_id: string; suggested_actions: SuggestedAction[]; intent: string }) => void
+  onDone?: (data: { experience_id: number; session_id: string; suggested_actions: SuggestedAction[]; intent: string; content?: string }) => void
   onError?: (message: string) => void
+  onAbort?: () => void
 }
 
 export const agentApi = {
@@ -41,12 +42,18 @@ export const agentApi = {
     return json.data
   },
 
-  /** Streaming chat via SSE */
-  async chatStream(message: string, sessionId: string | undefined, callbacks: StreamCallbacks): Promise<void> {
+  /** Streaming chat via SSE (supports AbortSignal for cancellation) */
+  async chatStream(
+    message: string,
+    sessionId: string | undefined,
+    callbacks: StreamCallbacks,
+    signal?: AbortSignal
+  ): Promise<void> {
     const res = await fetch(`${API_BASE_URL}/api/agent/chat/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message, session_id: sessionId }),
+      signal,
     })
 
     if (!res.ok) {
@@ -64,42 +71,54 @@ export const agentApi = {
     const decoder = new TextDecoder()
     let buffer = ''
 
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        if (signal?.aborted) {
+          reader.cancel()
+          break
+        }
 
-      buffer += decoder.decode(value, { stream: true })
-      const lines = buffer.split('\n')
-      buffer = lines.pop() || ''
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
 
-      for (const line of lines) {
-        if (!line.startsWith('data: ')) continue
-        const raw = line.slice(6).trim()
-        if (!raw) continue
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          const raw = line.slice(6).trim()
+          if (!raw) continue
 
-        try {
-          const event = JSON.parse(raw)
-          switch (event.type) {
-            case 'intent':
-              callbacks.onIntent?.(event.intent)
-              break
-            case 'tool_use':
-              callbacks.onToolUse?.(event.tool)
-              break
-            case 'token':
-              callbacks.onToken?.(event.content)
-              break
-            case 'done':
-              callbacks.onDone?.(event)
-              break
-            case 'error':
-              callbacks.onError?.(event.message)
-              break
+          try {
+            const event = JSON.parse(raw)
+            switch (event.type) {
+              case 'intent':
+                callbacks.onIntent?.(event.intent)
+                break
+              case 'tool_use':
+                callbacks.onToolUse?.(event.tool)
+                break
+              case 'token':
+                callbacks.onToken?.(event.content)
+                break
+              case 'done':
+                callbacks.onDone?.(event)
+                break
+              case 'error':
+                callbacks.onError?.(event.message)
+                break
+            }
+          } catch {
+            // Skip malformed events
           }
-        } catch {
-          // Skip malformed events
         }
       }
+    } catch (e) {
+      if (e instanceof Error && e.name === 'AbortError') {
+        callbacks.onAbort?.()
+        return
+      }
+      throw e
     }
   },
 

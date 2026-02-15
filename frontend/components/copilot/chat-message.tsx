@@ -103,7 +103,7 @@ export function ChatMessage({ message }: Props) {
             <button
               onClick={() => handleFeedback(1)}
               disabled={feedback !== null}
-              className="p-1 rounded-none transition-colors hover:bg-green-50"
+              className="p-1 rounded-none transition-colors hover:bg-muted"
               style={{ color: feedback === 1 ? '#22c55e' : 'var(--positivus-gray-dark)' }}
               title="Helpful"
             >
@@ -112,7 +112,7 @@ export function ChatMessage({ message }: Props) {
             <button
               onClick={() => handleFeedback(-1)}
               disabled={feedback !== null}
-              className="p-1 rounded-none transition-colors hover:bg-red-50"
+              className="p-1 rounded-none transition-colors hover:bg-muted"
               style={{ color: feedback === -1 ? '#ef4444' : 'var(--positivus-gray-dark)' }}
               title="Not helpful"
             >
