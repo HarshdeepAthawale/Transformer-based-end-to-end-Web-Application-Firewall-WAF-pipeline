@@ -34,6 +34,7 @@ export function Sidebar() {
   const menuItems = useMemo(() => {
     const items = [
       { icon: Home, label: 'Overview', href: '/dashboard' },
+      { icon: Bot, label: 'AI Copilot', href: '/copilot' },
       { icon: BarChart3, label: 'Analytics', href: '/analytics' },
       { icon: Eye, label: 'Traffic', href: '/traffic' },
       { icon: AlertTriangle, label: 'Threats', href: '/threats' },

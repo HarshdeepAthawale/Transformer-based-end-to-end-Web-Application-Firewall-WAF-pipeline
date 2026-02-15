@@ -99,6 +99,14 @@ try:
 except Exception as e:
     logger.warning(f"Rate limit middleware not available: {e}")
 
+# Agent-specific rate limiting
+try:
+    from backend.middleware.agent_rate_limit import AgentRateLimitMiddleware
+
+    app.add_middleware(AgentRateLimitMiddleware)
+except Exception as e:
+    logger.warning(f"Agent rate limit middleware not available: {e}")
+
 # WAF Middleware - Must be after CORS but before other middleware
 try:
     from backend.middleware.waf_middleware import WAFMiddleware
@@ -206,6 +214,7 @@ advanced_routes = [
     ("security_rules", "/api/rules", "security-rules"),
     ("users", "/api/users", "users"),
     ("audit", "/api/audit", "audit"),
+    ("agent", "/api/agent", "ai-agent"),
 ]
 
 for module_name, prefix, tag in advanced_routes:

@@ -56,3 +56,6 @@ psutil>=5.9.0
 
 # WebSocket
 websockets>=11.0
+
+# AI Agent
+openai>=1.0.0
