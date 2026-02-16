@@ -38,7 +38,6 @@ docker-compose up -d
 ```
 
 - Open **http://localhost:3000** for the dashboard
-- Open **http://localhost:8080** for the protected app (when using the gateway)
 
 See [docs/README.md](docs/README.md) for full setup, environment variables, and deployment.
 
@@ -46,18 +45,28 @@ See [docs/README.md](docs/README.md) for full setup, environment variables, and 
 
 ## Architecture
 
+B2B SaaS model: each customer connects their apps; traffic flows through the WAF before reaching their origins.
+
 ```
+                    Customer Traffic (HTTPS)
+                           ↓
 ┌─────────────────────────────────────────────────────────────┐
-│                     Frontend Dashboard                       │
-│                   (Next.js on port 3000)                    │
-│         Real-time metrics, traffic logs, charts             │
+│            WAF Gateway (Reverse Proxy · Edge)               │
+│              Inspect → Score → Allow / Block                 │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ Events, metrics (per tenant)
+                       ↓
+┌─────────────────────────────────────────────────────────────┐
+│                     Customer Dashboard                       │
+│                   (Next.js · Multi-tenant)                   │
+│         Per-org metrics, alerts, config, API keys             │
 └──────────────────────┬──────────────────────────────────────┘
                        │ REST API + WebSocket
                        ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                     Backend API Server                       │
-│                  (FastAPI on port 3001)                     │
-│         WAF Middleware + ML Model + Database                │
+│                  (FastAPI · Multi-tenant)                    │
+│         WAF config + ML Model + Tenant isolation              │
 └──┬─────────┬────────┬────────────────────────────────┬──────┘
    │         │        │                                │
    ↓         ↓        ↓                                ↓
@@ -66,12 +75,12 @@ See [docs/README.md](docs/README.md) for full setup, environment variables, and 
 └─────┘  └──────┘ │(DistilBERT Fine-tuned)   │   └─────────┘
                   └──────────────────────────┘
 
-                 ↓ Protects ↓
+                 ↓ Protects (per customer) ↓
 
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│  Juice Shop  │  │   WebGoat    │  │     DVWA     │
-│  Port 8080   │  │  Port 8081   │  │  Port 8082   │
-└──────────────┘  └──────────────┘  └──────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                   Customer Origins (B2B)                     │
+│     app.customer-a.com · api.customer-b.com · ...            │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -89,7 +98,7 @@ PyTorch · DistilBERT · FastAPI · Next.js · Docker · PostgreSQL · Redis
 | `backend/`      | FastAPI API, WAF middleware, ML inference    |
 | `frontend/`     | Next.js dashboard                            |
 | `gateway/`      | Reverse proxy + WAF inspection               |
-| `applications/` | Juice Shop, WebGoat, DVWA (protected apps)   |
+| `applications/` | Demo apps (Juice Shop, WebGoat, DVWA) for testing |
 | `models/`       | Trained DistilBERT model                     |
 | `scripts/`      | Fine-tuning, stress tests, threshold sweeps  |
 | `docs/`         | Phase guides and detailed documentation      |
