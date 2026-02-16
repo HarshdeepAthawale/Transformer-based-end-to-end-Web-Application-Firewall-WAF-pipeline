@@ -2,6 +2,7 @@
 FastAPI Application Entry Point
 """
 
+import os
 import time
 from contextlib import asynccontextmanager
 
@@ -46,15 +47,49 @@ async def lifespan(app: FastAPI):
         logger.error(f"Failed to initialize database: {e}")
         raise
 
+    # Sync IP blacklist to Redis for gateway enforcement (B2B scalable)
+    try:
+        from backend.database import SessionLocal
+        from backend.services.ip_fencing import IPFencingService
+        from backend.services.blacklist_sync import sync_full_blacklist, REDIS_REQUIRED_MSG
+
+        db = SessionLocal()
+        try:
+            service = IPFencingService(db)
+            entries = service.get_blacklist(limit=10000)
+            count = sync_full_blacklist(entries)
+            if count > 0:
+                logger.info(f"Blacklist synced to Redis: {count} IPs")
+        finally:
+            db.close()
+    except RuntimeError as e:
+        if REDIS_REQUIRED_MSG in str(e):
+            logger.error(str(e))
+            raise
+        raise
+    except Exception as e:
+        logger.debug(f"Blacklist sync on startup skipped: {e}")
+
     # Create WAF service via core factory and store in app state
     try:
-        from backend.core.waf_factory import create_waf_service
+        from backend.core.waf_factory import create_waf_service, is_model_available
 
         app.state.waf_service = create_waf_service()
         if app.state.waf_service:
             logger.info("WAF service created and stored in app.state")
         else:
             logger.warning("WAF service not available (model/vocab may be missing)")
+            if config.WAF_ENABLED and os.getenv("WAF_REQUIRE_MODEL", "false").lower() == "true":
+                model_ok = is_model_available()
+                if not model_ok:
+                    logger.critical(
+                        "WAF_ENABLED=true and WAF_REQUIRE_MODEL=true but model is missing. "
+                        "Ensure models/waf-distilbert exists with config.json, tokenizer.json, and model weights. "
+                        "Exiting."
+                    )
+                    raise SystemExit(1)
+    except SystemExit:
+        raise
     except Exception as e:
         logger.warning(f"Could not create WAF service: {e}")
         app.state.waf_service = None
@@ -68,9 +103,34 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Failed to start some background workers: {e}")
 
+    # Start continuous learning scheduler (optional)
+    learning_scheduler = None
+    if os.getenv("LEARNING_ENABLED", "false").lower() == "true":
+        log_path = getattr(config, "LOG_PATH", None) or os.getenv("LOG_PATH")
+        if log_path:
+            try:
+                from backend.ml.learning.scheduler import LearningScheduler
+
+                learning_scheduler = LearningScheduler(
+                    log_path=log_path,
+                    model_path=os.getenv("WAF_MODEL_PATH", "models/waf-distilbert"),
+                    update_interval_hours=int(os.getenv("LEARNING_UPDATE_INTERVAL_HOURS", "24")),
+                )
+                learning_scheduler.start()
+                logger.info("Continuous learning scheduler started")
+            except Exception as e:
+                logger.warning(f"Learning scheduler not started: {e}")
+        else:
+            logger.debug("LEARNING_ENABLED=true but LOG_PATH not set, skipping scheduler")
+
     yield
 
     # Shutdown
+    if learning_scheduler is not None:
+        try:
+            learning_scheduler.stop()
+        except Exception:
+            pass
     logger.info("Shutting down WAF API Server...")
     close_db()
     logger.info("Shutdown complete")

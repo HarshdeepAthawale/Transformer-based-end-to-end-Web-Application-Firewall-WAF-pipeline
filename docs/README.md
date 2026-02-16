@@ -171,6 +171,10 @@ This directory contains comprehensive documentation for building a Transformer-b
 - [Rate Limiting](rate-limiting.md) - Redis-backed per-IP throttling
 - [DDoS Protection](ddos-protection.md) - Burst detection and request size limits
 
+Deployment:
+- **Full stack** (dashboard + backend + gateway + Redis + MongoDB): `docker compose up -d` — dashboard at http://localhost:3000
+- **Gateway only** (rate limit + DDoS): `docker compose -f docker-compose.gateway.yml up -d`
+
 ## References
 
 - [Awesome WAF Project](https://github.com/0xInfection/awesome-waf) - Comprehensive WAF resources

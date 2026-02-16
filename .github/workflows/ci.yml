@@ -1,0 +1,66 @@
+# CI Pipeline - Lint, Test, Coverage
+name: CI
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff check
+        run: ruff check backend gateway --ignore E501
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio pytest-cov
+
+      - name: Run unit tests
+        env:
+          DATABASE_URL: sqlite:///./data/test.db
+        run: |
+          mkdir -p data
+          pytest tests/unit -v --tb=short
+
+  model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate WAF model presence
+        run: |
+          MODEL_DIR="models/waf-distilbert"
+          if [ ! -d "$MODEL_DIR" ]; then
+            echo "::error::Model directory $MODEL_DIR not found"
+            exit 1
+          fi
+          if [ ! -f "$MODEL_DIR/config.json" ] || [ ! -f "$MODEL_DIR/tokenizer.json" ]; then
+            echo "::error::Model requires config.json and tokenizer.json in $MODEL_DIR"
+            exit 1
+          fi
+          echo "Model files present"

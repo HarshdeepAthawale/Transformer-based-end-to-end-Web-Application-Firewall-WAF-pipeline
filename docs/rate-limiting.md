@@ -21,14 +21,18 @@ The WAF Gateway includes Redis-backed rate limiting to throttle excessive reques
 
 ## Gateway Deployment
 
-Ensure Redis is available and `REDIS_URL` is set:
+Use the provided Compose file to run the gateway with Redis (rate limiting and DDoS both require Redis):
 
 ```bash
-REDIS_URL=redis://redis:6379
-RATE_LIMIT_ENABLED=true
 docker compose -f docker-compose.gateway.yml up -d
 ```
 
+Ensure `REDIS_URL` is set (default in the compose is `redis://redis:6379`). For dashboard metrics, set `BACKEND_EVENTS_URL` to your backend ingest endpoint and `BACKEND_EVENTS_ENABLED=true` (default is true).
+
+If Redis is unavailable, rate limiting is disabled and requests are allowed (fail-open); the gateway logs a warning at startup.
+
+To verify rate limit and DDoS behavior, run the stress test against the gateway: `STRESS_TEST_BASE_URL=http://localhost:8080 python scripts/stress_test_rate_limit.py`.
+
 ## Dashboard
 
-Rate limit events are reported to the backend (when `BACKEND_EVENTS_ENABLED=true`) and shown in the dashboard under "Rate Limit Hits" and the "Rate Limit & DDoS Events" chart.
+Rate limit events are reported to the backend when `BACKEND_EVENTS_URL` is set and `BACKEND_EVENTS_ENABLED=true`, and are shown in the dashboard under "Rate Limit Hits" and the "Rate Limit & DDoS Events" chart.

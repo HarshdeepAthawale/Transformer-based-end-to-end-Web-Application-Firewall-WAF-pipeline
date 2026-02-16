@@ -1,0 +1,91 @@
+# Full-stack WAF: Backend API, Frontend Dashboard, Gateway, Redis, MongoDB
+# Run: docker compose up -d
+# Dashboard: http://localhost:3000 | Gateway: http://localhost:8080 | Backend API: http://localhost:3001
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: sqlite:///./data/waf_dashboard.db
+      REDIS_URL: redis://redis:6379
+      CORS_ORIGINS: http://localhost:3000,http://localhost:80,http://frontend:3000
+      WEBSOCKET_ENABLED: "true"
+      WAF_ENABLED: "true"
+    volumes:
+      - backend_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+        NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3001/ws/}
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
+      NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL:-ws://localhost:3001/ws/}
+    depends_on:
+      - backend
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_URL: redis://redis:6379
+      MONGODB_URI: mongodb://mongodb:27017
+      MONGODB_DB: waf_gateway
+      UPSTREAM_URL: ${UPSTREAM_URL:-http://frontend:3000}
+      BACKEND_EVENTS_URL: http://backend:3001/api/events/ingest
+      BACKEND_EVENTS_ENABLED: "true"
+      RATE_LIMIT_ENABLED: "true"
+      DDOS_ENABLED: "true"
+      WAF_ENABLED: "true"
+      BLACKLIST_ENABLED: "true"
+    depends_on:
+      redis:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend_data:

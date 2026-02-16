@@ -1,38 +1,19 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, AlertTriangle, Shield, Zap, BarChart3, RefreshCw, Gauge, Ban } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, AlertTriangle, Shield, BarChart3, RefreshCw } from 'lucide-react'
 import { useRealTimeData } from '@/hooks/use-real-time-data'
 import { useEffect, useState } from 'react'
-import { metricsApi, wsManager, RealTimeMetrics, eventsApi, EventsStats } from '@/lib/api'
+import { wsManager, RealTimeMetrics } from '@/lib/api'
 
 export function MetricsOverview() {
-  const { metrics: realTimeMetrics, getFreshnessLevel, refresh } = useRealTimeData()
-  const [eventsStats, setEventsStats] = useState<EventsStats | null>(null)
+  const { metrics: realTimeMetrics, refresh } = useRealTimeData()
   const [animatedValues, setAnimatedValues] = useState({
     requests: 0,
     blocked: 0,
     attackRate: 0,
     threatsPerMinute: 0,
-    rateLimitHits: 0,
-    ddosBlocks: 0,
   })
   const [previousMetrics, setPreviousMetrics] = useState<RealTimeMetrics | null>(null)
-
-  useEffect(() => {
-    eventsApi.getStats('24h').then((res) => {
-      if (res.success && res.data) {
-        setEventsStats(res.data)
-      }
-    })
-    const interval = setInterval(() => {
-      eventsApi.getStats('24h').then((res) => {
-        if (res.success && res.data) {
-          setEventsStats(res.data)
-        }
-      })
-    }, 60_000)
-    return () => clearInterval(interval)
-  }, [])
 
   // Subscribe to real-time metrics updates
   useEffect(() => {
@@ -61,12 +42,11 @@ export function MetricsOverview() {
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimatedValues(prev => ({
+        ...prev,
         requests: prev.requests + (realTimeMetrics.requests - prev.requests) * 0.1,
         blocked: prev.blocked + (realTimeMetrics.blocked - prev.blocked) * 0.1,
         attackRate: prev.attackRate + (realTimeMetrics.attackRate - prev.attackRate) * 0.1,
         threatsPerMinute: prev.threatsPerMinute + (realTimeMetrics.threatsPerMinute - prev.threatsPerMinute) * 0.1,
-        rateLimitHits: prev.rateLimitHits,
-        ddosBlocks: prev.ddosBlocks,
       }))
     }, 100)
 
@@ -77,9 +57,6 @@ export function MetricsOverview() {
   const requestsTrend = getTrend(realTimeMetrics.requests, previousMetrics?.requests || null)
   const blockedTrend = getTrend(realTimeMetrics.blocked, previousMetrics?.blocked || null)
   const attackRateTrend = getTrend(realTimeMetrics.attackRate, previousMetrics?.attackRate || null)
-
-  const rateLimitHits = eventsStats?.rate_limit_count ?? 0
-  const ddosBlocks = eventsStats?.ddos_count ?? 0
 
   const metrics = [
     {
@@ -113,28 +90,10 @@ export function MetricsOverview() {
       priority: animatedValues.attackRate > 10 ? 'critical' : 'normal',
       isLive: true,
     },
-    {
-      label: 'Rate Limit Hits (24h)',
-      value: rateLimitHits.toLocaleString(),
-      change: '0%',
-      trend: 'neutral' as const,
-      icon: Gauge,
-      priority: 'normal' as const,
-      isLive: false,
-    },
-    {
-      label: 'DDoS Blocks (24h)',
-      value: ddosBlocks.toLocaleString(),
-      change: '0%',
-      trend: 'neutral' as const,
-      icon: Ban,
-      priority: ddosBlocks > 0 ? 'critical' : 'normal',
-      isLive: false,
-    },
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {metrics.map((metric, index) => {
         const Icon = metric.icon
         const TrendIcon = metric.trend === 'up' ? ArrowUpRight : ArrowDownRight

@@ -6,6 +6,7 @@ import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
   Shield,
+  ShieldCheck,
   BarChart3,
   AlertTriangle,
   Settings,
@@ -38,6 +39,7 @@ export function Sidebar() {
       { icon: BarChart3, label: 'Analytics', href: '/analytics' },
       { icon: Eye, label: 'Traffic', href: '/traffic' },
       { icon: AlertTriangle, label: 'Threats', href: '/threats' },
+      { icon: ShieldCheck, label: 'DoS/DDoS Protection', href: '/dos-protection' },
       { icon: Ban, label: 'IP Management', href: '/ip-management' },
       { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
       { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },

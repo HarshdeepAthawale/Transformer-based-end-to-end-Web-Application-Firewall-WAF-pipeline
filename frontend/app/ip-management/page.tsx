@@ -20,7 +20,7 @@ export default function IPManagementPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [selectedIP, setSelectedIP] = useState<string | null>(null)
-  const [reputation, setReputation] = useState<IPReputation | null>(null)
+  const [reputation, setReputation] = useState<IPReputation | null | 'not_found'>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -94,16 +94,21 @@ export default function IPManagementPage() {
 
   const handleViewReputation = async (ip: string) => {
     setSelectedIP(ip)
+    setReputation(null)
     setLoading(true)
+    setError(null)
     try {
       const response = await ipApi.getReputation(ip)
-      if (response.success) {
+      if (response.success && response.data) {
         setReputation(response.data)
+      } else {
+        setReputation('not_found')
       }
     } catch (err: any) {
       if (!err?.isNetworkError) {
         setError(err?.message || 'Failed to fetch reputation')
       }
+      setReputation('not_found')
     } finally {
       setLoading(false)
     }
@@ -287,12 +292,12 @@ export default function IPManagementPage() {
 
             {/* Reputation Dialog */}
             {selectedIP && (
-              <Dialog open={!!selectedIP} onOpenChange={() => setSelectedIP(null)}>
+              <Dialog open={!!selectedIP} onOpenChange={() => { setSelectedIP(null); setReputation(null) }}>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>IP Reputation: {selectedIP}</DialogTitle>
                   </DialogHeader>
-                  {reputation ? (
+                  {reputation && reputation !== 'not_found' ? (
                     <div className="space-y-4">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -315,6 +320,8 @@ export default function IPManagementPage() {
                         </div>
                       </div>
                     </div>
+                  ) : reputation === 'not_found' ? (
+                    <p className="text-muted-foreground">No reputation data found for this IP. Reputation is populated when the IP appears in traffic or threat data.</p>
                   ) : (
                     <p className="text-muted-foreground">Loading reputation data...</p>
                   )}

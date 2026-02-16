@@ -232,6 +232,17 @@ export interface SecurityEventData {
 export interface EventsStats {
   rate_limit_count: number
   ddos_count: number
+  blacklist_count?: number
+}
+
+export interface DosOverviewData {
+  stats: EventsStats
+  chart_rate_limit: { time: string; count: number }[]
+  chart_ddos: { time: string; count: number }[]
+  chart_blacklist?: { time: string; count: number }[]
+  recent_rate_limit: SecurityEventData[]
+  recent_ddos: SecurityEventData[]
+  recent_blacklist?: SecurityEventData[]
 }
 
 export const eventsApi = {
@@ -243,6 +254,9 @@ export const eventsApi = {
 
   getDdosEvents: (range: string = '24h'): Promise<ApiResponse<SecurityEventData[]>> =>
     apiRequest(`/api/events/ddos?range=${range}`),
+
+  getDosOverview: (range: string = '24h', limit?: number): Promise<ApiResponse<DosOverviewData>> =>
+    apiRequest(`/api/events/dos-overview?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
 }
 
 // Traffic API

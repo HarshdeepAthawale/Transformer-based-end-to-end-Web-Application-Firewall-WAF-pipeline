@@ -6,11 +6,30 @@ from typing import Optional
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from backend.database import get_db
 from backend.models.security_event import SecurityEvent
 
 router = APIRouter()
+
+
+def _aggregate_security_events(db: Session, start_time, event_types: list[str]) -> list:
+    """Aggregate security events by hour for chart data."""
+    results = (
+        db.query(
+            func.strftime("%Y-%m-%d %H:00:00", SecurityEvent.timestamp).label("time"),
+            func.count(SecurityEvent.id).label("count"),
+        )
+        .filter(
+            SecurityEvent.event_type.in_(event_types),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .group_by("time")
+        .order_by("time")
+        .all()
+    )
+    return [{"time": row.time, "count": int(row.count)} for row in results]
 
 
 class IngestEvent(BaseModel):
@@ -142,3 +161,97 @@ async def list_ddos_events(
         .all()
     )
     return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/dos-overview")
+async def get_dos_overview(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d, 90d"),
+    limit: int = Query(100, le=500, description="Max events per list"),
+    db: Session = Depends(get_db),
+):
+    """Combined endpoint: stats, chart data, and recent events for DoS/DDoS protection page."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+
+    # Stats
+    rate_limit_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type == "rate_limit",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+    ddos_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("ddos_burst", "ddos_blocked", "ddos_size")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+    blacklist_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type == "blacklist",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+
+    # Chart data
+    chart_rate_limit = _aggregate_security_events(db, start_time, ["rate_limit"])
+    chart_ddos = _aggregate_security_events(
+        db, start_time, ["ddos_burst", "ddos_blocked", "ddos_size"]
+    )
+    chart_blacklist = _aggregate_security_events(db, start_time, ["blacklist"])
+
+    # Recent events
+    recent_rate_limit = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type == "rate_limit",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    recent_ddos = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("ddos_burst", "ddos_blocked", "ddos_size")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    recent_blacklist = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type == "blacklist",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+
+    return {
+        "success": True,
+        "data": {
+            "stats": {
+                "rate_limit_count": rate_limit_count,
+                "ddos_count": ddos_count,
+                "blacklist_count": blacklist_count,
+            },
+            "chart_rate_limit": chart_rate_limit,
+            "chart_ddos": chart_ddos,
+            "chart_blacklist": chart_blacklist,
+            "recent_rate_limit": [r.to_dict() for r in recent_rate_limit],
+            "recent_ddos": [r.to_dict() for r in recent_ddos],
+            "recent_blacklist": [r.to_dict() for r in recent_blacklist],
+        },
+    }

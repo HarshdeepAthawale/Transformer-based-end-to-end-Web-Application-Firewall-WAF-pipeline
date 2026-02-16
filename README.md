@@ -43,6 +43,8 @@ docker-compose up -d
 
 - Open **http://localhost:3000** for the dashboard
 
+To run only the WAF gateway with Redis (rate limiting and DDoS): `docker compose -f docker-compose.gateway.yml up -d`.
+
 See [docs/README.md](docs/README.md) for full setup, environment variables, and deployment.
 
 ---

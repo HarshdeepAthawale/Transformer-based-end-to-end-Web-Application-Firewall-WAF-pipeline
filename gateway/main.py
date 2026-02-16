@@ -6,6 +6,7 @@ Usage:
     UPSTREAM_URL=http://your-app:8080 uvicorn gateway.main:app --host 0.0.0.0 --port 8080
 """
 
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -21,7 +22,8 @@ from gateway.proxy import forward_request
 from gateway.waf_inspect import inspect_request
 from gateway.rate_limit import create_rate_limiter
 from gateway.ddos_protection import create_ddos_protection
-from gateway.events import report_event
+from gateway.blacklist import create_blacklist_checker
+from gateway.events import report_event, start_event_batcher, stop_event_batcher
 
 # Configure logger
 logger.add(
@@ -82,11 +84,21 @@ async def lifespan(app: FastAPI):
     else:
         logger.info("DDoS protection disabled or unavailable")
 
+    # IP blacklist (backend syncs to Redis)
+    app.state.blacklist_checker = create_blacklist_checker()
+    if app.state.blacklist_checker:
+        logger.info("IP blacklist enforcement enabled")
+    else:
+        logger.info("IP blacklist disabled or unavailable")
+
+    # Event batching: batch events before POST to backend
+    start_event_batcher()
+
     # Initialize WAF classifier (reuse backend factory)
     app.state.waf_service = None
     if gateway_config.WAF_ENABLED:
         try:
-            from backend.core.waf_factory import create_waf_service
+            from backend.core.waf_factory import create_waf_service, is_model_available
 
             app.state.waf_service = create_waf_service()
             if app.state.waf_service:
@@ -95,6 +107,15 @@ async def lifespan(app: FastAPI):
                 logger.warning(
                     "WAF classifier not available (model may be missing)"
                 )
+                if os.getenv("WAF_REQUIRE_MODEL", "false").lower() == "true":
+                    if not is_model_available():
+                        logger.critical(
+                            "WAF_REQUIRE_MODEL=true but model is missing. "
+                            "Ensure models/waf-distilbert exists. Exiting."
+                        )
+                        raise SystemExit(1)
+        except SystemExit:
+            raise
         except Exception as exc:
             logger.error(f"Failed to initialize WAF classifier: {exc}")
 
@@ -102,12 +123,15 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("Shutting down WAF Gateway...")
+    await stop_event_batcher()
     await app.state.http_client.aclose()
     await app.state.event_store.close()
     if app.state.rate_limiter:
         await app.state.rate_limiter.close()
     if app.state.ddos_protection:
         await app.state.ddos_protection.close()
+    if getattr(app.state, "blacklist_checker", None):
+        await app.state.blacklist_checker.close()
     logger.info("Gateway shutdown complete")
 
 
@@ -122,12 +146,20 @@ app = FastAPI(
 
 
 @app.get("/gateway/health")
-async def health():
+async def health(request: Request):
     """Gateway health check endpoint (liveness)."""
+    model_loaded = False
+    try:
+        waf_svc = getattr(request.app.state, "waf_service", None)
+        if waf_svc is not None and getattr(waf_svc, "is_loaded", False):
+            model_loaded = True
+    except Exception:
+        pass
     return {
         "status": "healthy",
         "service": "waf-gateway",
         "waf_enabled": gateway_config.WAF_ENABLED,
+        "model_loaded": model_loaded,
         "waf_mode": gateway_config.WAF_MODE,
         "upstream": gateway_config.UPSTREAM_URL,
         "rate_limit_enabled": gateway_config.RATE_LIMIT_ENABLED,
@@ -174,11 +206,16 @@ def _log_gateway_event(
     upstream_status: int | None = None,
     total_latency_ms: float,
     blocked_by: str | None = None,
+    retry_after_seconds: int | None = None,
+    block_duration_seconds: int | None = None,
+    content_length: int | None = None,
+    max_bytes: int | None = None,
+    block_ttl_seconds: int | None = None,
 ) -> None:
     """Helper to log an event to both MongoDB and the legacy event reporter."""
     event_store: MongoEventStore = request.app.state.event_store
     headers = dict(request.headers)
-    content_length = headers.get("content-length")
+    header_content_length = headers.get("content-length")
 
     event_store.log_event(
         request_id=request_id,
@@ -195,11 +232,11 @@ def _log_gateway_event(
         total_latency_ms=total_latency_ms,
         blocked_by=blocked_by,
         user_agent=headers.get("user-agent", ""),
-        content_length=int(content_length) if content_length else None,
+        content_length=int(header_content_length) if header_content_length else None,
     )
 
-    # Also fire legacy event reporter if enabled
-    report_event({
+    # Build payload for backend ingest (IngestEvent: retry_after, content_length, max_bytes, block_ttl_seconds, block_duration_seconds)
+    event_payload = {
         "event_type": blocked_by or "allow",
         "request_id": request_id,
         "ip": client_ip,
@@ -207,7 +244,18 @@ def _log_gateway_event(
         "path": request.url.path,
         "decision": decision,
         "anomaly_score": anomaly_score,
-    })
+    }
+    if retry_after_seconds is not None:
+        event_payload["retry_after"] = retry_after_seconds
+    if block_duration_seconds is not None:
+        event_payload["block_duration_seconds"] = block_duration_seconds
+    if content_length is not None:
+        event_payload["content_length"] = content_length
+    if max_bytes is not None:
+        event_payload["max_bytes"] = max_bytes
+    if block_ttl_seconds is not None:
+        event_payload["block_ttl_seconds"] = block_ttl_seconds
+    report_event(event_payload)
 
 
 @app.api_route(
@@ -226,6 +274,30 @@ async def gateway_proxy(request: Request, path: str):
     request_id = str(uuid.uuid4())
     client_ip = _get_client_ip(request)
 
+    # --- IP blacklist check (first; backend syncs to Redis) ---
+    blacklist = getattr(request.app.state, "blacklist_checker", None)
+    if blacklist:
+        is_blocked, reason = await blacklist.is_blocked(client_ip)
+        if is_blocked:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="blacklist",
+            )
+            resp = JSONResponse(
+                status_code=403,
+                content={
+                    "blocked": True,
+                    "message": reason or "IP is blacklisted",
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
     # --- Rate limit check (before body read) ---
     rate_limiter = getattr(request.app.state, "rate_limiter", None)
     if rate_limiter:
@@ -239,6 +311,7 @@ async def gateway_proxy(request: Request, path: str):
                 decision="block",
                 total_latency_ms=elapsed_ms,
                 blocked_by="rate_limit",
+                retry_after_seconds=max(1, int(retry_after)),
             )
             resp = JSONResponse(
                 status_code=429,
@@ -271,6 +344,8 @@ async def gateway_proxy(request: Request, path: str):
                 decision="block",
                 total_latency_ms=elapsed_ms,
                 blocked_by="ddos_size",
+                content_length=cl if cl is not None else 0,
+                max_bytes=gateway_config.DDOS_MAX_BODY_BYTES,
             )
             resp = JSONResponse(
                 status_code=413,
@@ -293,6 +368,8 @@ async def gateway_proxy(request: Request, path: str):
                 decision="block",
                 total_latency_ms=elapsed_ms,
                 blocked_by="ddos_blocked",
+                retry_after_seconds=max(1, int(ttl)),
+                block_ttl_seconds=max(1, int(ttl)),
             )
             resp = JSONResponse(
                 status_code=429,
@@ -316,6 +393,7 @@ async def gateway_proxy(request: Request, path: str):
                 decision="block",
                 total_latency_ms=elapsed_ms,
                 blocked_by="ddos_burst",
+                block_duration_seconds=gateway_config.DDOS_BLOCK_DURATION_SECONDS,
             )
             resp = JSONResponse(
                 status_code=429,

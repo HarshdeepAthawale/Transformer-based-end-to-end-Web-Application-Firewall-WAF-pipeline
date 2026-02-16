@@ -1,0 +1,34 @@
+# Production deployment configuration
+# Use with: DATABASE_URL, REDIS_URL, etc. from environment
+
+production:
+  model:
+    path: "models/waf-distilbert"
+    threshold: 0.65
+
+  api_server:
+    host: "0.0.0.0"
+    port: 3001
+    workers: 4
+    database:
+      url: "${DATABASE_URL}"
+    cors_origins: ["https://your-domain.com"]
+
+  waf_service:
+    host: "0.0.0.0"
+    port: 8000
+    timeout: 5.0
+    threshold: 0.65
+    fail_open: true
+
+  monitoring:
+    enabled: true
+    metrics_endpoint: "/api/metrics"
+    alert_threshold_percent: 10
+    alert_window_seconds: 60
+
+  ssl_tls:
+    # Configure at reverse proxy (Nginx/Traefik)
+    # Example Nginx: ssl_certificate /etc/letsencrypt/live/domain/fullchain.pem;
+    # Example Nginx: ssl_certificate_key /etc/letsencrypt/live/domain/privkey.pem;
+    recommended: "Use Nginx or Traefik as TLS termination in front of backend/gateway"

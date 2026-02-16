@@ -57,7 +57,7 @@ def check_waf_service():
 
     print("\033[91m✗ WAF Backend is not available at http://localhost:3001\033[0m")
     print("  Please start the backend first:")
-    print("  docker-compose -f docker-compose.full-test.yml up -d")
+    print("  docker compose up -d")
     return False
 
 

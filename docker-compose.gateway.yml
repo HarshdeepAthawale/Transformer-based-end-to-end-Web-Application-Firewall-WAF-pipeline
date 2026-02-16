@@ -1,0 +1,36 @@
+# WAF Gateway + Redis for rate limiting and DDoS protection.
+# Run from project root: docker compose -f docker-compose.gateway.yml up -d
+# Set BACKEND_EVENTS_URL to your backend (e.g. http://host.docker.internal:3001/api/events/ingest) for dashboard metrics.
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      REDIS_URL: redis://redis:6379
+      UPSTREAM_URL: ${UPSTREAM_URL:-http://host.docker.internal:3000}
+      BACKEND_EVENTS_URL: ${BACKEND_EVENTS_URL:-http://host.docker.internal:3001/api/events/ingest}
+      BACKEND_EVENTS_ENABLED: ${BACKEND_EVENTS_ENABLED:-true}
+      RATE_LIMIT_ENABLED: ${RATE_LIMIT_ENABLED:-true}
+      DDOS_ENABLED: ${DDOS_ENABLED:-true}
+      WAF_ENABLED: ${WAF_ENABLED:-true}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://host.docker.internal:27017}
+      MONGODB_DB: ${MONGODB_DB:-waf_gateway}
+    depends_on:
+      redis:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

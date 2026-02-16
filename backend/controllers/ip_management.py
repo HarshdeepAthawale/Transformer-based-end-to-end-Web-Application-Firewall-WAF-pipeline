@@ -1,8 +1,10 @@
 """IP management controller."""
 from datetime import datetime
 from sqlalchemy.orm import Session
+from fastapi import HTTPException
 
 from backend.services.ip_fencing import IPFencingService
+from backend.services.blacklist_sync import sync_add, sync_remove, sync_full_blacklist, REDIS_REQUIRED_MSG
 from backend.models.ip_blacklist import IPListType
 
 
@@ -36,6 +38,13 @@ def add_to_blacklist(
 ) -> dict:
     service = IPFencingService(db)
     entry = service.add_to_blacklist(ip=ip, reason=reason, source=source, duration_hours=duration_hours)
+    # Sync to Redis for gateway enforcement (B2B scalable)
+    try:
+        sync_add(ip, reason=reason, expires_at=entry.expires_at)
+    except RuntimeError as e:
+        if REDIS_REQUIRED_MSG in str(e):
+            raise HTTPException(status_code=503, detail=str(e))
+        raise
     return {"success": True, "data": entry.to_dict(), "timestamp": datetime.utcnow().isoformat()}
 
 
@@ -49,6 +58,13 @@ def remove_from_list(db: Session, ip: str, list_type: str) -> dict:
     service = IPFencingService(db)
     if list_type == "blacklist":
         success = service.remove_from_list(ip, IPListType.BLACKLIST)
+        if success:
+            try:
+                sync_remove(ip)
+            except RuntimeError as e:
+                if REDIS_REQUIRED_MSG in str(e):
+                    raise HTTPException(status_code=503, detail=str(e))
+                raise
     elif list_type == "whitelist":
         success = service.remove_from_list(ip, IPListType.WHITELIST)
     else:
