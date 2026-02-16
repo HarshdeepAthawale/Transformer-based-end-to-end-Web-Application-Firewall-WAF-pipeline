@@ -1,0 +1,82 @@
+[
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "id": "456"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "id": "user_001"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/test/login",
+    "json": {
+      "username": "user",
+      "password": "secret123"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/test/login",
+    "json": {
+      "email": "user@example.com",
+      "password": "pass"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/test/search",
+    "json": {
+      "query": "laptop"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/test/login",
+    "json": {
+      "username": "admin",
+      "password": "admin"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "q": "hello"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "filter": "active"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "id": "123"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/test/search",
+    "json": {
+      "query": "wireless mouse"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/test/profile",
+    "params": {
+      "id": "42"
+    }
+  }
+]

@@ -1,0 +1,22 @@
+[
+  {"method": "GET", "url": "/test/endpoint", "params": {"id": "123"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"id": "456"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"search": "products"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"search": "laptop"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"q": "hello"}},
+  {"method": "GET", "url": "/test/profile", "params": {"name": "John"}},
+  {"method": "GET", "url": "/test/profile", "params": {"name": "Jane"}},
+  {"method": "POST", "url": "/test/login", "json": {"username": "user", "password": "secret123"}},
+  {"method": "POST", "url": "/test/login", "json": {"username": "admin", "password": "admin"}},
+  {"method": "POST", "url": "/test/search", "json": {"query": "laptop"}},
+  {"method": "POST", "url": "/test/search", "json": {"query": "wireless mouse"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"page": "1", "limit": "10"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"sort": "date", "order": "desc"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"filter": "active"}},
+  {"method": "POST", "url": "/test/search", "json": {"query": "best headphones 2024"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"id": "user_001"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"search": "javascript tutorial"}},
+  {"method": "POST", "url": "/test/login", "json": {"email": "user@example.com", "password": "pass"}},
+  {"method": "GET", "url": "/test/profile", "params": {"id": "42"}},
+  {"method": "GET", "url": "/test/endpoint", "params": {"category": "electronics"}}
+]

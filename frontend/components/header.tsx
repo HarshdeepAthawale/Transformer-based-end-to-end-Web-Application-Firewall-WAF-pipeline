@@ -17,6 +17,7 @@ export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: Head
     { label: '24h', value: '24h' },
     { label: '7d', value: '7d' },
     { label: '30d', value: '30d' },
+    { label: '90d', value: '90d' },
   ]
 
   return (

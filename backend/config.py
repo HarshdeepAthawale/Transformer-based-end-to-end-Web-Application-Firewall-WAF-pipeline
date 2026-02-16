@@ -47,7 +47,7 @@ class Config:
     # WAF Middleware Configuration
     WAF_ENABLED: bool = os.getenv("WAF_ENABLED", "true").lower() == "true"
     WAF_FAIL_OPEN: bool = os.getenv("WAF_FAIL_OPEN", "true").lower() == "true"  # Allow requests if WAF unavailable
-    WAF_THRESHOLD: float = float(os.getenv("WAF_THRESHOLD", "0.5"))
+    WAF_THRESHOLD: float = float(os.getenv("WAF_THRESHOLD", "0.65"))
     WAF_MODEL_PATH: Optional[str] = os.getenv("WAF_MODEL_PATH", None)
     WAF_VOCAB_PATH: Optional[str] = os.getenv("WAF_VOCAB_PATH", None)
     WAF_TIMEOUT: float = float(os.getenv("WAF_TIMEOUT", "5.0"))  # Timeout in seconds

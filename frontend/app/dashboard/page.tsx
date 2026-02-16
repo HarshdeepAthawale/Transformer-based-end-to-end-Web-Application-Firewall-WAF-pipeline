@@ -42,7 +42,7 @@ export default function DashboardPage() {
                 {/* Main Content Area - Charts */}
                 <div className="xl:col-span-8">
                   <ErrorBoundary>
-                    <ChartsSection timeRange={timeRange} />
+                    <ChartsSection timeRange={timeRange} onTimeRangeChange={setTimeRange} />
                   </ErrorBoundary>
                 </div>
 

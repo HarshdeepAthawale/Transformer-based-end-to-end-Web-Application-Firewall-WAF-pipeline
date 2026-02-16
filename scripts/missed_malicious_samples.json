@@ -1,0 +1,9 @@
+[
+  {
+    "method": "GET",
+    "url": "/test/endpoint",
+    "params": {
+      "search": "UNION"
+    }
+  }
+]
