@@ -202,6 +202,7 @@ def _log_gateway_event(
     body_bytes: bytes | None = None,
     decision: str,
     anomaly_score: float | None = None,
+    attack_score: int | None = None,
     waf_latency_ms: float | None = None,
     upstream_status: int | None = None,
     total_latency_ms: float,
@@ -245,6 +246,8 @@ def _log_gateway_event(
         "decision": decision,
         "anomaly_score": anomaly_score,
     }
+    if attack_score is not None:
+        event_payload["attack_score"] = attack_score
     if retry_after_seconds is not None:
         event_payload["retry_after"] = retry_after_seconds
     if block_duration_seconds is not None:
@@ -426,6 +429,8 @@ async def gateway_proxy(request: Request, path: str):
 
     if should_block:
         elapsed_ms = (time.perf_counter() - start_time) * 1000
+        waf_action = waf_result.get("action", "block")
+        waf_event_type = "waf_challenge" if waf_action == "challenge" else "waf_block"
         _log_gateway_event(
             request,
             request_id=request_id,
@@ -433,15 +438,18 @@ async def gateway_proxy(request: Request, path: str):
             body_bytes=body_bytes,
             decision="block",
             anomaly_score=waf_result.get("anomaly_score"),
+            attack_score=waf_result.get("attack_score"),
             waf_latency_ms=waf_result.get("waf_latency_ms"),
             total_latency_ms=elapsed_ms,
-            blocked_by="waf",
+            blocked_by=waf_event_type,
         )
         resp = JSONResponse(
             status_code=403,
             content={
                 "blocked": True,
-                "message": "Request blocked by WAF",
+                "message": "Request blocked by WAF" if waf_action == "block" else "Request challenged by WAF",
+                "action": waf_action,
+                "attack_score": waf_result.get("attack_score"),
                 "anomaly_score": waf_result.get("anomaly_score", 0.0),
                 "threshold": waf_result.get(
                     "threshold", gateway_config.WAF_THRESHOLD
@@ -473,6 +481,7 @@ async def gateway_proxy(request: Request, path: str):
         body_bytes=body_bytes,
         decision=decision,
         anomaly_score=waf_result.get("anomaly_score"),
+        attack_score=waf_result.get("attack_score"),
         waf_latency_ms=waf_result.get("waf_latency_ms"),
         upstream_status=response.status_code,
         total_latency_ms=elapsed_ms,
@@ -483,7 +492,7 @@ async def gateway_proxy(request: Request, path: str):
     response.headers["X-Gateway-Time-Ms"] = f"{elapsed_ms:.1f}"
     if waf_result and not waf_result.get("skipped"):
         response.headers["X-WAF-Score"] = str(
-            waf_result.get("anomaly_score", "")
+            waf_result.get("attack_score", "")
         )
         response.headers["X-WAF-Mode"] = gateway_config.WAF_MODE
 

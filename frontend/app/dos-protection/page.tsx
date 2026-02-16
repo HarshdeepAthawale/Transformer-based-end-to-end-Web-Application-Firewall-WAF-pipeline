@@ -17,7 +17,7 @@ import {
   type ChartConfig,
 } from '@/components/ui/chart'
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts'
-import { Gauge, Ban, ShieldCheck, AlertCircle, Loader2, ShieldX } from 'lucide-react'
+import { Gauge, Ban, ShieldCheck, AlertCircle, Loader2, ShieldX, ShieldAlert } from 'lucide-react'
 import { eventsApi, ipApi, type SecurityEventData } from '@/lib/api'
 import { useTimezone } from '@/contexts/timezone-context'
 import { formatTimeLocal } from '@/lib/chart-utils'
@@ -41,7 +41,9 @@ export default function DosProtectionPage() {
     recent_ddos: SecurityEventData[]
     recent_blacklist?: SecurityEventData[]
   } | null>(null)
-  const [activeTab, setActiveTab] = useState<'rate_limit' | 'ddos' | 'blacklist'>('rate_limit')
+  const [wafEvents, setWafEvents] = useState<SecurityEventData[]>([])
+  const [wafBlockCount, setWafBlockCount] = useState(0)
+  const [activeTab, setActiveTab] = useState<'rate_limit' | 'ddos' | 'blacklist' | 'waf'>('rate_limit')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [blacklistLoading, setBlacklistLoading] = useState<string | null>(null)
@@ -52,9 +54,19 @@ export default function DosProtectionPage() {
       setLoading(true)
       setError(null)
       try {
-        const res = await eventsApi.getDosOverview(timeRange, 100)
+        const [res, wafRes, statsRes] = await Promise.all([
+          eventsApi.getDosOverview(timeRange, 100),
+          eventsApi.getWafEvents(timeRange, 100),
+          eventsApi.getStats(timeRange),
+        ])
         if (res.success && res.data) {
           setOverviewData(res.data)
+        }
+        if (wafRes.success && wafRes.data) {
+          setWafEvents(wafRes.data)
+        }
+        if (statsRes.success && statsRes.data) {
+          setWafBlockCount(statsRes.data.waf_block_count ?? 0)
         }
       } catch (err: unknown) {
         const e = err as { isNetworkError?: boolean; message?: string }
@@ -129,7 +141,9 @@ export default function DosProtectionPage() {
       ? rateLimitEvents
       : activeTab === 'ddos'
         ? ddosEvents
-        : blacklistEvents
+        : activeTab === 'waf'
+          ? wafEvents
+          : blacklistEvents
 
   return (
     <div className="flex h-screen" style={{ backgroundColor: 'var(--positivus-gray)' }}>
@@ -158,7 +172,7 @@ export default function DosProtectionPage() {
               )}
 
               {/* Metric cards */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card
                   className="p-6 border-2"
                   style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
@@ -207,6 +221,23 @@ export default function DosProtectionPage() {
                   </div>
                   <p className="text-2xl font-semibold" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
                     {loading ? '...' : blacklistCount.toLocaleString()}
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--positivus-gray-dark)' }}>Last {timeRange}</p>
+                </Card>
+                <Card
+                  className="p-6 border-2"
+                  style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 rounded-md" style={{ backgroundColor: 'var(--positivus-green-bg)' }}>
+                      <ShieldAlert size={20} style={{ color: 'var(--positivus-green)' }} />
+                    </div>
+                    <span className="text-sm font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>
+                      WAF Blocks
+                    </span>
+                  </div>
+                  <p className="text-2xl font-semibold" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
+                    {loading ? '...' : wafBlockCount.toLocaleString()}
                   </p>
                   <p className="text-xs mt-1" style={{ color: 'var(--positivus-gray-dark)' }}>Last {timeRange}</p>
                 </Card>
@@ -291,6 +322,15 @@ export default function DosProtectionPage() {
                     <ShieldX size={16} />
                     Blacklist Events ({blacklistEvents.length})
                   </Button>
+                  <Button
+                    variant={activeTab === 'waf' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setActiveTab('waf')}
+                    className="gap-2"
+                  >
+                    <ShieldAlert size={16} />
+                    WAF Events ({wafEvents.length})
+                  </Button>
                 </div>
                 <div className="overflow-x-auto">
                   {loading ? (
@@ -299,7 +339,7 @@ export default function DosProtectionPage() {
                     </div>
                   ) : currentEvents.length === 0 ? (
                     <div className="py-12 text-center text-muted-foreground">
-                      No {activeTab === 'rate_limit' ? 'rate limit' : activeTab === 'ddos' ? 'DDoS' : 'blacklist'} events in the selected period
+                      No {activeTab === 'rate_limit' ? 'rate limit' : activeTab === 'ddos' ? 'DDoS' : activeTab === 'waf' ? 'WAF' : 'blacklist'} events in the selected period
                     </div>
                   ) : (
                     <Table>
@@ -309,6 +349,7 @@ export default function DosProtectionPage() {
                           <TableHead>IP</TableHead>
                           <TableHead>Method</TableHead>
                           <TableHead>Path</TableHead>
+                          {activeTab === 'waf' && <TableHead>Attack Score</TableHead>}
                           <TableHead>Details</TableHead>
                           <TableHead className="w-[120px]">Actions</TableHead>
                         </TableRow>
@@ -322,6 +363,36 @@ export default function DosProtectionPage() {
                             <TableCell className="font-mono text-sm">{ev.ip}</TableCell>
                             <TableCell className="text-sm">{ev.method || '-'}</TableCell>
                             <TableCell className="text-sm max-w-[200px] truncate">{ev.path || '-'}</TableCell>
+                            {activeTab === 'waf' && (
+                              <TableCell>
+                                {ev.attack_score != null ? (
+                                  <span
+                                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                                    style={{
+                                      backgroundColor:
+                                        ev.attack_score >= 70
+                                          ? 'hsl(0 84% 60% / 0.15)'
+                                          : ev.attack_score >= 30
+                                            ? 'hsl(45 93% 47% / 0.15)'
+                                            : 'hsl(142 76% 36% / 0.15)',
+                                      color:
+                                        ev.attack_score >= 70
+                                          ? 'hsl(0 84% 40%)'
+                                          : ev.attack_score >= 30
+                                            ? 'hsl(45 93% 30%)'
+                                            : 'hsl(142 76% 26%)',
+                                    }}
+                                  >
+                                    {ev.attack_score}
+                                    <span className="ml-1">
+                                      {ev.attack_score >= 70 ? 'High' : ev.attack_score >= 30 ? 'Medium' : 'Low'}
+                                    </span>
+                                  </span>
+                                ) : (
+                                  <span className="text-muted-foreground">&mdash;</span>
+                                )}
+                              </TableCell>
+                            )}
                             <TableCell className="text-sm max-w-[200px] truncate text-muted-foreground">
                               {ev.details || '-'}
                             </TableCell>
@@ -334,7 +405,7 @@ export default function DosProtectionPage() {
                                   size="sm"
                                   className="gap-1"
                                   disabled={blacklistLoading === ev.ip}
-                                  onClick={() => handleAddToBlacklist(ev.ip, `DoS event: ${ev.event_type}`)}
+                                  onClick={() => handleAddToBlacklist(ev.ip, `${activeTab === 'waf' ? 'WAF' : 'DoS'} event: ${ev.event_type}`)}
                                 >
                                   {blacklistLoading === ev.ip ? (
                                     <Loader2 className="h-3 w-3 animate-spin" />

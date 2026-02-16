@@ -26,6 +26,8 @@ class GatewayConfig:
     WAF_THRESHOLD: float = float(os.getenv("WAF_THRESHOLD", "0.65"))
     WAF_FAIL_OPEN: bool = os.getenv("WAF_FAIL_OPEN", "true").lower() == "true"
     WAF_TIMEOUT: float = float(os.getenv("WAF_TIMEOUT", "5.0"))
+    WAF_ATTACK_SCORE_BLOCK_THRESHOLD: int = int(os.getenv("WAF_ATTACK_SCORE_BLOCK_THRESHOLD", "70"))
+    WAF_ATTACK_SCORE_CHALLENGE_THRESHOLD: int = int(os.getenv("WAF_ATTACK_SCORE_CHALLENGE_THRESHOLD", "0"))
 
     # Body limits
     BODY_MAX_BYTES: int = int(os.getenv("BODY_MAX_BYTES", str(10 * 1024 * 1024)))

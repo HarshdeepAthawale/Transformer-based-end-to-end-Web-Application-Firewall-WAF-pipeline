@@ -134,12 +134,15 @@ class WAFClassifier:
             label = "malicious" if is_malicious else "benign"
             confidence = malicious_prob if is_malicious else benign_prob
 
+            attack_score = max(0, min(100, int(round(malicious_prob * 100))))
+
             return {
                 "label": label,
                 "confidence": round(confidence, 4),
                 "is_malicious": is_malicious,
                 "malicious_score": round(malicious_prob, 4),
                 "benign_score": round(benign_prob, 4),
+                "attack_score": attack_score,
             }
         except Exception as e:
             logger.error(f"Classification error: {e}")
@@ -186,12 +189,14 @@ class WAFClassifier:
                     benign_prob = prob[0].item()
                     is_malicious = malicious_prob >= self.threshold
 
+                    attack_score = max(0, min(100, int(round(malicious_prob * 100))))
                     results.append({
                         "label": "malicious" if is_malicious else "benign",
                         "confidence": round(malicious_prob if is_malicious else benign_prob, 4),
                         "is_malicious": is_malicious,
                         "malicious_score": round(malicious_prob, 4),
                         "benign_score": round(benign_prob, 4),
+                        "attack_score": attack_score,
                     })
             except Exception as e:
                 logger.error(f"Batch classification error: {e}")
@@ -362,6 +367,8 @@ class WAFClassifier:
             if is_anomaly:
                 self._metrics["anomalies_detected"] += 1
 
+        attack_score = classification.get("attack_score") or max(0, min(100, int(round(malicious_score * 100))))
+
         return {
             "is_anomaly": is_anomaly,
             "anomaly_score": malicious_score,
@@ -371,6 +378,7 @@ class WAFClassifier:
             "confidence": classification.get("confidence", 0.0),
             "malicious_score": malicious_score,
             "benign_score": classification.get("benign_score", 0.0),
+            "attack_score": attack_score,
         }
 
     def get_metrics(self) -> Dict[str, Any]:

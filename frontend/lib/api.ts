@@ -226,6 +226,7 @@ export interface SecurityEventData {
   method?: string
   path?: string
   details?: string
+  attack_score?: number
   block_duration_seconds?: number
 }
 
@@ -233,6 +234,8 @@ export interface EventsStats {
   rate_limit_count: number
   ddos_count: number
   blacklist_count?: number
+  waf_block_count?: number
+  avg_attack_score?: number | null
 }
 
 export interface DosOverviewData {
@@ -257,6 +260,9 @@ export const eventsApi = {
 
   getDosOverview: (range: string = '24h', limit?: number): Promise<ApiResponse<DosOverviewData>> =>
     apiRequest(`/api/events/dos-overview?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
+
+  getWafEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<SecurityEventData[]>> =>
+    apiRequest(`/api/events/waf?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
 }
 
 // Traffic API

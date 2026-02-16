@@ -22,6 +22,7 @@ class SecurityEvent(Base):
     path = Column(String(500), nullable=True)
 
     details = Column(Text, nullable=True)
+    attack_score = Column(Integer, nullable=True, index=True)
     block_duration_seconds = Column(Integer, nullable=True)
 
     def to_dict(self):
@@ -33,5 +34,6 @@ class SecurityEvent(Base):
             "method": self.method,
             "path": self.path,
             "details": self.details,
+            "attack_score": self.attack_score,
             "block_duration_seconds": self.block_duration_seconds,
         }

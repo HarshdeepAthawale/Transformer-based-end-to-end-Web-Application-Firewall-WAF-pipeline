@@ -56,24 +56,42 @@ async def inspect_request(
         )
         elapsed_ms = (time.perf_counter() - start) * 1000
 
-        is_anomaly = result.get("is_anomaly", False)
         anomaly_score = result.get("anomaly_score", 0.0)
         result["waf_latency_ms"] = round(elapsed_ms, 2)
 
-        if is_anomaly:
-            client_ip = headers.get("x-forwarded-for", "unknown")
-            if gateway_config.WAF_MODE == "block":
+        # Derive integer attack score (0-100)
+        attack_score = result.get("attack_score")
+        if attack_score is None:
+            attack_score = max(0, min(100, int(round(anomaly_score * 100))))
+        result["attack_score"] = attack_score
+
+        block_threshold = gateway_config.WAF_ATTACK_SCORE_BLOCK_THRESHOLD
+        challenge_threshold = gateway_config.WAF_ATTACK_SCORE_CHALLENGE_THRESHOLD
+        client_ip = headers.get("x-forwarded-for", "unknown")
+
+        if gateway_config.WAF_MODE == "block":
+            if attack_score >= block_threshold:
                 logger.warning(
                     f"WAF BLOCK: {method} {path} | "
-                    f"score={anomaly_score:.4f} | ip={client_ip}"
+                    f"attack_score={attack_score} (>={block_threshold}) | ip={client_ip}"
                 )
+                result["action"] = "block"
                 return True, result
-            else:
+
+            if challenge_threshold > 0 and attack_score >= challenge_threshold:
+                logger.warning(
+                    f"WAF CHALLENGE: {method} {path} | "
+                    f"attack_score={attack_score} (>={challenge_threshold}) | ip={client_ip}"
+                )
+                result["action"] = "challenge"
+                return True, result
+        else:
+            # Monitor mode: never block, but log high scores
+            if attack_score >= block_threshold:
                 logger.warning(
                     f"WAF MONITOR (would block): {method} {path} | "
-                    f"score={anomaly_score:.4f} | ip={client_ip}"
+                    f"attack_score={attack_score} | ip={client_ip}"
                 )
-                return False, result
 
         return False, result
 

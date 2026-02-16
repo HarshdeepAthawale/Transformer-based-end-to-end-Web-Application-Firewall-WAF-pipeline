@@ -44,6 +44,7 @@ class IngestEvent(BaseModel):
     max_bytes: Optional[int] = None
     block_ttl_seconds: Optional[int] = None
     block_duration_seconds: Optional[int] = None
+    attack_score: Optional[int] = None
 
 
 class IngestRequest(BaseModel):
@@ -67,6 +68,8 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
         if e.block_duration_seconds is not None:
             block_sec = e.block_duration_seconds
             details["block_duration_seconds"] = e.block_duration_seconds
+        if e.attack_score is not None:
+            details["attack_score"] = e.attack_score
 
         ev = SecurityEvent(
             event_type=e.event_type,
@@ -74,6 +77,7 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
             method=e.method,
             path=e.path,
             details=json.dumps(details) if details else None,
+            attack_score=e.attack_score,
             block_duration_seconds=block_sec,
         )
         db.add(ev)
@@ -106,13 +110,54 @@ async def get_events_stats(
         )
         .count()
     )
+    waf_block_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("waf_block", "waf_challenge", "waf")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+    avg_attack_score_row = (
+        db.query(func.avg(SecurityEvent.attack_score))
+        .filter(
+            SecurityEvent.attack_score.isnot(None),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .scalar()
+    )
     return {
         "success": True,
         "data": {
             "rate_limit_count": rate_limit_count,
             "ddos_count": ddos_count,
+            "waf_block_count": waf_block_count,
+            "avg_attack_score": round(avg_attack_score_row, 1) if avg_attack_score_row is not None else None,
         },
     }
+
+
+@router.get("/waf")
+async def list_waf_events(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d, 90d"),
+    limit: int = Query(100, le=500),
+    db: Session = Depends(get_db),
+):
+    """List WAF block/challenge events with attack scores."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    rows = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("waf_block", "waf_challenge", "waf")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    return {"success": True, "data": [r.to_dict() for r in rows]}
 
 
 @router.get("/rate-limit")
