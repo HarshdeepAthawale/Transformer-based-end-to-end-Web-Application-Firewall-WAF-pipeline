@@ -2,8 +2,8 @@
 Threat Intelligence Service
 """
 from sqlalchemy.orm import Session
-from typing import Dict, List, Optional
-from datetime import datetime, timedelta
+from typing import Dict, List
+from datetime import datetime
 from loguru import logger
 
 from backend.models.threat_intel import ThreatIntel
@@ -36,7 +36,7 @@ class ThreatIntelService:
         ip_threat = self.db.query(ThreatIntel)\
             .filter(ThreatIntel.threat_type == 'ip')\
             .filter(ThreatIntel.value == ip)\
-            .filter(ThreatIntel.is_active == True)\
+            .filter(ThreatIntel.is_active)\
             .first()
         
         if ip_threat:
@@ -57,7 +57,7 @@ class ThreatIntelService:
         if path:
             domain_threats = self.db.query(ThreatIntel)\
                 .filter(ThreatIntel.threat_type == 'domain')\
-                .filter(ThreatIntel.is_active == True)\
+                .filter(ThreatIntel.is_active)\
                 .all()
             
             for threat in domain_threats:
@@ -67,7 +67,7 @@ class ThreatIntelService:
                         'threat_type': 'domain',
                         'severity': threat.severity,
                         'source': threat.source,
-                        'description': threat.description or f"Path contains known malicious domain"
+                        'description': threat.description or "Path contains known malicious domain"
                     }
         
         # Check signature threats
@@ -76,7 +76,7 @@ class ThreatIntelService:
             
             signature_threats = self.db.query(ThreatIntel)\
                 .filter(ThreatIntel.threat_type == 'signature')\
-                .filter(ThreatIntel.is_active == True)\
+                .filter(ThreatIntel.is_active)\
                 .all()
             
             for threat in signature_threats:
@@ -142,7 +142,7 @@ class ThreatIntelService:
         if threat_type:
             query = query.filter(ThreatIntel.threat_type == threat_type)
         if active_only:
-            query = query.filter(ThreatIntel.is_active == True)
+            query = query.filter(ThreatIntel.is_active)
         
         return query.order_by(ThreatIntel.timestamp.desc()).limit(limit).all()
     
@@ -150,7 +150,7 @@ class ThreatIntelService:
         """Remove expired threat intelligence entries"""
         expired = self.db.query(ThreatIntel)\
             .filter(ThreatIntel.expires_at < datetime.utcnow())\
-            .filter(ThreatIntel.is_active == True)\
+            .filter(ThreatIntel.is_active)\
             .all()
         
         for threat in expired:

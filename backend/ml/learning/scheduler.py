@@ -1,6 +1,5 @@
 """Scheduler for periodic model updates (continuous learning)."""
 
-import os
 import threading
 import time
 from pathlib import Path

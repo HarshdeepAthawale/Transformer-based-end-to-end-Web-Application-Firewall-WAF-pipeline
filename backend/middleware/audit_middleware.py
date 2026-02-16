@@ -3,7 +3,6 @@ Audit Logging Middleware
 """
 from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
-from datetime import datetime
 from loguru import logger
 
 from backend.database import SessionLocal

@@ -5,7 +5,6 @@ import time
 from collections import defaultdict
 from threading import Lock
 from typing import Dict, Optional
-from loguru import logger
 
 
 class PerIPRateLimiter:

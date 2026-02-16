@@ -1,8 +1,7 @@
 """
 Traffic logs database model
 """
-from sqlalchemy import Column, Integer, String, DateTime, Text, Index
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, DateTime, Text
 from backend.database import Base
 from datetime import datetime, timezone
 

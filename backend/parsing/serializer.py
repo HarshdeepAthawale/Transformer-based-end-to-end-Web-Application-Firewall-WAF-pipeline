@@ -15,7 +15,6 @@ Format:
 
 import json
 import logging
-from typing import Optional
 
 from backend.parsing.log_parser import HTTPRequest
 

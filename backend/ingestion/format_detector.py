@@ -8,7 +8,6 @@ from sample log lines using regex pattern matching.
 import re
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 import logging
 

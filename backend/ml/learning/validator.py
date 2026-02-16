@@ -1,9 +1,8 @@
 """Validate model before deployment."""
 
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, Optional
 
-from loguru import logger
 
 from backend.ml.waf_classifier import WAFClassifier
 

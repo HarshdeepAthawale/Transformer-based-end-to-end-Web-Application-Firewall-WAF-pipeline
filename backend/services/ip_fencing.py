@@ -2,7 +2,6 @@
 IP Fencing Service
 """
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_, func
 from datetime import datetime, timedelta
 from typing import List, Optional, Tuple
 import ipaddress
@@ -31,7 +30,7 @@ class IPFencingService:
         # Check exact IP match
         exact_match = self.db.query(IPBlacklist)\
             .filter(IPBlacklist.ip == ip)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .first()
         
@@ -45,8 +44,8 @@ class IPFencingService:
         
         # Check IP ranges (CIDR)
         ip_ranges = self.db.query(IPBlacklist)\
-            .filter(IPBlacklist.is_range == True)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_range)\
+            .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .all()
         
@@ -70,7 +69,7 @@ class IPFencingService:
         # Check exact IP match
         exact_match = self.db.query(IPBlacklist)\
             .filter(IPBlacklist.ip == ip)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
             .first()
         
@@ -79,8 +78,8 @@ class IPFencingService:
         
         # Check IP ranges
         ip_ranges = self.db.query(IPBlacklist)\
-            .filter(IPBlacklist.is_range == True)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_range)\
+            .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
             .all()
         
@@ -241,7 +240,7 @@ class IPFencingService:
         # Check if already blocked
         existing = self.db.query(IPBlacklist)\
             .filter(IPBlacklist.ip == ip)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .first()
         
@@ -317,7 +316,7 @@ class IPFencingService:
         entries = self.db.query(IPBlacklist)\
             .filter(IPBlacklist.ip == ip)\
             .filter(IPBlacklist.list_type == list_type)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .all()
         
         for entry in entries:
@@ -330,7 +329,7 @@ class IPFencingService:
         """Get active blacklist entries"""
         return self.db.query(IPBlacklist)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .order_by(IPBlacklist.timestamp.desc())\
             .limit(limit)\
             .all()
@@ -339,7 +338,7 @@ class IPFencingService:
         """Get active whitelist entries"""
         return self.db.query(IPBlacklist)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
-            .filter(IPBlacklist.is_active == True)\
+            .filter(IPBlacklist.is_active)\
             .order_by(IPBlacklist.timestamp.desc())\
             .limit(limit)\
             .all()
@@ -348,8 +347,8 @@ class IPFencingService:
         """Remove expired temporary blocks"""
         expired = self.db.query(IPBlacklist)\
             .filter(IPBlacklist.expires_at < datetime.utcnow())\
-            .filter(IPBlacklist.is_active == True)\
-            .filter(IPBlacklist.auto_unblock == True)\
+            .filter(IPBlacklist.is_active)\
+            .filter(IPBlacklist.auto_unblock)\
             .all()
         
         for block in expired:

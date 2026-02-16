@@ -6,11 +6,9 @@ import threading
 import time
 from datetime import datetime, timedelta
 from loguru import logger
-from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from backend.database import SessionLocal
-from backend.models.metrics import Metrics
 from backend.models.traffic import TrafficLog
 from backend.models.threats import Threat
 from backend.services.metrics_service import MetricsService
@@ -105,7 +103,7 @@ class MetricsAggregator:
                 mem_pct = 0.0
 
             metrics_service = MetricsService(db)
-            metrics = metrics_service.create_metrics_snapshot(
+            metrics_service.create_metrics_snapshot(
                 {
                     "total_requests": total_requests,
                     "blocked_requests": blocked_requests,

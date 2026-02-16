@@ -5,7 +5,6 @@ import threading
 import time
 from datetime import datetime, timedelta
 from loguru import logger
-from sqlalchemy.orm import Session
 
 from backend.database import SessionLocal
 from backend.services.ip_fencing import IPFencingService

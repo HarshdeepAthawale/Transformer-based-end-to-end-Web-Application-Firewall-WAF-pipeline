@@ -1,9 +1,8 @@
 """
 Data Leakage Prevention (DLP) Service
 """
-from typing import Dict, List, Optional
+from typing import Dict, List
 import re
-from loguru import logger
 
 
 class DLPService:

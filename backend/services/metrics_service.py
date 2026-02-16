@@ -3,12 +3,10 @@ Metrics Service
 """
 
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func
 from datetime import datetime, timedelta
-from typing import List, Optional
-import psutil
+from typing import List
 import time
-from loguru import logger
 
 from backend.models.metrics import Metrics
 from backend.models.traffic import TrafficLog
@@ -46,11 +44,11 @@ class MetricsService:
 
         total_requests = int(traffic_stats.total or 0)
         blocked_requests = int(traffic_stats.blocked or 0)
-        allowed_requests = total_requests - blocked_requests
+        total_requests - blocked_requests
         attack_rate = (
             (blocked_requests / total_requests * 100) if total_requests > 0 else 0.0
         )
-        avg_processing_time = float(traffic_stats.avg_time or 0)
+        float(traffic_stats.avg_time or 0)
 
         # Get threat count
         threat_count = (

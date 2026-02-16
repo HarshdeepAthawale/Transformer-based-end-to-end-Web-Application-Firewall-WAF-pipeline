@@ -3,7 +3,7 @@ Analytics Service
 """
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Dict, List
 
 from backend.models.metrics import Metrics

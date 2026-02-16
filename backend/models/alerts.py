@@ -2,7 +2,6 @@
 Alerts database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum
-from sqlalchemy.sql import func
 from backend.database import Base
 from datetime import datetime
 import enum

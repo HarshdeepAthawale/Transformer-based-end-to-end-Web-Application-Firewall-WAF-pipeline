@@ -44,12 +44,6 @@ def get_db() -> Generator[Session, None, None]:
 def init_db():
     """Initialize database tables"""
     # Import all models to ensure they're registered with Base
-    from backend.models import (
-        metrics, alerts, traffic, threats, activities,
-        ip_blacklist, ip_reputation, geo_rules, bot_signatures,
-        threat_intel, security_rules, users, audit_log, settings,
-        agent_experience, security_event,
-    )
     
     # Create all tables
     Base.metadata.create_all(bind=engine)

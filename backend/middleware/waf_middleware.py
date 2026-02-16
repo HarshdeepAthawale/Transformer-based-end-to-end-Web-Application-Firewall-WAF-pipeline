@@ -4,10 +4,16 @@ WAF Middleware
 Intercepts all incoming HTTP requests and checks them with the WAF service.
 Blocks requests that are detected as anomalies.
 """
-from fastapi import Request, HTTPException
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Dict, Optional
+
+from fastapi import Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from typing import Dict, Optional
+
+if TYPE_CHECKING:
+    from backend.services.geoip_lookup import GeoIPLookupService
 import time
 import json
 from loguru import logger

@@ -2,8 +2,7 @@
 Metrics database model
 """
 
-from sqlalchemy import Column, Integer, Float, DateTime, String
-from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, Float, DateTime
 from backend.database import Base
 from datetime import datetime
 

@@ -3,7 +3,6 @@ Security events: rate limit hits and DDoS blocks.
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, Text
-from sqlalchemy.sql import func
 from backend.database import Base
 from datetime import datetime, timezone
 

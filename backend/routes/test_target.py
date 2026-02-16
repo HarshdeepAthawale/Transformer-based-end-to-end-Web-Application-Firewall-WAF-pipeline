@@ -34,7 +34,7 @@ async def test_login(request: Request):
     """Test login endpoint"""
     try:
         body = await request.json()
-    except:
+    except Exception:
         body = {}
 
     return JSONResponse({
@@ -59,7 +59,7 @@ async def test_search(request: Request):
     """Test search endpoint"""
     try:
         body = await request.json()
-    except:
+    except Exception:
         body = {}
 
     return JSONResponse({

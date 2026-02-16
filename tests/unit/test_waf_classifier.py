@@ -47,9 +47,17 @@ def test_request_to_text_normalization(classifier_no_model):
     assert "id" in text or "123" in text
 
 
+def _model_is_loadable(path: str) -> bool:
+    """Check if model dir exists and contains weight files (not just config/tokenizer)."""
+    p = Path(path)
+    if not p.exists():
+        return False
+    return (p / "model.safetensors").exists() or (p / "pytorch_model.bin").exists()
+
+
 @pytest.mark.skipif(
-    not Path("models/waf-distilbert").exists(),
-    reason="Model not available - run finetune_waf_model.py first",
+    not _model_is_loadable("models/waf-distilbert"),
+    reason="Model weights not available - run finetune_waf_model.py first",
 )
 def test_classifier_with_real_model():
     """When model exists, classifier loads and can classify (integration)."""

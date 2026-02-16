@@ -1,6 +1,5 @@
 """Hot swap manager for deploying new model versions without downtime."""
 
-from pathlib import Path
 from typing import Optional
 
 from loguru import logger

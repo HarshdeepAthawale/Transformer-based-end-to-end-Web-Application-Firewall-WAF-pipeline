@@ -1,8 +1,7 @@
 """
 Advanced Rate Limiting Service
 """
-from typing import Dict, Optional
-from datetime import datetime, timedelta
+from typing import Dict
 from collections import defaultdict
 import time
 from threading import Lock

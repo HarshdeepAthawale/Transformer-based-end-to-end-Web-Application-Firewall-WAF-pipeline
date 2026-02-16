@@ -2,7 +2,7 @@
 Bot Detection Service
 """
 from sqlalchemy.orm import Session
-from typing import Dict, List, Optional
+from typing import Dict, List
 import re
 from datetime import datetime
 from loguru import logger
@@ -21,7 +21,7 @@ class BotDetectionService:
     def _load_signatures(self):
         """Load bot signatures into cache"""
         self._signature_cache = self.db.query(BotSignature)\
-            .filter(BotSignature.is_active == True)\
+            .filter(BotSignature.is_active)\
             .all()
         logger.info(f"Loaded {len(self._signature_cache)} bot signatures")
     
@@ -159,5 +159,5 @@ class BotDetectionService:
         """Get bot signatures"""
         query = self.db.query(BotSignature)
         if active_only:
-            query = query.filter(BotSignature.is_active == True)
+            query = query.filter(BotSignature.is_active)
         return query.order_by(BotSignature.timestamp.desc()).all()

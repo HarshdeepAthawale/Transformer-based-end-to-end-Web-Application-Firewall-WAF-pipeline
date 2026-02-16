@@ -9,7 +9,7 @@ import urllib.error
 import json
 import ssl
 
-from backend.services.email_sender import send_alert_email, is_configured as email_configured
+from backend.services.email_sender import send_alert_email
 
 
 def _severity_enabled(settings: Dict[str, Any], severity: str) -> bool:

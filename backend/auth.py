@@ -8,7 +8,6 @@ import secrets
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from loguru import logger
 
 from backend.database import get_db
 from backend.models.users import User, UserRole

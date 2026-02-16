@@ -1,8 +1,6 @@
 """Incremental fine-tuning pipeline using HuggingFace Trainer."""
 
 import json
-import subprocess
-import sys
 from pathlib import Path
 from typing import List, Optional
 
@@ -63,7 +61,6 @@ class IncrementalFineTuner:
                 Trainer,
                 DataCollatorWithPadding,
             )
-            import torch
         except ImportError as e:
             logger.error(f"Missing deps for fine-tuning: {e}")
             return None

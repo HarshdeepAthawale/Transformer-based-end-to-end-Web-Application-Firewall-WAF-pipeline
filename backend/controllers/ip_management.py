@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
 from backend.services.ip_fencing import IPFencingService
-from backend.services.blacklist_sync import sync_add, sync_remove, sync_full_blacklist, REDIS_REQUIRED_MSG
+from backend.services.blacklist_sync import sync_add, sync_remove, REDIS_REQUIRED_MSG
 from backend.models.ip_blacklist import IPListType
 
 

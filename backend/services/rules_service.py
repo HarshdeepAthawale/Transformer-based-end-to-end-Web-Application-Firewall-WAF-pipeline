@@ -2,7 +2,7 @@
 Security Rules Service
 """
 from sqlalchemy.orm import Session
-from typing import Dict, List, Optional
+from typing import Dict, List
 from datetime import datetime
 import re
 import json
@@ -22,7 +22,7 @@ class RulesService:
     def _load_rules(self):
         """Load active rules into cache"""
         self._rules_cache = self.db.query(SecurityRule)\
-            .filter(SecurityRule.is_active == True)\
+            .filter(SecurityRule.is_active)\
             .order_by(
                 SecurityRule.priority.desc(),
                 SecurityRule.timestamp.desc()
@@ -175,13 +175,13 @@ class RulesService:
         """Get security rules"""
         query = self.db.query(SecurityRule)
         if active_only:
-            query = query.filter(SecurityRule.is_active == True)
+            query = query.filter(SecurityRule.is_active)
         return query.order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc()).all()
     
     def get_owasp_rules(self) -> List[SecurityRule]:
         """Get OWASP Top 10 rules"""
         return self.db.query(SecurityRule)\
             .filter(SecurityRule.owasp_category.isnot(None))\
-            .filter(SecurityRule.is_active == True)\
+            .filter(SecurityRule.is_active)\
             .order_by(SecurityRule.owasp_category)\
             .all()

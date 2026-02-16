@@ -4,8 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.models.users import User, UserRole
-from backend.auth import get_current_user, require_role, optional_admin
+from backend.models.users import User
+from backend.auth import get_current_user, optional_admin
 from backend.schemas.users import UserCreateRequest, LoginRequest, ApiKeyCreateRequest
 from backend.controllers import users as ctrl
 

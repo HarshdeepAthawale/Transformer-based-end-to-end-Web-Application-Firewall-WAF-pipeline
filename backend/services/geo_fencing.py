@@ -2,9 +2,8 @@
 Geo-fencing Service
 """
 from sqlalchemy.orm import Session
-from typing import Dict, Optional, List
+from typing import Dict, List
 from datetime import datetime
-from loguru import logger
 
 from backend.models.geo_rules import GeoRule, GeoRuleType
 try:
@@ -49,7 +48,7 @@ class GeoFencingService:
         
         # Get active geo rules
         rules = self.db.query(GeoRule)\
-            .filter(GeoRule.is_active == True)\
+            .filter(GeoRule.is_active)\
             .order_by(GeoRule.priority.desc())\
             .all()
         
@@ -143,7 +142,7 @@ class GeoFencingService:
         """Get geo rules"""
         query = self.db.query(GeoRule)
         if active_only:
-            query = query.filter(GeoRule.is_active == True)
+            query = query.filter(GeoRule.is_active)
         return query.order_by(GeoRule.priority.desc(), GeoRule.timestamp.desc()).all()
     
     def get_geographic_stats(self, start_time: datetime) -> List[Dict]:

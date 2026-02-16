@@ -9,7 +9,7 @@ import re
 import logging
 from dataclasses import dataclass, field
 from typing import Optional
-from urllib.parse import urlparse, parse_qs
+from urllib.parse import parse_qs
 
 from backend.ingestion.format_detector import LogFormat, detect_format
 

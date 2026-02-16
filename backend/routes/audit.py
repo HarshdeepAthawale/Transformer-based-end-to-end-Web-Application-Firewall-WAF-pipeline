@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.models.users import User, UserRole
+from backend.models.users import User
 from backend.auth import optional_admin
 from backend.controllers import audit as ctrl
 
