@@ -35,10 +35,10 @@ async def inspect_request(
             return True, {"skipped": True, "reason": "waf_unavailable_fail_closed"}
 
     try:
-        # Parse body for inspection (truncate to BODY_MAX_BYTES)
+        # Parse body for inspection (truncate to WAF_BODY_INSPECT_MAX, not full proxy limit)
         body_for_inspection = None
         if body:
-            body_text = body[: gateway_config.BODY_MAX_BYTES].decode(
+            body_text = body[: gateway_config.WAF_BODY_INSPECT_MAX].decode(
                 "utf-8", errors="ignore"
             )
             try:

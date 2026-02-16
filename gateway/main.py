@@ -7,6 +7,7 @@ Usage:
 """
 
 import time
+import uuid
 from contextlib import asynccontextmanager
 
 import httpx
@@ -15,8 +16,12 @@ from fastapi.responses import JSONResponse, Response
 from loguru import logger
 
 from gateway.config import gateway_config
+from gateway.mongo import MongoEventStore
 from gateway.proxy import forward_request
 from gateway.waf_inspect import inspect_request
+from gateway.rate_limit import create_rate_limiter
+from gateway.ddos_protection import create_ddos_protection
+from gateway.events import report_event
 
 # Configure logger
 logger.add(
@@ -27,9 +32,17 @@ logger.add(
 )
 
 
+def _get_client_ip(request: Request) -> str:
+    """Extract client IP from request (X-Forwarded-For or client)."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage gateway lifecycle: httpx client + WAF classifier."""
+    """Manage gateway lifecycle: httpx client + WAF classifier + rate limit + DDoS + MongoDB."""
     logger.info(
         f"Starting WAF Gateway on "
         f"{gateway_config.GATEWAY_HOST}:{gateway_config.GATEWAY_PORT}"
@@ -50,6 +63,24 @@ async def lifespan(app: FastAPI):
             max_keepalive_connections=20,
         ),
     )
+
+    # MongoDB event store
+    app.state.event_store = MongoEventStore()
+    await app.state.event_store.connect()
+
+    # Rate limiter (Redis-backed)
+    app.state.rate_limiter = create_rate_limiter()
+    if app.state.rate_limiter:
+        logger.info("Rate limiting enabled")
+    else:
+        logger.info("Rate limiting disabled or unavailable")
+
+    # DDoS protection
+    app.state.ddos_protection = create_ddos_protection()
+    if app.state.ddos_protection:
+        logger.info("DDoS protection enabled")
+    else:
+        logger.info("DDoS protection disabled or unavailable")
 
     # Initialize WAF classifier (reuse backend factory)
     app.state.waf_service = None
@@ -72,6 +103,11 @@ async def lifespan(app: FastAPI):
     # Shutdown
     logger.info("Shutting down WAF Gateway...")
     await app.state.http_client.aclose()
+    await app.state.event_store.close()
+    if app.state.rate_limiter:
+        await app.state.rate_limiter.close()
+    if app.state.ddos_protection:
+        await app.state.ddos_protection.close()
     logger.info("Gateway shutdown complete")
 
 
@@ -87,14 +123,91 @@ app = FastAPI(
 
 @app.get("/gateway/health")
 async def health():
-    """Gateway health check endpoint."""
+    """Gateway health check endpoint (liveness)."""
     return {
         "status": "healthy",
         "service": "waf-gateway",
         "waf_enabled": gateway_config.WAF_ENABLED,
         "waf_mode": gateway_config.WAF_MODE,
         "upstream": gateway_config.UPSTREAM_URL,
+        "rate_limit_enabled": gateway_config.RATE_LIMIT_ENABLED,
+        "ddos_enabled": gateway_config.DDOS_ENABLED,
     }
+
+
+@app.get("/gateway/ready")
+async def ready(request: Request):
+    """Readiness check — verifies MongoDB and upstream are reachable."""
+    checks = {}
+
+    # MongoDB check
+    event_store: MongoEventStore = request.app.state.event_store
+    checks["mongodb"] = await event_store.is_ready()
+
+    # Upstream check
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            resp = await client.get(gateway_config.UPSTREAM_URL)
+            checks["upstream"] = resp.status_code < 500
+    except Exception:
+        checks["upstream"] = False
+
+    all_ready = all(checks.values())
+    return JSONResponse(
+        status_code=200 if all_ready else 503,
+        content={
+            "ready": all_ready,
+            "checks": checks,
+        },
+    )
+
+
+def _log_gateway_event(
+    request: Request,
+    *,
+    request_id: str,
+    client_ip: str,
+    body_bytes: bytes | None = None,
+    decision: str,
+    anomaly_score: float | None = None,
+    waf_latency_ms: float | None = None,
+    upstream_status: int | None = None,
+    total_latency_ms: float,
+    blocked_by: str | None = None,
+) -> None:
+    """Helper to log an event to both MongoDB and the legacy event reporter."""
+    event_store: MongoEventStore = request.app.state.event_store
+    headers = dict(request.headers)
+    content_length = headers.get("content-length")
+
+    event_store.log_event(
+        request_id=request_id,
+        client_ip=client_ip,
+        method=request.method,
+        path=request.url.path,
+        query_string=str(request.url.query),
+        headers=headers,
+        body=body_bytes,
+        decision=decision,
+        anomaly_score=anomaly_score,
+        waf_latency_ms=waf_latency_ms,
+        upstream_status=upstream_status,
+        total_latency_ms=total_latency_ms,
+        blocked_by=blocked_by,
+        user_agent=headers.get("user-agent", ""),
+        content_length=int(content_length) if content_length else None,
+    )
+
+    # Also fire legacy event reporter if enabled
+    report_event({
+        "event_type": blocked_by or "allow",
+        "request_id": request_id,
+        "ip": client_ip,
+        "method": request.method,
+        "path": request.url.path,
+        "decision": decision,
+        "anomaly_score": anomaly_score,
+    })
 
 
 @app.api_route(
@@ -103,13 +216,118 @@ async def health():
 )
 async def gateway_proxy(request: Request, path: str):
     """
-    Catch-all route: inspect with WAF, then forward to upstream.
+    Catch-all route: rate limit -> DDoS check -> WAF inspect -> forward to upstream.
     """
     # Skip WAF for gateway internal endpoints
     if request.url.path.startswith("/gateway/"):
         return JSONResponse(status_code=404, content={"detail": "Not found"})
 
     start_time = time.perf_counter()
+    request_id = str(uuid.uuid4())
+    client_ip = _get_client_ip(request)
+
+    # --- Rate limit check (before body read) ---
+    rate_limiter = getattr(request.app.state, "rate_limiter", None)
+    if rate_limiter:
+        allowed, retry_after = await rate_limiter.is_allowed(client_ip)
+        if not allowed:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="rate_limit",
+            )
+            resp = JSONResponse(
+                status_code=429,
+                content={
+                    "blocked": True,
+                    "message": "Too many requests",
+                    "retry_after_seconds": max(1, int(retry_after)),
+                },
+                headers={"Retry-After": str(max(1, int(retry_after)))},
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+    # --- DDoS checks (before body read) ---
+    ddos = getattr(request.app.state, "ddos_protection", None)
+    if ddos:
+        content_length = request.headers.get("content-length")
+        try:
+            cl = int(content_length) if content_length else None
+        except (ValueError, TypeError):
+            cl = None
+
+        allowed_size, reason = ddos.check_request_size(cl)
+        if not allowed_size:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="ddos_size",
+            )
+            resp = JSONResponse(
+                status_code=413,
+                content={
+                    "blocked": True,
+                    "message": "Request too large",
+                    "reason": reason,
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+        is_blocked, ttl = await ddos.is_blocked(client_ip)
+        if is_blocked:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="ddos_blocked",
+            )
+            resp = JSONResponse(
+                status_code=429,
+                content={
+                    "blocked": True,
+                    "message": "Temporarily blocked due to traffic spike",
+                    "retry_after_seconds": max(1, int(ttl)),
+                },
+                headers={"Retry-After": str(max(1, int(ttl)))},
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+        allowed_burst, triggered = await ddos.record_request_and_check_burst(client_ip)
+        if not allowed_burst:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="ddos_burst",
+            )
+            resp = JSONResponse(
+                status_code=429,
+                content={
+                    "blocked": True,
+                    "message": "Traffic spike detected; temporarily blocked",
+                    "retry_after_seconds": gateway_config.DDOS_BLOCK_DURATION_SECONDS,
+                },
+                headers={"Retry-After": str(gateway_config.DDOS_BLOCK_DURATION_SECONDS)},
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
 
     # Read body once (needed for both WAF inspection and forwarding)
     body_bytes = await request.body()
@@ -129,7 +347,19 @@ async def gateway_proxy(request: Request, path: str):
         )
 
     if should_block:
-        return JSONResponse(
+        elapsed_ms = (time.perf_counter() - start_time) * 1000
+        _log_gateway_event(
+            request,
+            request_id=request_id,
+            client_ip=client_ip,
+            body_bytes=body_bytes,
+            decision="block",
+            anomaly_score=waf_result.get("anomaly_score"),
+            waf_latency_ms=waf_result.get("waf_latency_ms"),
+            total_latency_ms=elapsed_ms,
+            blocked_by="waf",
+        )
+        resp = JSONResponse(
             status_code=403,
             content={
                 "blocked": True,
@@ -140,6 +370,8 @@ async def gateway_proxy(request: Request, path: str):
                 ),
             },
         )
+        resp.headers["X-Request-ID"] = request_id
+        return resp
 
     # --- Forward to upstream ---
     response = await forward_request(
@@ -148,8 +380,28 @@ async def gateway_proxy(request: Request, path: str):
         body_bytes=body_bytes if body_bytes else None,
     )
 
-    # Add gateway observability headers
+    # Determine decision for event log
+    is_anomaly = waf_result.get("is_anomaly", False)
+    if is_anomaly and gateway_config.WAF_MODE == "monitor":
+        decision = "monitor_would_block"
+    else:
+        decision = "allow"
+
     elapsed_ms = (time.perf_counter() - start_time) * 1000
+    _log_gateway_event(
+        request,
+        request_id=request_id,
+        client_ip=client_ip,
+        body_bytes=body_bytes,
+        decision=decision,
+        anomaly_score=waf_result.get("anomaly_score"),
+        waf_latency_ms=waf_result.get("waf_latency_ms"),
+        upstream_status=response.status_code,
+        total_latency_ms=elapsed_ms,
+    )
+
+    # Add gateway observability headers
+    response.headers["X-Request-ID"] = request_id
     response.headers["X-Gateway-Time-Ms"] = f"{elapsed_ms:.1f}"
     if waf_result and not waf_result.get("skipped"):
         response.headers["X-WAF-Score"] = str(

@@ -21,6 +21,7 @@ from backend.routes import (
     traffic,
     threats,
     analytics,
+    events,
 )
 from backend.routes import health, test, debug
 from backend.websocket import router as websocket_router
@@ -192,6 +193,7 @@ app.include_router(traffic.router, prefix="/api/traffic", tags=["traffic"])
 app.include_router(threats.router, prefix="/api/threats", tags=["threats"])
 
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(events.router, prefix="/api/events", tags=["events"])
 
 # WAF service routes (includes /middleware-metrics)
 try:

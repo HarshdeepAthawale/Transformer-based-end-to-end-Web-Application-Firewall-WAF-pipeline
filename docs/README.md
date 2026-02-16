@@ -166,6 +166,11 @@ This directory contains comprehensive documentation for building a Transformer-b
 - Focus on patterns, not specific values
 - Critical for generalization
 
+## Rate Limiting & DDoS Protection
+
+- [Rate Limiting](rate-limiting.md) - Redis-backed per-IP throttling
+- [DDoS Protection](ddos-protection.md) - Burst detection and request size limits
+
 ## References
 
 - [Awesome WAF Project](https://github.com/0xInfection/awesome-waf) - Comprehensive WAF resources

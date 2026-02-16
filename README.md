@@ -24,6 +24,10 @@ This WAF uses unsupervised anomaly detection. It learns what normal traffic look
 
 **Production-Ready** — Docker Compose, Nginx, PostgreSQL, Redis; one command to run.
 
+**Rate Limiting** — Redis-backed per-IP throttling; configurable requests per minute.
+
+**DDoS Protection** — Burst detection, request size limits, and temporary IP blocking.
+
 **Continuous Learning** — Fine-tune on new traffic; adapt to evolving patterns.
 
 ---
@@ -52,7 +56,7 @@ B2B SaaS model: each customer connects their apps; traffic flows through the WAF
                            ↓
 ┌─────────────────────────────────────────────────────────────┐
 │            WAF Gateway (Reverse Proxy · Edge)               │
-│              Inspect → Score → Allow / Block                 │
+│     Rate Limit → DDoS Check → Inspect → Score → Allow/Block  │
 └──────────────────────┬──────────────────────────────────────┘
                        │ Events, metrics (per tenant)
                        ↓

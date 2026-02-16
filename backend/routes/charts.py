@@ -23,3 +23,19 @@ async def get_threats_chart(
     db: Session = Depends(get_db),
 ):
     return ctrl.get_threats(db, range)
+
+
+@router.get("/rate-limit")
+async def get_rate_limit_chart(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d, 90d"),
+    db: Session = Depends(get_db),
+):
+    return ctrl.get_rate_limit_chart(db, range)
+
+
+@router.get("/ddos")
+async def get_ddos_chart(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d, 90d"),
+    db: Session = Depends(get_db),
+):
+    return ctrl.get_ddos_chart(db, range)

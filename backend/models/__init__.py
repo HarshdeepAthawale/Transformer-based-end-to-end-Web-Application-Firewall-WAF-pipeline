@@ -15,6 +15,7 @@ from backend.models.security_rules import SecurityRule, RulePriority, RuleAction
 from backend.models.users import User, UserRole
 from backend.models.audit_log import AuditLog, AuditAction
 from backend.models.settings import AccountSetting
+from backend.models.security_event import SecurityEvent
 
 __all__ = [
     "Metrics",
@@ -39,4 +40,5 @@ __all__ = [
     "AuditLog",
     "AuditAction",
     "AccountSetting",
+    "SecurityEvent",
 ]

@@ -116,3 +116,4 @@ applications/app2-webgoat/.git/
 applications/app3-dvwa/.git/
 applications/*/logs/
 applications/*/*.log
+applications/app1-juice-shop

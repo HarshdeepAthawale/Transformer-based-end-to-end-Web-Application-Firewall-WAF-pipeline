@@ -195,6 +195,40 @@ export const chartsApi = {
 
   getThreats: (timeRange: string): Promise<ApiResponse<ChartDataPoint[]>> =>
     apiRequest(`/api/charts/threats?range=${timeRange}`),
+
+  getRateLimit: (timeRange: string): Promise<ApiResponse<{ time: string; count: number }[]>> =>
+    apiRequest(`/api/charts/rate-limit?range=${timeRange}`),
+
+  getDdos: (timeRange: string): Promise<ApiResponse<{ time: string; count: number }[]>> =>
+    apiRequest(`/api/charts/ddos?range=${timeRange}`),
+}
+
+// Events API (rate limit, DDoS)
+export interface SecurityEventData {
+  id: number
+  timestamp: string
+  event_type: string
+  ip: string
+  method?: string
+  path?: string
+  details?: string
+  block_duration_seconds?: number
+}
+
+export interface EventsStats {
+  rate_limit_count: number
+  ddos_count: number
+}
+
+export const eventsApi = {
+  getStats: (range: string = '24h'): Promise<ApiResponse<EventsStats>> =>
+    apiRequest(`/api/events/stats?range=${range}`),
+
+  getRateLimitEvents: (range: string = '24h'): Promise<ApiResponse<SecurityEventData[]>> =>
+    apiRequest(`/api/events/rate-limit?range=${range}`),
+
+  getDdosEvents: (range: string = '24h'): Promise<ApiResponse<SecurityEventData[]>> =>
+    apiRequest(`/api/events/ddos?range=${range}`),
 }
 
 // Traffic API

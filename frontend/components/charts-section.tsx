@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
 import {
   ChartContainer,
   ChartLegend,
@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/chart'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useChartData } from '@/hooks/use-chart-data'
+import { useSecurityEventsChart } from '@/hooks/use-security-events-chart'
 import { formatTimeIST, CHART_TIME_RANGES } from '@/lib/chart-utils'
 
 const requestVolumeChartConfig = {
@@ -25,6 +26,11 @@ const topThreatChartConfig = {
   name: { label: 'Threat Type' },
 } satisfies ChartConfig
 
+const securityEventsChartConfig = {
+  rateLimit: { label: 'Rate Limit Hits', color: 'var(--chart-3)' },
+  ddos: { label: 'DDoS Blocks', color: 'hsl(var(--destructive))' },
+} satisfies ChartConfig
+
 interface ChartsSectionProps {
   timeRange: string
   onTimeRangeChange?: (range: string) => void
@@ -33,6 +39,7 @@ interface ChartsSectionProps {
 export function ChartsSection({ timeRange, onTimeRangeChange }: ChartsSectionProps) {
   const router = useRouter()
   const { requestData, topThreatTypes, isLoading, error } = useChartData(timeRange)
+  const { data: securityEventsData, isLoading: securityLoading } = useSecurityEventsChart(timeRange)
 
   const formattedRequestData = useMemo(
     () =>
@@ -238,6 +245,74 @@ export function ChartsSection({ timeRange, onTimeRangeChange }: ChartsSectionPro
                 />
                 <Bar dataKey="count" fill="var(--color-count)" radius={[0, 4, 4, 0]} />
               </BarChart>
+            </ChartContainer>
+          )}
+        </div>
+
+        {/* Rate Limit & DDoS Events */}
+        <div
+          className="rounded-md p-4 md:p-6 xl:col-span-2 border-2"
+          style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+        >
+          <div className="mb-4 md:mb-6">
+            <h2
+              className="text-lg font-semibold"
+              style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+            >
+              Rate Limit & DDoS Events
+            </h2>
+            <p className="text-sm text-muted-foreground hidden sm:block">
+              Rate limit hits and DDoS blocks over time
+            </p>
+          </div>
+          {securityLoading || securityEventsData.length === 0 ? (
+            <div
+              className="flex flex-col items-center justify-center h-[250px] border-2 border-dashed rounded-md"
+              style={{ borderColor: 'var(--positivus-gray)' }}
+            >
+              <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
+                {securityLoading ? 'Loading...' : 'No rate limit or DDoS events yet'}
+              </p>
+            </div>
+          ) : (
+            <ChartContainer config={securityEventsChartConfig} className="aspect-auto h-[250px] w-full">
+              <AreaChart data={securityEventsData}>
+                <defs>
+                  <linearGradient id="fillRateLimit" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-rateLimit)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-rateLimit)" stopOpacity={0.1} />
+                  </linearGradient>
+                  <linearGradient id="fillDdos" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="var(--color-ddos)" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="var(--color-ddos)" stopOpacity={0.1} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey="timeFormatted"
+                  tickLine={false}
+                  axisLine={false}
+                  tickMargin={8}
+                  minTickGap={32}
+                />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent labelFormatter={(v) => v} indicator="dot" />}
+                />
+                <Area
+                  dataKey="rateLimit"
+                  type="natural"
+                  fill="url(#fillRateLimit)"
+                  stroke="var(--color-rateLimit)"
+                />
+                <Area
+                  dataKey="ddos"
+                  type="natural"
+                  fill="url(#fillDdos)"
+                  stroke="var(--color-ddos)"
+                />
+                <ChartLegend content={<ChartLegendContent />} />
+              </AreaChart>
             </ChartContainer>
           )}
         </div>
