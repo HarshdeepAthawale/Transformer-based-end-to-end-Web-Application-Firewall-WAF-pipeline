@@ -15,6 +15,26 @@ import threading
 
 from backend.config import config
 
+# Lazy singleton for GeoIP to avoid re-loading MMDB on every request
+_geoip_service: Optional["GeoIPLookupService"] = None
+_geoip_lock = threading.Lock()
+
+
+def _get_geoip_service():
+    """Get or create GeoIPLookupService singleton (thread-safe)."""
+    global _geoip_service
+    if _geoip_service is not None:
+        return _geoip_service
+    with _geoip_lock:
+        if _geoip_service is not None:
+            return _geoip_service
+        try:
+            from backend.services.geoip_lookup import GeoIPLookupService
+            _geoip_service = GeoIPLookupService()
+            return _geoip_service
+        except Exception:
+            return None
+
 
 class WAFMiddleware(BaseHTTPMiddleware):
     """Middleware for WAF request interception and blocking"""
@@ -305,6 +325,17 @@ class WAFMiddleware(BaseHTTPMiddleware):
                 # If we can't determine size, default to 0
                 response_size = 0
             
+            # GeoIP lookup for country attribution (before background thread)
+            country_code = None
+            try:
+                geoip = _get_geoip_service()
+                if geoip:
+                    geo_data = geoip.lookup(client_ip)
+                    if geo_data:
+                        country_code = geo_data.get('country_code')
+            except Exception as e:
+                logger.debug(f"GeoIP lookup skipped for {client_ip}: {e}")
+
             # Store in background thread to avoid blocking
             def store_traffic():
                 db = SessionLocal()
@@ -322,7 +353,8 @@ class WAFMiddleware(BaseHTTPMiddleware):
                         processing_time_ms=int(processing_time),
                         was_blocked=result.get('is_anomaly', False),
                         anomaly_score=result.get('anomaly_score'),
-                        threat_type=None  # Can add classification later
+                        threat_type=None,  # Can add classification later
+                        country_code=country_code,
                     )
                     # Broadcast update
                     broadcast_update_sync("traffic", traffic_log.to_dict())
@@ -365,7 +397,7 @@ class WAFMiddleware(BaseHTTPMiddleware):
                                 details=f"Detected via ML model (score: {anomaly_score:.4f})",
                                 payload=payload,
                                 user_agent=user_agent,
-                                country_code=None,  # Could add geo lookup here
+                                country_code=country_code,
                                 processing_time_ms=int(processing_time)
                             )
                             # Broadcast threat update

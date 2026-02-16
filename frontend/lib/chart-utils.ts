@@ -25,7 +25,15 @@ export interface TopThreatItem {
   count: number
 }
 
-export function formatTimeIST(timestamp: string | Date): string {
+/**
+ * Format timestamp in the user's/local client's timezone.
+ * Uses browser timezone by default (reflects user's device / company location).
+ * Pass timezone (e.g. 'America/New_York', 'Europe/London') to display in a specific region.
+ */
+export function formatTimeLocal(
+  timestamp: string | Date,
+  timezone?: string
+): string {
   try {
     let date: Date
     if (typeof timestamp === 'string') {
@@ -45,18 +53,22 @@ export function formatTimeIST(timestamp: string | Date): string {
       date = timestamp
     }
     if (isNaN(date.getTime())) return 'Invalid Time'
-    return new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Kolkata',
+    const opts: Intl.DateTimeFormatOptions = {
       hour: 'numeric',
       minute: '2-digit',
       second: '2-digit',
       hour12: true,
-    }).format(date)
+    }
+    if (timezone) opts.timeZone = timezone
+    return new Intl.DateTimeFormat('en-US', opts).format(date)
   } catch (error) {
     console.error('Error formatting time:', error, timestamp)
     return 'Invalid Time'
   }
 }
+
+/** @deprecated Use formatTimeLocal – displays in user's local timezone (their country/device). */
+export const formatTimeIST = formatTimeLocal
 
 export function roundToMinute(timestamp: string | Date): string {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp

@@ -65,6 +65,8 @@ export function MetricsOverview() {
         blocked: prev.blocked + (realTimeMetrics.blocked - prev.blocked) * 0.1,
         attackRate: prev.attackRate + (realTimeMetrics.attackRate - prev.attackRate) * 0.1,
         threatsPerMinute: prev.threatsPerMinute + (realTimeMetrics.threatsPerMinute - prev.threatsPerMinute) * 0.1,
+        rateLimitHits: prev.rateLimitHits,
+        ddosBlocks: prev.ddosBlocks,
       }))
     }, 100)
 

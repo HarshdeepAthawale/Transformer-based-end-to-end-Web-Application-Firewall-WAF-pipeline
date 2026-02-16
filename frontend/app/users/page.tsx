@@ -39,7 +39,13 @@ export default function UsersPage() {
       const response = await usersApi.getUsers()
       if (response.success) setUsers(response.data)
     } catch (err: any) {
-      if (!err?.isNetworkError) {
+      if (err?.isNetworkError) {
+        setError('Backend server not available. Start the API server (e.g. run the backend or docker-compose) and try again.')
+      } else if (err?.status === 503) {
+        setError(err?.message || 'User API is not available. Install PyJWT on the backend: pip install \'PyJWT>=2.8.0\' and restart.')
+      } else if (err?.status === 404) {
+        setError('User API not found. Ensure the backend is running and reachable. If using Docker, set NEXT_PUBLIC_API_URL to the backend URL (e.g. http://localhost:3001).')
+      } else {
         setError(err?.message || 'Failed to fetch users')
       }
     } finally {
@@ -117,10 +123,15 @@ export default function UsersPage() {
               </div>
 
               {error && (
-                <Card className="p-4 bg-destructive/10 border-destructive">
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4 text-destructive" />
-                    <p className="text-sm text-destructive">{error}</p>
+                <Card className="p-4 bg-destructive/10 border border-border border-l-4 border-l-destructive">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <AlertCircle className="h-4 w-4 text-destructive shrink-0" />
+                      <p className="text-sm text-destructive">{error}</p>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => fetchUsers()}>
+                      Retry
+                    </Button>
                   </div>
                 </Card>
               )}

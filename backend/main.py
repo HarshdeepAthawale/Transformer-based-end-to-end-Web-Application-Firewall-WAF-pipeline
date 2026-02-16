@@ -5,10 +5,11 @@ FastAPI Application Entry Point
 import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi import HTTPException
 from loguru import logger
 
 from backend.config import config
@@ -227,6 +228,22 @@ for module_name, prefix, tag in advanced_routes:
         logger.info(f"✓ Registered routes: {prefix}")
     except ImportError as e:
         logger.error(f"✗ Failed to import {module_name}: {e}")
+        if module_name == "users":
+            logger.error("Install auth deps: pip install 'PyJWT>=2.8.0' then restart the backend.")
+            _stub = APIRouter()
+            _detail = "Users module not loaded. Install PyJWT: pip install 'PyJWT>=2.8.0' and restart the backend."
+
+            @_stub.get("")
+            @_stub.post("")
+            def _users_stub_base():
+                raise HTTPException(status_code=503, detail=_detail)
+
+            @_stub.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
+            def _users_stub_path(path: str):
+                raise HTTPException(status_code=503, detail=_detail)
+
+            app.include_router(_stub, prefix=prefix, tags=[tag])
+            logger.info(f"✓ Registered stub route: {prefix} (returns 503)")
     except AttributeError as e:
         logger.error(f"✗ {module_name} missing 'router': {e}")
     except Exception as e:

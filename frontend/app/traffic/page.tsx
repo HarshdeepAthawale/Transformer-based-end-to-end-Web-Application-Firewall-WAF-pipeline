@@ -13,106 +13,12 @@ import { Loader2, AlertCircle, Search, Filter, Download, ArrowUpDown, Eye, Refre
 import { trafficApi, TrafficData, wsManager } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-
-// Utility function to format time in IST with 12-hour format and AM/PM
-function formatTimeIST(timestamp: string | Date): string {
-  try {
-    let date: Date
-    
-    if (typeof timestamp === 'string') {
-      // Backend sends UTC timestamps - ensure they're treated as UTC
-      // If timestamp doesn't have timezone info (no Z or +/-), assume it's UTC
-      let timestampStr = timestamp.trim()
-      
-      // Check if it already has timezone indicator
-      const hasTimezone = timestampStr.endsWith('Z') || 
-                         timestampStr.includes('+') || 
-                         (timestampStr.includes('-') && timestampStr.length > 19 && timestampStr[19] === '-' || timestampStr[19] === '+')
-      
-      // If no timezone info, treat as UTC by appending 'Z'
-      if (!hasTimezone && timestampStr.length > 0) {
-        // Remove any trailing space or invalid chars, then add Z
-        timestampStr = timestampStr.replace(/[^\d\-:T\s]/g, '') + 'Z'
-      }
-      
-      date = new Date(timestampStr)
-      
-      // Validate the date
-      if (isNaN(date.getTime())) {
-        // If parsing failed, try treating the original string as UTC manually
-        // Parse format: "YYYY-MM-DDTHH:MM:SS" or "YYYY-MM-DD HH:MM:SS"
-        const cleaned = timestamp.replace(/[^\d\-:T\s]/g, ' ').trim()
-        const parts = cleaned.split(/[\sT]/)
-        if (parts.length >= 2) {
-          const [datePart, timePart] = parts
-          const [year, month, day] = datePart.split('-').map(Number)
-          const [hour, minute, second] = timePart.split(':').map(Number)
-          date = new Date(Date.UTC(year, month - 1, day, hour || 0, minute || 0, second || 0))
-        } else {
-          date = new Date(timestamp) // Last resort
-        }
-      }
-    } else {
-      date = timestamp
-    }
-    
-    // Validate date
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid timestamp:', timestamp)
-      return 'Invalid Time'
-    }
-    
-    // Use Intl.DateTimeFormat to convert to IST and format in 12-hour format
-    // This automatically handles UTC to IST conversion
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: 'Asia/Kolkata',
-      hour: 'numeric',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: true
-    })
-    
-    return formatter.format(date)
-  } catch (error) {
-    console.error('Error formatting time:', error, timestamp)
-    // Fallback: manual UTC to IST conversion
-    try {
-      let date: Date
-      if (typeof timestamp === 'string') {
-        // Try to parse as UTC
-        const utcStr = timestamp.endsWith('Z') ? timestamp : timestamp + 'Z'
-        date = new Date(utcStr)
-        if (isNaN(date.getTime())) {
-          date = new Date(timestamp)
-        }
-      } else {
-        date = timestamp
-      }
-      
-      if (isNaN(date.getTime())) {
-        return 'Invalid Time'
-      }
-      
-      // Get UTC time and add IST offset (UTC+5:30 = 5.5 hours)
-      const utcTime = date.getTime()
-      const istOffset = 5.5 * 60 * 60 * 1000 // IST is UTC+5:30
-      const istTime = new Date(utcTime + istOffset)
-      
-      const hours = istTime.getUTCHours()
-      const minutes = istTime.getUTCMinutes()
-      const seconds = istTime.getUTCSeconds()
-      const ampm = hours >= 12 ? 'PM' : 'AM'
-      const displayHours = hours % 12 || 12
-      
-      return `${displayHours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`
-    } catch (fallbackError) {
-      return 'Invalid Time'
-    }
-  }
-}
+import { useTimezone } from '@/contexts/timezone-context'
+import { formatTimeLocal } from '@/lib/chart-utils'
 
 export default function TrafficPage() {
   const pathname = usePathname()
+  const { timezone } = useTimezone()
   const [timeRange, setTimeRange] = useState('24h')
   const [trafficData, setTrafficData] = useState<TrafficData[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -347,7 +253,7 @@ export default function TrafficPage() {
         t.endpoint,
         t.status,
         t.size,
-        formatTimeIST(t.timestamp)
+        formatTimeLocal(t.timestamp, timezone)
       ].join(','))
     ].join('\n')
 
@@ -591,7 +497,7 @@ export default function TrafficPage() {
                               </span>
                             </TableCell>
                             <TableCell className="text-sm">{request.size}</TableCell>
-                            <TableCell className="text-sm">{formatTimeIST(request.timestamp)}</TableCell>
+                            <TableCell className="text-sm">{formatTimeLocal(request.timestamp, timezone)}</TableCell>
                             <TableCell>
                               <Button
                                 variant="ghost"
@@ -665,7 +571,7 @@ export default function TrafficPage() {
                           </div>
                           <div>
                             <span className="text-muted-foreground">Time:</span>
-                            <p>{formatTimeIST(selectedTraffic.timestamp)}</p>
+                            <p>{formatTimeLocal(selectedTraffic.timestamp, timezone)}</p>
                           </div>
                           {selectedTraffic.userAgent && (
                             <div className="col-span-2">

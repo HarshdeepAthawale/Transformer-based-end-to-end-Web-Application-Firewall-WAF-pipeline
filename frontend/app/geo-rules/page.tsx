@@ -10,11 +10,28 @@ import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
-import { Globe as GlobeVisualization } from '@/components/ui/globe'
-import { getCountryCoordinates } from '@/lib/country-coordinates'
+import { GeoAttackMap } from '@/components/geo-attack-map'
 import { geoApi, GeoRule, GeoStats } from '@/lib/api'
 import { Globe, Plus, Search, MapPin, AlertCircle } from 'lucide-react'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
+
+const geoStatsChartConfig = {
+  total_requests: { label: 'Total Requests', color: 'var(--chart-1)' },
+  blocked_requests: { label: 'Blocked', color: 'var(--chart-2)' },
+} satisfies ChartConfig
+
+const topThreatCountriesChartConfig = {
+  count: { label: 'Threats', color: 'var(--chart-1)' },
+  name: { label: 'Country' },
+} satisfies ChartConfig
 
 const STATS_RANGE_OPTIONS = [
   { value: '1h', label: 'Last 1 hour' },
@@ -109,29 +126,18 @@ export default function GeoRulesPage() {
     rule.country_code.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const globeMarkers = useMemo(() => {
-    if (!Array.isArray(stats) || stats.length === 0) return []
-    const maxThreat = Math.max(1, ...stats.map((s) => s.threat_count))
-    const minSize = 0.02
-    const maxSize = 0.14
-    const markers: { location: [number, number]; size: number }[] = []
-    for (const stat of stats) {
-      const coords = getCountryCoordinates(stat.country_code)
-      if (!coords) continue
-      const size = minSize + (stat.threat_count / maxThreat) * (maxSize - minSize)
-      markers.push({ location: coords, size })
-    }
-    return markers
-  }, [stats])
-
-  const globeConfig = useMemo(
-    () => ({
-      markerColor: [251 / 255, 80 / 255, 21 / 255] as [number, number, number],
-      glowColor: [1, 0.3, 0.1] as [number, number, number],
-      markers: globeMarkers,
-    }),
-    [globeMarkers]
+  const geoStatsChartData = useMemo(
+    () => (Array.isArray(stats) ? stats.slice(0, 10) : []),
+    [stats]
   )
+
+  const topThreatCountriesData = useMemo(() => {
+    if (!Array.isArray(stats) || stats.length === 0) return []
+    return [...stats]
+      .sort((a, b) => b.threat_count - a.threat_count)
+      .slice(0, 10)
+      .map((s) => ({ name: s.country_name, count: s.threat_count }))
+  }, [stats])
 
   return (
     <div className="flex h-screen bg-background">
@@ -185,68 +191,140 @@ export default function GeoRulesPage() {
                     </Select>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Where attacks and malicious requests are coming from. Marker size reflects threat count.
+                    Where blocked requests are coming from. Marker size reflects blocked request count.
+                    <span className="block mt-1 text-xs opacity-80">Drag to pan • Scroll to zoom • Hover markers for details</span>
                   </p>
-                  {globeMarkers.length > 0 ? (
-                    <div className="relative w-full min-h-[400px] rounded-lg overflow-hidden bg-muted/30">
-                      <GlobeVisualization
-                        className="absolute inset-0 top-0 left-0"
-                        config={globeConfig}
-                      />
+                  {stats.length > 0 ? (
+                    <div className="relative w-full min-h-[32vh] aspect-[2/1] rounded-lg overflow-hidden bg-muted/30">
+                      <GeoAttackMap stats={stats} className="absolute inset-0" />
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center justify-center min-h-[400px] rounded-lg bg-muted/30 text-muted-foreground text-sm">
+                    <div className="flex flex-col items-center justify-center min-h-[55vh] rounded-lg bg-muted/30 text-muted-foreground text-sm text-center px-4">
                       <MapPin className="h-12 w-12 mb-2 opacity-50" />
                       <p>No geographic data for the selected period.</p>
                       <p className="mt-1">Traffic or threats with country attribution will appear here.</p>
+                      <p className="mt-2 text-xs opacity-80">
+                        Ensure GeoIP database is configured (see docs/GEOIP_SETUP.md) or run{' '}
+                        <code className="bg-muted px-1 rounded">scripts/seed_geo_traffic.py</code> for demo data.
+                      </p>
                     </div>
                   )}
                 </div>
               </Card>
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">
-                      Geographic Statistics ({statsRange === '1h' ? '1h' : statsRange === '24h' ? '24h' : statsRange === '7d' ? '7d' : '30d'})
-                    </h3>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={Array.isArray(stats) ? stats.slice(0, 10) : []}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="country_code" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="total_requests" fill="#8884d8" name="Total Requests" />
-                        <Bar dataKey="blocked_requests" fill="#82ca9d" name="Blocked" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-                </Card>
-
-                <Card>
-                  <div className="p-6">
-                    <h3 className="text-lg font-semibold mb-4">Top Threat Countries</h3>
-                    <div className="space-y-2">
-                      {Array.isArray(stats) && stats.length > 0 ? (
-                        stats
-                          .sort((a, b) => b.threat_count - a.threat_count)
-                          .slice(0, 5)
-                          .map((stat) => (
-                            <div key={stat.country_code} className="flex items-center justify-between p-2 bg-muted rounded">
-                              <div className="flex items-center gap-2">
-                                <MapPin className="h-4 w-4" />
-                                <span className="font-medium">{stat.country_name}</span>
-                              </div>
-                              <Badge variant="destructive">{stat.threat_count} threats</Badge>
-                            </div>
-                          ))
-                      ) : (
-                        <div className="p-4 text-center text-muted-foreground text-sm">No statistics available</div>
-                      )}
+                <div
+                  className="rounded-md p-4 md:p-6 border-2"
+                  style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+                >
+                  <h3
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                  >
+                    Geographic Statistics ({statsRange === '1h' ? '1h' : statsRange === '24h' ? '24h' : statsRange === '7d' ? '7d' : '30d'})
+                  </h3>
+                  {geoStatsChartData.length === 0 ? (
+                    <div
+                      className="flex flex-col items-center justify-center h-[300px] border-2 border-dashed rounded-md"
+                      style={{ borderColor: 'var(--positivus-gray)' }}
+                    >
+                      <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
+                        No statistics available
+                      </p>
                     </div>
-                  </div>
-                </Card>
+                  ) : (
+                    <ChartContainer config={geoStatsChartConfig} className="aspect-auto h-[300px] w-full">
+                      <BarChart data={geoStatsChartData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="country_code"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          minTickGap={32}
+                        />
+                        <YAxis tickLine={false} axisLine={false} tickMargin={8} allowDecimals={false} />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              labelFormatter={(value) => value}
+                              formatter={(value) => Number(value).toLocaleString()}
+                            />
+                          }
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                        <Bar dataKey="total_requests" fill="var(--color-total_requests)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="blocked_requests" fill="var(--color-blocked_requests)" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ChartContainer>
+                  )}
+                </div>
+
+                <div
+                  className="rounded-md p-4 md:p-6 border-2"
+                  style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+                >
+                  <h3
+                    className="text-lg font-semibold mb-4"
+                    style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                  >
+                    Top Threat Countries
+                  </h3>
+                  <p className="text-sm text-muted-foreground hidden sm:block mb-4">
+                    Countries with the highest threat counts
+                  </p>
+                  {topThreatCountriesData.length === 0 ? (
+                    <div
+                      className="flex flex-col items-center justify-center h-[300px] border-2 border-dashed rounded-md"
+                      style={{ borderColor: 'var(--positivus-gray)' }}
+                    >
+                      <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
+                        No statistics available
+                      </p>
+                    </div>
+                  ) : (
+                    <ChartContainer
+                      config={topThreatCountriesChartConfig}
+                      className="aspect-auto w-full"
+                      style={{ height: Math.max(250, topThreatCountriesData.length * 36) }}
+                    >
+                      <BarChart
+                        accessibilityLayer
+                        data={topThreatCountriesData}
+                        layout="vertical"
+                        margin={{ left: 8, right: 12, top: 8, bottom: 8 }}
+                      >
+                        <CartesianGrid horizontal={false} />
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          allowDecimals={false}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="name"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          width={140}
+                        />
+                        <ChartTooltip
+                          content={
+                            <ChartTooltipContent
+                              className="w-[180px]"
+                              nameKey="count"
+                              labelFormatter={(value) => value}
+                              formatter={(value) => `${Number(value).toLocaleString()} threats`}
+                            />
+                          }
+                        />
+                        <Bar dataKey="count" fill="var(--color-count)" radius={[0, 4, 4, 0]} />
+                      </BarChart>
+                    </ChartContainer>
+                  )}
+                </div>
               </div>
 
               <Card>

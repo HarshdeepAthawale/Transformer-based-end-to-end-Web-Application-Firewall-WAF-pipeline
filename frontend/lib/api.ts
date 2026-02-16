@@ -107,12 +107,26 @@ async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options.headers as Record<string, string>),
+    }
+    // Attach backend JWT when on client so /api/users and other auth routes work
+    if (typeof window !== 'undefined') {
+      try {
+        const { getSession } = await import('next-auth/react')
+        const session = await getSession()
+        const backendToken = (session?.user as { backendToken?: string } | undefined)?.backendToken
+        if (backendToken) {
+          headers['Authorization'] = `Bearer ${backendToken}`
+        }
+      } catch {
+        // next-auth not available or not in provider (e.g. tests)
+      }
+    }
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
       ...options,
+      headers,
     })
 
     if (!response.ok) {

@@ -10,6 +10,8 @@ import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, X
 import { Loader2, AlertCircle, Download, TrendingUp, Shield, Ban } from 'lucide-react'
 import { analyticsApi, chartsApi, ChartDataPoint, wsManager } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
+import { useTimezone } from '@/contexts/timezone-context'
+import { formatTimeLocal } from '@/lib/chart-utils'
 
 // Positivus theme chart colors
 const CHART_COLORS = {
@@ -19,18 +21,9 @@ const CHART_COLORS = {
   pie: ['#dc2626', '#ea580c', '#f59e0b', '#7c3aed', '#06b6d4', '#22c55e'],
 }
 
-function formatTimeIST(timestamp: string | Date): string {
-  try {
-    const date = typeof timestamp === 'string' ? new Date(timestamp.trim().replace(/[^\d\-:T\s]/g, '').replace(/(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})$/, '$1Z')) : timestamp
-    if (isNaN(date.getTime())) return String(timestamp)
-    return new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit', hour12: true }).format(date)
-  } catch {
-    return String(timestamp)
-  }
-}
-
 export default function AnalyticsPage() {
   const pathname = usePathname()
+  const { timezone } = useTimezone()
   const [timeRange, setTimeRange] = useState('24h')
   const [analyticsData, setAnalyticsData] = useState<ChartDataPoint[]>([])
   const [summary, setSummary] = useState<Record<string, any>>({})
@@ -109,9 +102,9 @@ export default function AnalyticsPage() {
     }
   }, [pathname, timeRange])
 
-  const formattedData = useMemo(() =>
-    analyticsData.map(d => ({ ...d, timeFormatted: formatTimeIST(d.time || '') })),
-    [analyticsData]
+  const formattedData = useMemo(
+    () => analyticsData.map((d) => ({ ...d, timeFormatted: formatTimeLocal(d.time || '', timezone) })),
+    [analyticsData, timezone]
   )
 
   const chartTooltipStyle = {
@@ -257,7 +250,7 @@ export default function AnalyticsPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
                         <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
                         <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={v => `Time: ${v} IST`} />
+                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
                         <Legend wrapperStyle={{ paddingTop: 8 }} />
                         <Line type="monotone" dataKey="requests" stroke={CHART_COLORS.requests} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} name="Total Requests" />
                         <Line type="monotone" dataKey="blocked" stroke={CHART_COLORS.blocked} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} name="Blocked" />
@@ -275,7 +268,7 @@ export default function AnalyticsPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
                         <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
                         <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={v => `Time: ${v} IST`} />
+                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
                         <Legend wrapperStyle={{ paddingTop: 8 }} />
                         <Bar dataKey="blocked" fill={CHART_COLORS.blocked} radius={[4, 4, 0, 0]} name="Blocked" />
                         <Bar dataKey="allowed" fill={CHART_COLORS.allowed} radius={[4, 4, 0, 0]} name="Allowed" />
@@ -324,7 +317,7 @@ export default function AnalyticsPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
                         <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
                         <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={v => `Time: ${v} IST`} />
+                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
                         <Legend wrapperStyle={{ paddingTop: 8 }} />
                         <Area type="monotone" dataKey="requests" stroke={CHART_COLORS.requests} strokeWidth={2} fill="url(#areaRequestsAnalytics)" name="Requests" />
                       </AreaChart>

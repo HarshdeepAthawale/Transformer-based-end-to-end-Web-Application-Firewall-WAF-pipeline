@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { ChevronDown, Search, Settings } from 'lucide-react'
+import { ChevronDown, Search, Settings, Globe } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationCenter } from '@/components/notification-center'
+import { useTimezone, TIMEZONE_OPTIONS } from '@/contexts/timezone-context'
 
 interface HeaderProps {
   timeRange?: string
@@ -11,6 +12,7 @@ interface HeaderProps {
 }
 
 export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: HeaderProps) {
+  const { timezone, setTimezone } = useTimezone()
   const timeRanges = [
     { label: '1h', value: '1h' },
     { label: '6h', value: '6h' },
@@ -68,6 +70,27 @@ export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: Head
               ))}
             </select>
             <ChevronDown size={16} style={{ color: 'var(--positivus-gray-dark)' }} className="pointer-events-none" />
+          </div>
+
+          {/* Timezone - client company's country */}
+          <div
+            className="flex items-center gap-2 rounded-none px-3 py-2 border-2"
+            style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+            title="Display times in your company's timezone"
+          >
+            <Globe size={16} style={{ color: 'var(--positivus-gray-dark)' }} />
+            <select
+              value={timezone ?? ''}
+              onChange={(e) => setTimezone(e.target.value || undefined)}
+              className="bg-transparent border-none outline-none text-sm cursor-pointer max-w-[140px]"
+              style={{ color: 'var(--positivus-black)' }}
+            >
+              {TIMEZONE_OPTIONS.map((opt) => (
+                <option key={opt.value || 'local'} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Theme Toggle */}

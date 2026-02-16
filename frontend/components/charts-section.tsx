@@ -14,7 +14,8 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useChartData } from '@/hooks/use-chart-data'
 import { useSecurityEventsChart } from '@/hooks/use-security-events-chart'
-import { formatTimeIST, CHART_TIME_RANGES } from '@/lib/chart-utils'
+import { useTimezone } from '@/contexts/timezone-context'
+import { formatTimeLocal, CHART_TIME_RANGES } from '@/lib/chart-utils'
 
 const requestVolumeChartConfig = {
   requests: { label: 'Total Requests', color: 'var(--chart-1)' },
@@ -38,16 +39,17 @@ interface ChartsSectionProps {
 
 export function ChartsSection({ timeRange, onTimeRangeChange }: ChartsSectionProps) {
   const router = useRouter()
+  const { timezone } = useTimezone()
   const { requestData, topThreatTypes, isLoading, error } = useChartData(timeRange)
-  const { data: securityEventsData, isLoading: securityLoading } = useSecurityEventsChart(timeRange)
+  const { data: securityEventsData, isLoading: securityLoading } = useSecurityEventsChart(timeRange, timezone)
 
   const formattedRequestData = useMemo(
     () =>
       requestData.map((point) => ({
         ...point,
-        timeFormatted: formatTimeIST(point.time || ''),
+        timeFormatted: formatTimeLocal(point.time || '', timezone),
       })),
-    [requestData]
+    [requestData, timezone]
   )
 
   if (isLoading) {

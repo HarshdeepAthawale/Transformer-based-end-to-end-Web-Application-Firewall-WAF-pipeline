@@ -59,4 +59,6 @@ When using Docker Compose (see [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)), b
 |---------|-------|-----|
 | Empty charts, no metrics | Backend not running | Start the backend on port 3001 |
 | Network errors in console | Backend unreachable | Check backend is running; verify port 3001 is not blocked |
+| **User API not found** / **Users module not loaded** | Backend missing PyJWT or users route not registered | Run `pip install 'PyJWT>=2.8.0'` in the backend environment, then restart the backend. With Docker, rebuild: `docker compose build backend && docker compose up -d backend`. |
+| User Management shows 404 | Frontend can’t reach backend `/api/users` | Ensure backend is running. If using Docker, set `NEXT_PUBLIC_API_URL=http://localhost:3001` (or the URL the browser uses to reach the API). |
 | Buttons not navigating | Usually fixed | View All Alerts, View Activity Log, Details now link to their pages |

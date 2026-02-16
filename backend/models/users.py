@@ -72,4 +72,5 @@ class User(Base):
             "last_login": self.last_login.isoformat() if self.last_login else None,
             "api_key_count": len(api_keys_list),
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
+            "created_at": self.timestamp.isoformat() if self.timestamp else None,
         }

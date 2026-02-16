@@ -4,6 +4,7 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { AuthSessionProvider } from '@/components/providers/session-provider'
+import { TimezoneProvider } from '@/contexts/timezone-context'
 import './globals.css'
 
 // Configure Inter font for clean, readable typography
@@ -49,9 +50,11 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className={`font-sans antialiased bg-background text-foreground`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="waf-theme">
-          <AuthSessionProvider>
-            {children}
-          </AuthSessionProvider>
+          <TimezoneProvider>
+            <AuthSessionProvider>
+              {children}
+            </AuthSessionProvider>
+          </TimezoneProvider>
           <Analytics />
         </ThemeProvider>
       </body>

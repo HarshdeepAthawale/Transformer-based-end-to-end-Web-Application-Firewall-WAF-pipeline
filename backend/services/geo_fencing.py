@@ -150,6 +150,7 @@ class GeoFencingService:
         """Get geographic threat statistics"""
         from backend.models.traffic import TrafficLog
         from backend.models.threats import Threat
+        from backend.lib.countries import get_country_name
         from sqlalchemy import func
         
         # Get traffic stats by country
@@ -163,47 +164,68 @@ class GeoFencingService:
         .group_by(TrafficLog.country_code)\
         .all()
         
-        # Get threat counts by country
-        threat_stats = self.db.query(
+        # Threat counts from Threat.country_code (direct attribution when available)
+        threat_by_country = self.db.query(
+            Threat.country_code,
+            func.count(Threat.id).label('threat_count')
+        )\
+        .filter(Threat.timestamp >= start_time)\
+        .filter(Threat.country_code.isnot(None))\
+        .group_by(Threat.country_code)\
+        .all()
+        
+        country_threat_map = {cc: int(tc) for cc, tc in threat_by_country}
+        
+        # Fallback: map threat IPs without country_code to countries via TrafficLog
+        threat_stats_by_ip = self.db.query(
             Threat.source_ip,
             func.count(Threat.id).label('threat_count')
         )\
         .filter(Threat.timestamp >= start_time)\
+        .filter(Threat.country_code.is_(None))\
         .group_by(Threat.source_ip)\
         .all()
         
-        # Map IPs to countries (simplified - in production, use GeoIP lookup)
-        # For now, we'll aggregate by country_code from traffic logs
-        country_threat_map = {}
-        for source_ip, threat_count in threat_stats:
-            # Try to get country from traffic logs
+        for source_ip, threat_count in threat_stats_by_ip:
             traffic_log = self.db.query(TrafficLog)\
                 .filter(TrafficLog.ip == source_ip)\
                 .filter(TrafficLog.timestamp >= start_time)\
                 .filter(TrafficLog.country_code.isnot(None))\
                 .first()
             if traffic_log and traffic_log.country_code:
-                country_code = traffic_log.country_code
-                country_threat_map[country_code] = country_threat_map.get(country_code, 0) + threat_count
+                cc = traffic_log.country_code
+                country_threat_map[cc] = country_threat_map.get(cc, 0) + int(threat_count)
         
-        # Build result list
+        def _resolve_country_name(country_code: str) -> str:
+            rule = self.db.query(GeoRule).filter(GeoRule.country_code == country_code).first()
+            if rule and rule.country_name:
+                return rule.country_name
+            return get_country_name(country_code)
+        
+        # Build result: countries with traffic
         result = []
-        country_names = {}  # Cache country names from rules
-        
+        seen_codes = set()
         for country_code, total_requests, blocked_requests in traffic_stats:
-            # Get country name from rules or use code as fallback
-            if country_code not in country_names:
-                rule = self.db.query(GeoRule)\
-                    .filter(GeoRule.country_code == country_code)\
-                    .first()
-                country_names[country_code] = rule.country_name if rule else country_code
-            
+            seen_codes.add(country_code)
             result.append({
                 'country_code': country_code,
-                'country_name': country_names[country_code],
+                'country_name': _resolve_country_name(country_code),
                 'total_requests': int(total_requests),
                 'blocked_requests': int(blocked_requests or 0),
-                'threat_count': int(country_threat_map.get(country_code, 0))
+                'threat_count': country_threat_map.get(country_code, 0)
             })
         
+        # Include countries that have only threats (no traffic)
+        for country_code in country_threat_map:
+            if country_code not in seen_codes:
+                result.append({
+                    'country_code': country_code,
+                    'country_name': _resolve_country_name(country_code),
+                    'total_requests': 0,
+                    'blocked_requests': 0,
+                    'threat_count': country_threat_map[country_code]
+                })
+        
+        # Sort by relevance (threat_count first, then total_requests)
+        result.sort(key=lambda r: (r['threat_count'], r['total_requests']), reverse=True)
         return result

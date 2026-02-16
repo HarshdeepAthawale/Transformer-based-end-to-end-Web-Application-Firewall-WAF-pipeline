@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { chartsApi } from '@/lib/api'
-import { formatTimeIST } from '@/lib/chart-utils'
+import { formatTimeLocal } from '@/lib/chart-utils'
 
 const MAX_POINTS = 60
 
@@ -13,7 +13,7 @@ export interface SecurityEventsChartPoint {
   ddos: number
 }
 
-export function useSecurityEventsChart(timeRange: string) {
+export function useSecurityEventsChart(timeRange: string, timezone?: string) {
   const [data, setData] = useState<SecurityEventsChartPoint[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,7 +52,7 @@ export function useSecurityEventsChart(timeRange: string) {
         .sort()
         .map((time) => ({
           time,
-          timeFormatted: formatTimeIST(time),
+          timeFormatted: formatTimeLocal(time, timezone),
           rateLimit: rateLimitMap.get(time) ?? 0,
           ddos: ddosMap.get(time) ?? 0,
         }))
@@ -65,7 +65,7 @@ export function useSecurityEventsChart(timeRange: string) {
     } finally {
       setIsLoading(false)
     }
-  }, [timeRange])
+  }, [timeRange, timezone])
 
   useEffect(() => {
     fetchData()
