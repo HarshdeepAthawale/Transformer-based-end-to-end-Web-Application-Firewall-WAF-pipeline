@@ -138,7 +138,7 @@ export default function CopilotPage() {
         const display =
           content ||
           (isNetwork
-            ? 'Failed to connect to the AI agent. Please check that the backend is running on port 3001.'
+            ? 'Failed to connect to the AI agent. Ensure the backend is running (e.g. port 3001) and reachable from the frontend server. See docs/FRONTEND_BACKEND_CONNECTION.md.'
             : `Error: ${errMsg}`)
         setMessages(prev => {
           const updated = [...prev]

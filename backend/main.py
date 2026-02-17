@@ -221,14 +221,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "success": False,
-            "message": "Internal server error",
-            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
-        },
-    )
+    content = {
+        "success": False,
+        "message": "Internal server error",
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+    }
+    if os.getenv("DEBUG", "false").lower() == "true":
+        content["detail"] = str(exc)
+    return JSONResponse(status_code=500, content=content)
 
 
 # Health, test, debug routers (no prefix)
@@ -268,6 +268,15 @@ except Exception as e:
     logger.error(f"Error registering WAF routes: {e}")
 
 # Advanced feature routes - register individually for better error handling
+# Bot management (score, verified bots, score bands) - /api/bot
+try:
+    from backend.routes import bot
+
+    app.include_router(bot.router, prefix="/api/bot", tags=["bot-management"])
+    logger.info("✓ Registered routes: /api/bot")
+except ImportError as e:
+    logger.error(f"✗ Failed to import bot routes: {e}")
+
 advanced_routes = [
     ("settings", "/api/settings", "settings"),
     ("ip_management", "/api/ip", "ip-management"),

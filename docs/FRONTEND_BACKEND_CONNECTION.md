@@ -24,34 +24,29 @@ cd frontend
 npm run dev
 ```
 
-The frontend runs on **http://localhost:3000**. When `NEXT_PUBLIC_API_URL` is not set, the frontend proxies API requests to **http://localhost:3001** via Next.js rewrites.
+The frontend runs on **http://localhost:3000**. All API requests (including the AI Copilot) go through the Next.js server via **proxy**: the browser calls `http://localhost:3000/api/*`, and Next.js rewrites those to the backend (default **http://localhost:3001**). The backend only needs to be reachable from the machine running the Next.js server, not directly from the browser.
 
 ### 3. Verify Connection
 
 - Open http://localhost:3000/dashboard
 - Metrics, charts, and data should load when the backend is reachable
-- If you see "No data available" or empty charts, ensure the backend is running on port 3001
+- Open the Copilot page; queries should work as long as the backend is running
+- If you see "No data available", empty charts, or "Failed to connect to the AI agent", ensure the backend is running on port 3001
 
 ## Configuration
 
-### Environment Variables (frontend/.env.local)
+### Environment Variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NEXT_PUBLIC_API_URL` | (empty) | Leave empty for proxy mode. Set to `http://localhost:3001` for direct API calls. |
-| `NEXT_PUBLIC_WS_URL` | `ws://localhost:3001/ws/` | WebSocket URL for real-time updates. |
+| Variable | Where | Default | Description |
+|----------|--------|---------|-------------|
+| `BACKEND_URL` | Server (next.config / Node) | `http://localhost:3001` | URL the Next.js server uses to proxy `/api/*` to the backend. In Docker, set to `http://backend:3001`. |
+| `NEXT_PUBLIC_WS_URL` | Frontend (browser) | `ws://localhost:3001/ws/` | WebSocket URL for real-time updates (browser connects directly to backend). |
 
-### Proxy Mode (default)
-
-When `NEXT_PUBLIC_API_URL` is **not set**, the frontend uses Next.js rewrites to proxy `/api/*` to `http://localhost:3001/api/*`. This avoids CORS issues in local development.
-
-### Direct API Mode
-
-Set `NEXT_PUBLIC_API_URL=http://localhost:3001` when you want the frontend to call the backend directly. The backend must allow CORS from `http://localhost:3000` (already configured).
+API requests from the frontend **always** use the proxy (relative `/api/*`). The proxy target is controlled by `BACKEND_URL` when running the Next.js server.
 
 ## Docker Deployment
 
-When using Docker Compose (see [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)), both services run in containers. Set `NEXT_PUBLIC_API_URL` to the backend service URL that the browser can reach (e.g. `http://localhost:3001` if the backend port is exposed).
+When using Docker Compose (see [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)), set `BACKEND_URL=http://backend:3001` so the frontend container can proxy API requests to the backend container. The browser only talks to the frontend; the frontend server proxies to the backend.
 
 ## Troubleshooting
 
@@ -59,6 +54,7 @@ When using Docker Compose (see [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md)), b
 |---------|-------|-----|
 | Empty charts, no metrics | Backend not running | Start the backend on port 3001 |
 | Network errors in console | Backend unreachable | Check backend is running; verify port 3001 is not blocked |
+| **Failed to connect to the AI agent** | Backend not running or not reachable from Next server | Start the backend on port 3001. Ensure `BACKEND_URL` (or default `http://localhost:3001`) is reachable from the process running `npm run dev` (or the frontend container). |
 | **User API not found** / **Users module not loaded** | Backend missing PyJWT or users route not registered | Run `pip install 'PyJWT>=2.8.0'` in the backend environment, then restart the backend. With Docker, rebuild: `docker compose build backend && docker compose up -d backend`. |
-| User Management shows 404 | Frontend can’t reach backend `/api/users` | Ensure backend is running. If using Docker, set `NEXT_PUBLIC_API_URL=http://localhost:3001` (or the URL the browser uses to reach the API). |
+| User Management shows 404 | Frontend can’t reach backend `/api/users` | Ensure backend is running. Proxy is always used; check that `BACKEND_URL` points at the running backend. |
 | Buttons not navigating | Usually fixed | View All Alerts, View Activity Log, Details now link to their pages |

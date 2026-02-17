@@ -4,9 +4,22 @@ import { useEffect, useState, useMemo } from 'react'
 import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
-import { Card } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart'
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, CartesianGrid, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import { Loader2, AlertCircle, Download, TrendingUp, Shield, Ban } from 'lucide-react'
 import { analyticsApi, chartsApi, ChartDataPoint, wsManager } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
@@ -19,6 +32,30 @@ const CHART_COLORS = {
   blocked: '#dc2626',
   allowed: '#22c55e',
   pie: ['#dc2626', '#ea580c', '#f59e0b', '#7c3aed', '#06b6d4', '#22c55e'],
+}
+
+const requestTrendsChartConfig = {
+  requests: { label: 'Total Requests', color: 'var(--chart-1)' },
+  blocked: { label: 'Blocked', color: 'var(--chart-2)' },
+  allowed: { label: 'Allowed', color: 'var(--chart-3)' },
+} satisfies ChartConfig
+
+const blockedAllowedChartConfig = {
+  blocked: { label: 'Blocked', color: 'var(--chart-1)' },
+  allowed: { label: 'Allowed', color: 'var(--chart-2)' },
+} satisfies ChartConfig
+
+const requestVolumeChartConfig = {
+  requests: { label: 'Requests', color: 'var(--chart-1)' },
+} satisfies ChartConfig
+
+/** Short label for bar chart X-axis to avoid crowding */
+function formatChartTick(value: string): string {
+  if (!value) return ''
+  if (value.length <= 8) return value
+  const parts = value.split(/[\sT]/)
+  if (parts.length >= 2 && /^\d{2}:\d{2}/.test(parts[1])) return parts[1].slice(0, 5)
+  return value.slice(0, 6)
 }
 
 export default function AnalyticsPage() {
@@ -243,38 +280,75 @@ export default function AnalyticsPage() {
               {/* Charts Grid */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className={chartCardClass} style={chartCardStyle}>
-                  <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Request Trends</h3>
-                  {formattedData.length === 0 ? emptyState : (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <LineChart data={formattedData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
-                        <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
-                        <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
-                        <Legend wrapperStyle={{ paddingTop: 8 }} />
-                        <Line type="monotone" dataKey="requests" stroke={CHART_COLORS.requests} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} name="Total Requests" />
-                        <Line type="monotone" dataKey="blocked" stroke={CHART_COLORS.blocked} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} name="Blocked" />
-                        <Line type="monotone" dataKey="allowed" stroke={CHART_COLORS.allowed} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} name="Allowed" />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  )}
+                  <CardHeader>
+                    <CardTitle className="text-lg" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Request Trends</CardTitle>
+                    <CardDescription style={{ color: 'var(--positivus-gray-dark)' }}>Total requests, blocked, and allowed per time bucket</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {formattedData.length === 0 ? emptyState : (
+                      <ChartContainer config={requestTrendsChartConfig} className="aspect-auto h-[300px] w-full">
+                        <BarChart accessibilityLayer data={formattedData}>
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="timeFormatted"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={formatChartTick}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dashed" />}
+                          />
+                          <Bar dataKey="requests" fill="var(--color-requests)" radius={4} />
+                          <Bar dataKey="blocked" fill="var(--color-blocked)" radius={4} />
+                          <Bar dataKey="allowed" fill="var(--color-allowed)" radius={4} />
+                        </BarChart>
+                      </ChartContainer>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="leading-none font-medium" style={{ color: 'var(--positivus-black)' }}>
+                      {summary.attack_rate != null ? `Block rate ${Number(summary.attack_rate).toFixed(1)}% this period` : 'Requests and security actions for the selected time range'}
+                    </div>
+                    <div className="text-muted-foreground leading-none">
+                      Showing requests for the selected time range
+                    </div>
+                  </CardFooter>
                 </Card>
 
                 <Card className={chartCardClass} style={chartCardStyle}>
-                  <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Blocked vs Allowed</h3>
-                  {formattedData.length === 0 ? emptyState : (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={formattedData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
-                        <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
-                        <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
-                        <Legend wrapperStyle={{ paddingTop: 8 }} />
-                        <Bar dataKey="blocked" fill={CHART_COLORS.blocked} radius={[4, 4, 0, 0]} name="Blocked" />
-                        <Bar dataKey="allowed" fill={CHART_COLORS.allowed} radius={[4, 4, 0, 0]} name="Allowed" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  )}
+                  <CardHeader>
+                    <CardTitle className="text-lg" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Blocked vs Allowed</CardTitle>
+                    <CardDescription style={{ color: 'var(--positivus-gray-dark)' }}>Blocked and allowed requests per time bucket</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {formattedData.length === 0 ? emptyState : (
+                      <ChartContainer config={blockedAllowedChartConfig} className="aspect-auto h-[300px] w-full">
+                        <BarChart accessibilityLayer data={formattedData}>
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="timeFormatted"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={formatChartTick}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dashed" />}
+                          />
+                          <Bar dataKey="blocked" fill="var(--color-blocked)" radius={4} />
+                          <Bar dataKey="allowed" fill="var(--color-allowed)" radius={4} />
+                        </BarChart>
+                      </ChartContainer>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="text-muted-foreground leading-none">
+                      Blocked vs allowed requests per time bucket
+                    </div>
+                  </CardFooter>
                 </Card>
 
                 {attackTypeData.length > 0 && (
@@ -304,25 +378,36 @@ export default function AnalyticsPage() {
                 )}
 
                 <Card className={chartCardClass} style={chartCardStyle}>
-                  <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Request Volume Over Time</h3>
-                  {formattedData.length === 0 ? emptyState : (
-                    <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart data={formattedData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
-                        <defs>
-                          <linearGradient id="areaRequestsAnalytics" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor={CHART_COLORS.requests} stopOpacity={0.4} />
-                            <stop offset="100%" stopColor={CHART_COLORS.requests} stopOpacity={0.05} />
-                          </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="var(--positivus-gray)" vertical={false} />
-                        <XAxis dataKey="timeFormatted" stroke="var(--positivus-gray-dark)" fontSize={11} angle={-45} textAnchor="end" height={70} interval="preserveStartEnd" />
-                        <YAxis stroke="var(--positivus-gray-dark)" fontSize={12} allowDecimals={false} />
-                        <Tooltip contentStyle={chartTooltipStyle} labelStyle={{ color: 'var(--positivus-black)' }} labelFormatter={(v) => `Time: ${v}`} />
-                        <Legend wrapperStyle={{ paddingTop: 8 }} />
-                        <Area type="monotone" dataKey="requests" stroke={CHART_COLORS.requests} strokeWidth={2} fill="url(#areaRequestsAnalytics)" name="Requests" />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  )}
+                  <CardHeader>
+                    <CardTitle className="text-lg" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Request Volume Over Time</CardTitle>
+                    <CardDescription style={{ color: 'var(--positivus-gray-dark)' }}>Total request volume per time bucket</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {formattedData.length === 0 ? emptyState : (
+                      <ChartContainer config={requestVolumeChartConfig} className="aspect-auto h-[300px] w-full">
+                        <BarChart accessibilityLayer data={formattedData}>
+                          <CartesianGrid vertical={false} />
+                          <XAxis
+                            dataKey="timeFormatted"
+                            tickLine={false}
+                            tickMargin={10}
+                            axisLine={false}
+                            tickFormatter={formatChartTick}
+                          />
+                          <ChartTooltip
+                            cursor={false}
+                            content={<ChartTooltipContent indicator="dashed" />}
+                          />
+                          <Bar dataKey="requests" fill="var(--color-requests)" radius={4} />
+                        </BarChart>
+                      </ChartContainer>
+                    )}
+                  </CardContent>
+                  <CardFooter className="flex-col items-start gap-2 text-sm">
+                    <div className="text-muted-foreground leading-none">
+                      Total request volume for the selected time range
+                    </div>
+                  </CardFooter>
                 </Card>
               </div>
             </div>

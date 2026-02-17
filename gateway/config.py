@@ -62,6 +62,13 @@ class GatewayConfig:
     DDOS_BLOCK_DURATION_SECONDS: int = int(os.getenv("DDOS_BLOCK_DURATION_SECONDS", "60"))
     DDOS_FAIL_OPEN: bool = os.getenv("DDOS_FAIL_OPEN", "true").lower() == "true"
 
+    # Bot management (score + bands)
+    BOT_ENABLED: bool = os.getenv("BOT_ENABLED", "true").lower() == "true"
+    BOT_BACKEND_URL: str = os.getenv("BOT_BACKEND_URL", "")
+    BOT_FAIL_OPEN: bool = os.getenv("BOT_FAIL_OPEN", "true").lower() == "true"
+    BOT_TIMEOUT_SECONDS: float = float(os.getenv("BOT_TIMEOUT_SECONDS", "1.0"))
+    BOT_CHALLENGE_RETRY_AFTER: int = int(os.getenv("BOT_CHALLENGE_RETRY_AFTER", "60"))
+
     # Event reporting to backend
     BACKEND_EVENTS_URL: str = os.getenv("BACKEND_EVENTS_URL", "")
     BACKEND_EVENTS_ENABLED: bool = os.getenv("BACKEND_EVENTS_ENABLED", "true").lower() == "true"

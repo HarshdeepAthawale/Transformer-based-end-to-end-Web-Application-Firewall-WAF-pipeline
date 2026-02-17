@@ -9,7 +9,7 @@ router = APIRouter()
 
 
 @router.get("/recent")
-async def get_recent_traffic(limit: int = Query(50, ge=1, le=500), db: Session = Depends(get_db)):
+async def get_recent_traffic(limit: int = Query(50, ge=1, le=2000), db: Session = Depends(get_db)):
     return ctrl.get_recent(db, limit)
 
 

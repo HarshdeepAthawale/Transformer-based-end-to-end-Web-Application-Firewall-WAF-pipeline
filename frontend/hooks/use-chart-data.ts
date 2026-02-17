@@ -30,10 +30,10 @@ export function useChartData(timeRange: string): UseChartDataResult {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchTrafficByMinute = useCallback(async () => {
+  const fetchTrafficByMinute = useCallback(async (): Promise<ChartDataPoint[]> => {
     try {
       const response = await trafficApi.getRecent(1000)
-      if (!response.success) return
+      if (!response.success || !Array.isArray(response.data)) return []
       const minuteMap = new Map<string, { requests: number; blocked: number; allowed: number }>()
       response.data.forEach((traffic: { timestamp?: string; time?: string; was_blocked?: boolean; wasBlocked?: boolean }) => {
         const timestamp = traffic.timestamp || traffic.time
@@ -52,12 +52,14 @@ export function useChartData(timeRange: string): UseChartDataResult {
         .sort((a, b) => new Date(a.time || '').getTime() - new Date(b.time || '').getTime())
         .slice(-MAX_POINTS)
       setRequestData(chartData)
+      return chartData
     } catch (err: unknown) {
       if ((err as { isNetworkError?: boolean })?.isNetworkError) {
         console.debug('[useChartData] Traffic fetch failed (backend may be offline)')
       } else {
         console.error('[useChartData] Failed to fetch traffic:', err)
       }
+      return []
     }
   }, [])
 
@@ -95,7 +97,15 @@ export function useChartData(timeRange: string): UseChartDataResult {
     try {
       setIsLoading(true)
       if (useRealtime) {
-        await fetchTrafficByMinute()
+        const trafficChartData = await fetchTrafficByMinute()
+        // Fallback: when traffic/recent is empty (e.g. different backend or proxy), use charts API so graph still shows
+        if (trafficChartData.length === 0) {
+          const res = await chartsApi.getRequests(timeRange)
+          if (res.success && res.data?.length) {
+            const aggregated = aggregateByMinute(res.data)
+            setRequestData(aggregated.slice(-MAX_POINTS))
+          }
+        }
       } else {
         const res = await chartsApi.getRequests(timeRange)
         if (res.success && res.data?.length) {

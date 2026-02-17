@@ -1,7 +1,9 @@
 // API service layer for WAF Dashboard backend integration
 
-// Base API configuration - empty string uses Next.js proxy (see next.config.mjs rewrites)
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
+// Use relative path so all API requests go through Next.js proxy (/api/* -> backend). Backend URL is
+// configured server-side via BACKEND_URL (next.config.mjs). This avoids connection failures when
+// the browser cannot reach the backend directly (e.g. Docker, or backend not on same host).
+const API_BASE_URL = ''
 // WebSocket URL - note: the backend route is /ws/ so the full path is ws://localhost:3001/ws/
 const WS_BASE_URL = process.env.NEXT_PUBLIC_WS_URL || (typeof window !== 'undefined' 
   ? `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.hostname}:3001/ws/`
@@ -228,6 +230,7 @@ export interface SecurityEventData {
   details?: string
   attack_score?: number
   block_duration_seconds?: number
+  bot_score?: number
 }
 
 export interface EventsStats {
@@ -451,6 +454,23 @@ export interface BotSignature {
   created_at: string
 }
 
+export interface VerifiedBot {
+  id: number
+  name: string
+  user_agent_pattern: string
+  source: 'manual' | 'remote'
+  synced_at: string | null
+  created_at: string
+}
+
+export interface BotScoreBand {
+  id: number
+  min_score: number
+  max_score: number
+  action: 'allow' | 'challenge' | 'block'
+  priority: number
+}
+
 export const botApi = {
   getSignatures: (activeOnly: boolean = true): Promise<ApiResponse<BotSignature[]>> =>
     apiRequest(`/api/bots/signatures?active_only=${activeOnly}`),
@@ -466,6 +486,37 @@ export const botApi = {
       method: 'POST',
       body: JSON.stringify(signature),
     }),
+
+  // Bot management (score bands, verified bots)
+  getScoreBands: (): Promise<ApiResponse<BotScoreBand[]>> =>
+    apiRequest('/api/bot/score-bands'),
+
+  updateScoreBands: (bands: { min_score: number; max_score: number; action: string }[]): Promise<ApiResponse<BotScoreBand[]>> =>
+    apiRequest('/api/bot/score-bands', {
+      method: 'PUT',
+      body: JSON.stringify({ bands }),
+    }),
+
+  getVerifiedBots: (): Promise<ApiResponse<VerifiedBot[]>> =>
+    apiRequest('/api/bot/verified'),
+
+  addVerifiedBot: (bot: { name: string; user_agent_pattern: string }): Promise<ApiResponse<VerifiedBot>> =>
+    apiRequest('/api/bot/verified', {
+      method: 'POST',
+      body: JSON.stringify(bot),
+    }),
+
+  deleteVerifiedBot: (id: number): Promise<ApiResponse<void>> =>
+    apiRequest(`/api/bot/verified/${id}`, { method: 'DELETE' }),
+
+  syncVerifiedBots: (): Promise<ApiResponse<{ synced: number }>> =>
+    apiRequest('/api/bot/verified/sync', { method: 'POST' }),
+}
+
+// Bot events (for bot-detection page)
+export const botEventsApi = {
+  getBotEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<SecurityEventData[]>> =>
+    apiRequest(`/api/events/bot?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
 }
 
 // Threat Intelligence API

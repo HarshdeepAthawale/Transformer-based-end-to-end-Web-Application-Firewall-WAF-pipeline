@@ -23,11 +23,22 @@ class SecurityEvent(Base):
     details = Column(Text, nullable=True)
     attack_score = Column(Integer, nullable=True, index=True)
     block_duration_seconds = Column(Integer, nullable=True)
+    bot_score = Column(Integer, nullable=True, index=True)
+
+    def _serialize_timestamp(self, value):
+        """Normalize timestamp for JSON: handle None, string (e.g. from SQLite), or datetime."""
+        if value is None:
+            return None
+        if isinstance(value, str):
+            return value
+        if isinstance(value, datetime):
+            return value.replace(tzinfo=timezone.utc).isoformat()
+        return str(value)
 
     def to_dict(self):
         return {
             "id": self.id,
-            "timestamp": self.timestamp.replace(tzinfo=timezone.utc).isoformat() if self.timestamp else None,
+            "timestamp": self._serialize_timestamp(self.timestamp),
             "event_type": self.event_type,
             "ip": self.ip,
             "method": self.method,
@@ -35,4 +46,5 @@ class SecurityEvent(Base):
             "details": self.details,
             "attack_score": self.attack_score,
             "block_duration_seconds": self.block_duration_seconds,
+            "bot_score": self.bot_score,
         }

@@ -7,29 +7,37 @@ from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.orm import Session
 from sqlalchemy import func
+from loguru import logger
 
 from backend.database import get_db
 from backend.models.security_event import SecurityEvent
+from backend.config import config
+from backend.services.traffic_service import TrafficService
+from backend.services.websocket_service import broadcast_update_sync
 
 router = APIRouter()
 
 
 def _aggregate_security_events(db: Session, start_time, event_types: list[str]) -> list:
-    """Aggregate security events by hour for chart data."""
-    results = (
-        db.query(
-            func.strftime("%Y-%m-%d %H:00:00", SecurityEvent.timestamp).label("time"),
-            func.count(SecurityEvent.id).label("count"),
+    """Aggregate security events by hour for chart data. Returns empty list on DB/strftime errors."""
+    try:
+        results = (
+            db.query(
+                func.strftime("%Y-%m-%d %H:00:00", SecurityEvent.timestamp).label("time"),
+                func.count(SecurityEvent.id).label("count"),
+            )
+            .filter(
+                SecurityEvent.event_type.in_(event_types),
+                SecurityEvent.timestamp >= start_time,
+            )
+            .group_by("time")
+            .order_by("time")
+            .all()
         )
-        .filter(
-            SecurityEvent.event_type.in_(event_types),
-            SecurityEvent.timestamp >= start_time,
-        )
-        .group_by("time")
-        .order_by("time")
-        .all()
-    )
-    return [{"time": row.time, "count": int(row.count)} for row in results]
+        return [{"time": row.time, "count": int(row.count)} for row in results if row.time]
+    except Exception as e:
+        logger.warning(f"Events aggregation failed: {e}")
+        return []
 
 
 class IngestEvent(BaseModel):
@@ -39,12 +47,15 @@ class IngestEvent(BaseModel):
     ip: str
     method: Optional[str] = None
     path: Optional[str] = None
+    request_id: Optional[str] = None
     retry_after: Optional[int] = None
     content_length: Optional[int] = None
     max_bytes: Optional[int] = None
     block_ttl_seconds: Optional[int] = None
     block_duration_seconds: Optional[int] = None
     attack_score: Optional[int] = None
+    bot_score: Optional[int] = None
+    bot_action: Optional[str] = None
 
 
 class IngestRequest(BaseModel):
@@ -53,7 +64,12 @@ class IngestRequest(BaseModel):
 
 @router.post("/ingest")
 async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
-    """Accept batch of events from gateway. Fire-and-forget from gateway."""
+    """Accept batch of events from gateway. Fire-and-forget from gateway.
+    When EVENTS_INGEST_WRITE_TRAFFIC_LOG is true, also creates TrafficLog rows
+    so Request Volume & Threats chart shows gateway traffic."""
+    traffic_svc = TrafficService(db) if config.EVENTS_INGEST_WRITE_TRAFFIC_LOG else None
+    traffic_logs_created: list = []
+
     for e in body.events:
         details = {}
         block_sec = None
@@ -70,6 +86,8 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
             details["block_duration_seconds"] = e.block_duration_seconds
         if e.attack_score is not None:
             details["attack_score"] = e.attack_score
+        if e.bot_action is not None:
+            details["bot_action"] = e.bot_action
 
         ev = SecurityEvent(
             event_type=e.event_type,
@@ -79,9 +97,27 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
             details=json.dumps(details) if details else None,
             attack_score=e.attack_score,
             block_duration_seconds=block_sec,
+            bot_score=e.bot_score,
         )
         db.add(ev)
+
+        if traffic_svc:
+            log = traffic_svc.add_traffic_log_from_ingest_event(
+                event_type=e.event_type,
+                ip=e.ip,
+                method=e.method,
+                path=e.path,
+                attack_score=e.attack_score,
+                bot_score=e.bot_score,
+                bot_action=e.bot_action,
+            )
+            traffic_logs_created.append(log)
+
     db.commit()
+    for log in traffic_logs_created:
+        db.refresh(log)
+        broadcast_update_sync("traffic", log.to_dict())
+
     return {"success": True, "ingested": len(body.events)}
 
 
@@ -118,6 +154,14 @@ async def get_events_stats(
         )
         .count()
     )
+    bot_block_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("bot_block", "bot_challenge")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
     avg_attack_score_row = (
         db.query(func.avg(SecurityEvent.attack_score))
         .filter(
@@ -132,6 +176,7 @@ async def get_events_stats(
             "rate_limit_count": rate_limit_count,
             "ddos_count": ddos_count,
             "waf_block_count": waf_block_count,
+            "bot_block_count": bot_block_count,
             "avg_attack_score": round(avg_attack_score_row, 1) if avg_attack_score_row is not None else None,
         },
     }
@@ -174,6 +219,29 @@ async def list_rate_limit_events(
         db.query(SecurityEvent)
         .filter(
             SecurityEvent.event_type == "rate_limit",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/bot")
+async def list_bot_events(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d"),
+    limit: int = Query(100, le=500),
+    db: Session = Depends(get_db),
+):
+    """List bot block/challenge events with bot_score and action."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    rows = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("bot_block", "bot_challenge")),
             SecurityEvent.timestamp >= start_time,
         )
         .order_by(SecurityEvent.timestamp.desc())

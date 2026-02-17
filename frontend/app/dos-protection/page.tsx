@@ -4,8 +4,21 @@ import { useEffect, useState, useMemo } from 'react'
 import { Sidebar } from '@/components/sidebar'
 import { Header } from '@/components/header'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { Card } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import {
@@ -24,11 +37,71 @@ import { formatTimeLocal } from '@/lib/chart-utils'
 
 const MAX_CHART_POINTS = 60
 
+/** Build a full timeline of buckets for the range so the area chart renders continuous "up down" shape (like Request Volume & Threats). */
+function buildFullTimelineBuckets(timeRange: string): string[] {
+  const now = new Date()
+  const buckets: string[] = []
+  const pad = (n: number) => String(n).padStart(2, '0')
+  if (timeRange === '1h') {
+    for (let i = 1; i >= 0; i--) {
+      const d = new Date(now)
+      d.setHours(d.getHours() - i)
+      d.setMinutes(0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:00:00`)
+    }
+  } else if (timeRange === '6h') {
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now)
+      d.setHours(d.getHours() - i)
+      d.setMinutes(0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:00:00`)
+    }
+  } else if (timeRange === '24h') {
+    for (let i = 23; i >= 0; i--) {
+      const d = new Date(now)
+      d.setHours(d.getHours() - i)
+      d.setMinutes(0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:00:00`)
+    }
+  } else if (timeRange === '7d') {
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      d.setHours(0, 0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} 00:00:00`)
+    }
+  } else if (timeRange === '30d') {
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      d.setHours(0, 0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} 00:00:00`)
+    }
+  } else if (timeRange === '90d') {
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(now)
+      d.setDate(d.getDate() - i)
+      d.setHours(0, 0, 0, 0)
+      buckets.push(`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} 00:00:00`)
+    }
+  }
+  return buckets
+}
+
 const securityEventsChartConfig = {
-  rateLimit: { label: 'Rate Limit Hits', color: 'var(--chart-3)' },
-  ddos: { label: 'DDoS Blocks', color: 'hsl(var(--destructive))' },
-  blacklist: { label: 'Blacklist Blocks', color: 'var(--chart-2)' },
+  rateLimit: { label: 'Rate Limit Hits', color: 'var(--chart-1)' },
+  ddos: { label: 'DDoS Blocks', color: 'var(--chart-2)' },
+  blacklist: { label: 'Blacklist Blocks', color: 'var(--chart-3)' },
 } satisfies ChartConfig
+
+const CHART_TIME_RANGES = [
+  { value: '1h', label: 'Last 1 hour' },
+  { value: '6h', label: 'Last 6 hours' },
+  { value: '24h', label: 'Last 24 hours' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 3 months' },
+] as const
 
 export default function DosProtectionPage() {
   const [timeRange, setTimeRange] = useState('24h')
@@ -82,34 +155,50 @@ export default function DosProtectionPage() {
 
   const securityEventsData = useMemo(() => {
     if (!overviewData) return []
+    const isDaily = ['7d', '30d', '90d'].includes(timeRange)
+    const toKey = (t: string) => {
+      if (!t) return ''
+      if (isDaily) return t.slice(0, 10) + ' 00:00:00' // YYYY-MM-DD 00:00:00
+      return t
+    }
     const rateLimitMap = new Map<string, number>()
     overviewData.chart_rate_limit.forEach((p) => {
-      const k = p.time || ''
-      rateLimitMap.set(k, (rateLimitMap.get(k) ?? 0) + (p.count ?? 0))
+      const k = toKey(p.time || '')
+      if (k) rateLimitMap.set(k, (rateLimitMap.get(k) ?? 0) + (p.count ?? 0))
     })
     const ddosMap = new Map<string, number>()
     overviewData.chart_ddos.forEach((p) => {
-      const k = p.time || ''
-      ddosMap.set(k, (ddosMap.get(k) ?? 0) + (p.count ?? 0))
+      const k = toKey(p.time || '')
+      if (k) ddosMap.set(k, (ddosMap.get(k) ?? 0) + (p.count ?? 0))
     })
     const blacklistMap = new Map<string, number>()
     ;(overviewData.chart_blacklist ?? []).forEach((p) => {
-      const k = p.time || ''
-      blacklistMap.set(k, (blacklistMap.get(k) ?? 0) + (p.count ?? 0))
+      const k = toKey(p.time || '')
+      if (k) blacklistMap.set(k, (blacklistMap.get(k) ?? 0) + (p.count ?? 0))
     })
-    const allTimes = new Set([...rateLimitMap.keys(), ...ddosMap.keys(), ...blacklistMap.keys()])
-    return Array.from(allTimes)
-      .filter(Boolean)
-      .sort()
-      .map((time) => ({
-        time,
-        timeFormatted: formatTimeLocal(time, timezone),
-        rateLimit: rateLimitMap.get(time) ?? 0,
-        ddos: ddosMap.get(time) ?? 0,
-        blacklist: blacklistMap.get(time) ?? 0,
-      }))
-      .slice(-MAX_CHART_POINTS)
-  }, [overviewData, timezone])
+    const buckets = buildFullTimelineBuckets(timeRange)
+    if (buckets.length === 0) {
+      const allTimes = new Set([...rateLimitMap.keys(), ...ddosMap.keys(), ...blacklistMap.keys()])
+      return Array.from(allTimes)
+        .filter(Boolean)
+        .sort()
+        .map((time) => ({
+          time,
+          timeFormatted: formatTimeLocal(time, timezone),
+          rateLimit: rateLimitMap.get(time) ?? 0,
+          ddos: ddosMap.get(time) ?? 0,
+          blacklist: blacklistMap.get(time) ?? 0,
+        }))
+        .slice(-MAX_CHART_POINTS)
+    }
+    return buckets.map((time) => ({
+      time,
+      timeFormatted: formatTimeLocal(time, timezone),
+      rateLimit: rateLimitMap.get(time) ?? 0,
+      ddos: ddosMap.get(time) ?? 0,
+      blacklist: blacklistMap.get(time) ?? 0,
+    }))
+  }, [overviewData, timezone, timeRange])
 
   const handleAddToBlacklist = async (ip: string, reason: string) => {
     setBlacklistLoading(ip)
@@ -245,51 +334,140 @@ export default function DosProtectionPage() {
 
               {/* Chart */}
               <Card
-                className="p-6 border-2"
+                className="pt-0 border-2"
                 style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
               >
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
-                    Rate Limit & DDoS Events Over Time
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Rate limit hits and DDoS blocks over the selected period</p>
-                </div>
-                {loading || securityEventsData.length === 0 ? (
-                  <div
-                    className="flex flex-col items-center justify-center h-[250px] border-2 border-dashed rounded-md"
-                    style={{ borderColor: 'var(--positivus-gray)' }}
-                  >
-                    <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
-                      {loading ? 'Loading...' : 'No rate limit or DDoS events yet'}
-                    </p>
+                <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row" style={{ borderColor: 'var(--positivus-gray)' }}>
+                  <div className="grid flex-1 gap-1">
+                    <CardTitle className="text-lg" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
+                      Rate Limit Hits, DDoS Blocks & Blacklist Blocks
+                    </CardTitle>
+                    <CardDescription>
+                      Compare rate limit hits, DDoS blocks, and blacklist blocks over the selected period
+                    </CardDescription>
                   </div>
-                ) : (
-                  <ChartContainer config={securityEventsChartConfig} className="aspect-auto h-[250px] w-full">
-                    <AreaChart data={securityEventsData}>
-                      <defs>
-                        <linearGradient id="fillRateLimitDos" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--color-rateLimit)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="var(--color-rateLimit)" stopOpacity={0.1} />
-                        </linearGradient>
-                        <linearGradient id="fillDdosDos" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--color-ddos)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="var(--color-ddos)" stopOpacity={0.1} />
-                        </linearGradient>
-                        <linearGradient id="fillBlacklistDos" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="var(--color-blacklist)" stopOpacity={0.8} />
-                          <stop offset="95%" stopColor="var(--color-blacklist)" stopOpacity={0.1} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid vertical={false} />
-                      <XAxis dataKey="timeFormatted" tickLine={false} axisLine={false} tickMargin={8} minTickGap={32} />
-                      <ChartTooltip cursor={false} content={<ChartTooltipContent labelFormatter={(v) => v} indicator="dot" />} />
-                      <Area dataKey="rateLimit" type="natural" fill="url(#fillRateLimitDos)" stroke="var(--color-rateLimit)" />
-                      <Area dataKey="ddos" type="natural" fill="url(#fillDdosDos)" stroke="var(--color-ddos)" />
-                      <Area dataKey="blacklist" type="natural" fill="url(#fillBlacklistDos)" stroke="var(--color-blacklist)" />
-                      <ChartLegend content={<ChartLegendContent />} />
-                    </AreaChart>
-                  </ChartContainer>
-                )}
+                  <Select value={timeRange} onValueChange={setTimeRange}>
+                    <SelectTrigger
+                      className="w-[160px] rounded-lg sm:ml-auto border-2"
+                      style={{ borderColor: 'var(--positivus-gray)' }}
+                      aria-label="Select time range"
+                    >
+                      <SelectValue placeholder="Time range" />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-xl">
+                      {CHART_TIME_RANGES.map((r) => (
+                        <SelectItem key={r.value} value={r.value} className="rounded-lg">
+                          {r.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardHeader>
+                <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+                  {loading || securityEventsData.length === 0 ? (
+                    <div
+                      className="flex flex-col items-center justify-center h-[250px] border-2 border-dashed rounded-md"
+                      style={{ borderColor: 'var(--positivus-gray)' }}
+                    >
+                      <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
+                        {loading ? 'Loading...' : 'No rate limit, DDoS or blacklist events yet'}
+                      </p>
+                    </div>
+                  ) : (
+                    <ChartContainer config={securityEventsChartConfig} className="aspect-auto h-[250px] w-full">
+                      <AreaChart data={securityEventsData}>
+                        <defs>
+                          <linearGradient id="fillRateLimitDos" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--color-rateLimit)" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="var(--color-rateLimit)" stopOpacity={0.1} />
+                          </linearGradient>
+                          <linearGradient id="fillDdosDos" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--color-ddos)" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="var(--color-ddos)" stopOpacity={0.1} />
+                          </linearGradient>
+                          <linearGradient id="fillBlacklistDos" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="var(--color-blacklist)" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="var(--color-blacklist)" stopOpacity={0.1} />
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="time"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          minTickGap={24}
+                          tickFormatter={(value) => {
+                            try {
+                              const date = new Date(value)
+                              if (timeRange === '1h' || timeRange === '6h' || timeRange === '24h') {
+                                return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                              }
+                              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            } catch {
+                              return value
+                            }
+                          }}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={
+                            <ChartTooltipContent
+                              labelFormatter={(value) => {
+                                try {
+                                  const d = new Date(value)
+                                  if (timeRange === '1h' || timeRange === '6h' || timeRange === '24h') {
+                                    return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                                  }
+                                  return d.toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                  })
+                                } catch {
+                                  return value
+                                }
+                              }}
+                              indicator="dot"
+                            />
+                          }
+                        />
+                        <Area
+                          dataKey="rateLimit"
+                          type="natural"
+                          fill="url(#fillRateLimitDos)"
+                          stroke="var(--color-rateLimit)"
+                          stackId="a"
+                          radius={[0, 0, 4, 4]}
+                          dot={false}
+                          isAnimationActive={true}
+                        />
+                        <Area
+                          dataKey="ddos"
+                          type="natural"
+                          fill="url(#fillDdosDos)"
+                          stroke="var(--color-ddos)"
+                          stackId="a"
+                          radius={0}
+                          dot={false}
+                          isAnimationActive={true}
+                        />
+                        <Area
+                          dataKey="blacklist"
+                          type="natural"
+                          fill="url(#fillBlacklistDos)"
+                          stroke="var(--color-blacklist)"
+                          stackId="a"
+                          radius={[4, 4, 0, 0]}
+                          dot={false}
+                          isAnimationActive={true}
+                        />
+                        <ChartLegend content={<ChartLegendContent />} />
+                      </AreaChart>
+                    </ChartContainer>
+                  )}
+                </CardContent>
               </Card>
 
               {/* Event tables */}

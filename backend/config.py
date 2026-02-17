@@ -56,6 +56,21 @@ class Config:
     LOG_INGESTION_ENABLED: bool = os.getenv("LOG_INGESTION_ENABLED", "true").lower() == "true"
     LOG_PATH: Optional[str] = os.getenv("LOG_PATH")
 
+    # Events ingest: also write to traffic_logs so Request Volume chart shows gateway traffic
+    EVENTS_INGEST_WRITE_TRAFFIC_LOG: bool = os.getenv("EVENTS_INGEST_WRITE_TRAFFIC_LOG", "true").lower() == "true"
+
+    # Bot management (verified bots, score bands)
+    BOT_VERIFIED_SYNC_URL: str = os.getenv("BOT_VERIFIED_SYNC_URL", "")
+    BOT_VERIFIED_SYNC_CRON: str = os.getenv("BOT_VERIFIED_SYNC_CRON", "0 */6 * * *")
+    BOT_VERIFIED_SYNC_HEADER: Optional[str] = os.getenv("BOT_VERIFIED_SYNC_HEADER", None)
+    BOT_SCORE_VERIFIED: int = int(os.getenv("BOT_SCORE_VERIFIED", "95"))
+    BOT_SCORE_MISSING_UA: int = int(os.getenv("BOT_SCORE_MISSING_UA", "25"))
+    BOT_SCORE_BEHAVIORAL: int = int(os.getenv("BOT_SCORE_BEHAVIORAL", "25"))
+    BOT_SCORE_SIGNATURE_MATCHED: int = int(os.getenv("BOT_SCORE_SIGNATURE_MATCHED", "34"))
+    BOT_DEFAULT_SCORE_UNKNOWN: int = int(os.getenv("BOT_DEFAULT_SCORE_UNKNOWN", "50"))
+    BOT_BAND_BLOCK_MAX: int = int(os.getenv("BOT_BAND_BLOCK_MAX", "29"))
+    BOT_BAND_CHALLENGE_MAX: int = int(os.getenv("BOT_BAND_CHALLENGE_MAX", "69"))
+
     # Alert notifications (email)
     SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST", None)
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))

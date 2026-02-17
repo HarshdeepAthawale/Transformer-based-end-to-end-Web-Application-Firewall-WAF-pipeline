@@ -42,12 +42,84 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def init_db():
-    """Initialize database tables"""
+    """Initialize database tables and run migrations"""
     # Import all models to ensure they're registered with Base
-    
+    import backend.models  # noqa: F401
+
     # Create all tables
     Base.metadata.create_all(bind=engine)
+
+    # Migration: add any missing security_events columns (bot_score, attack_score, block_duration_seconds)
+    _migrate_security_events_columns()
+
+    # Seed default bot score bands if empty
+    _seed_bot_score_bands()
+
     logger.info("Database initialized successfully - all tables created")
+
+
+def _migrate_security_events_columns():
+    """Add missing columns to security_events (attack_score, block_duration_seconds, bot_score)."""
+    from sqlalchemy import text
+
+    required_columns = [
+        ("attack_score", "INTEGER"),
+        ("block_duration_seconds", "INTEGER"),
+        ("bot_score", "INTEGER"),
+    ]
+    with engine.connect() as conn:
+        if DATABASE_URL.startswith("sqlite"):
+            result = conn.execute(text("PRAGMA table_info(security_events)"))
+            columns = [row[1] for row in result]
+            for col_name, col_type in required_columns:
+                if col_name not in columns:
+                    conn.execute(text(f"ALTER TABLE security_events ADD COLUMN {col_name} {col_type}"))
+                    conn.commit()
+                    logger.info(f"Migration: added {col_name} column to security_events")
+        else:
+            # PostgreSQL
+            for col_name, col_type in required_columns:
+                result = conn.execute(
+                    text(
+                        "SELECT column_name FROM information_schema.columns "
+                        "WHERE table_name = 'security_events' AND column_name = :name"
+                    ),
+                    {"name": col_name},
+                )
+                if result.fetchone() is None:
+                    conn.execute(text(f"ALTER TABLE security_events ADD COLUMN {col_name} {col_type}"))
+                    conn.commit()
+                    logger.info(f"Migration: added {col_name} column to security_events")
+
+
+def _seed_bot_score_bands():
+    """Seed default score bands if bot_score_bands table is empty."""
+    from backend.models.bot_score_bands import BotScoreBand
+
+    db = SessionLocal()
+    try:
+        count = db.query(BotScoreBand).count()
+        if count == 0:
+            from backend.config import config
+
+            block_max = config.BOT_BAND_BLOCK_MAX
+            challenge_max = config.BOT_BAND_CHALLENGE_MAX
+            bands = [
+                BotScoreBand(min_score=1, max_score=block_max, action="block", priority=1),
+                BotScoreBand(
+                    min_score=block_max + 1,
+                    max_score=challenge_max,
+                    action="challenge",
+                    priority=2,
+                ),
+                BotScoreBand(min_score=challenge_max + 1, max_score=99, action="allow", priority=3),
+            ]
+            for b in bands:
+                db.add(b)
+            db.commit()
+            logger.info("Seeded default bot score bands")
+    finally:
+        db.close()
 
 
 def close_db():

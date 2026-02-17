@@ -16,6 +16,8 @@ from backend.models.users import User, UserRole
 from backend.models.audit_log import AuditLog, AuditAction
 from backend.models.settings import AccountSetting
 from backend.models.security_event import SecurityEvent
+from backend.models.verified_bots import VerifiedBot
+from backend.models.bot_score_bands import BotScoreBand
 
 __all__ = [
     "Metrics",
@@ -41,4 +43,6 @@ __all__ = [
     "AuditAction",
     "AccountSetting",
     "SecurityEvent",
+    "VerifiedBot",
+    "BotScoreBand",
 ]

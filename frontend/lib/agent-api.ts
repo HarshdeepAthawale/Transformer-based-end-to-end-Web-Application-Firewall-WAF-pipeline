@@ -1,6 +1,7 @@
 // Agent API client with SSE streaming support
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
+// Use relative path so requests go through Next.js proxy (/api/* -> backend). Avoids "Failed to connect" when
+// NEXT_PUBLIC_API_URL points at backend and backend is not reachable from the browser (e.g. Docker).
+const API_BASE_URL = ''
 
 export interface AgentResponse {
   content: string

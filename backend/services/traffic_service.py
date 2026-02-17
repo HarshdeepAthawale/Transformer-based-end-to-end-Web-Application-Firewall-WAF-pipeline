@@ -4,7 +4,7 @@ Traffic Service
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 
 from backend.models.traffic import TrafficLog
 
@@ -72,4 +72,56 @@ class TrafficService:
         self.db.add(log)
         self.db.commit()
         self.db.refresh(log)
+        return log
+
+    def add_traffic_log_from_ingest_event(
+        self,
+        event_type: str,
+        ip: str,
+        method: Optional[str] = None,
+        path: Optional[str] = None,
+        attack_score: Optional[int] = None,
+        bot_score: Optional[int] = None,
+        bot_action: Optional[str] = None,
+    ) -> TrafficLog:
+        """
+        Create a TrafficLog from a gateway ingest event and add to session (no commit).
+        Used so Request Volume & Threats chart shows gateway traffic.
+        """
+        was_blocked = event_type != "allow"
+        endpoint = (path or "/")[:500]
+        method = (method or "GET")[:10]
+        # Map event_type to threat_type for blocked events
+        threat_type = None
+        if was_blocked and event_type:
+            et = event_type.lower()
+            if "rate_limit" in et:
+                threat_type = "rate_limit"
+            elif "blacklist" in et:
+                threat_type = "blacklist"
+            elif "waf" in et:
+                threat_type = "waf"
+            elif "ddos" in et:
+                threat_type = "ddos"
+            elif "bot" in et:
+                threat_type = "bot"
+            else:
+                threat_type = event_type[:50]
+        anomaly_score = float(attack_score) / 100.0 if attack_score is not None else None
+        log = TrafficLog(
+            ip=ip,
+            method=method,
+            endpoint=endpoint,
+            status_code=0,
+            response_size=0,
+            user_agent=None,
+            query_string=None,
+            request_body=None,
+            processing_time_ms=0,
+            was_blocked=1 if was_blocked else 0,
+            anomaly_score=str(anomaly_score) if anomaly_score is not None else None,
+            country_code=None,
+            threat_type=threat_type,
+        )
+        self.db.add(log)
         return log

@@ -24,6 +24,7 @@ from gateway.rate_limit import create_rate_limiter
 from gateway.ddos_protection import create_ddos_protection
 from gateway.blacklist import create_blacklist_checker
 from gateway.events import report_event, start_event_batcher, stop_event_batcher
+from gateway.bot_score import get_bot_score
 
 # Configure logger
 logger.add(
@@ -164,6 +165,7 @@ async def health(request: Request):
         "upstream": gateway_config.UPSTREAM_URL,
         "rate_limit_enabled": gateway_config.RATE_LIMIT_ENABLED,
         "ddos_enabled": gateway_config.DDOS_ENABLED,
+        "bot_enabled": gateway_config.BOT_ENABLED,
     }
 
 
@@ -212,6 +214,8 @@ def _log_gateway_event(
     content_length: int | None = None,
     max_bytes: int | None = None,
     block_ttl_seconds: int | None = None,
+    bot_score: int | None = None,
+    bot_action: str | None = None,
 ) -> None:
     """Helper to log an event to both MongoDB and the legacy event reporter."""
     event_store: MongoEventStore = request.app.state.event_store
@@ -236,7 +240,7 @@ def _log_gateway_event(
         content_length=int(header_content_length) if header_content_length else None,
     )
 
-    # Build payload for backend ingest (IngestEvent: retry_after, content_length, max_bytes, block_ttl_seconds, block_duration_seconds)
+    # Build payload for backend ingest
     event_payload = {
         "event_type": blocked_by or "allow",
         "request_id": request_id,
@@ -258,6 +262,10 @@ def _log_gateway_event(
         event_payload["max_bytes"] = max_bytes
     if block_ttl_seconds is not None:
         event_payload["block_ttl_seconds"] = block_ttl_seconds
+    if bot_score is not None:
+        event_payload["bot_score"] = bot_score
+    if bot_action is not None:
+        event_payload["bot_action"] = bot_action
     report_event(event_payload)
 
 
@@ -406,6 +414,77 @@ async def gateway_proxy(request: Request, path: str):
                     "retry_after_seconds": gateway_config.DDOS_BLOCK_DURATION_SECONDS,
                 },
                 headers={"Retry-After": str(gateway_config.DDOS_BLOCK_DURATION_SECONDS)},
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+    # --- Bot scoring (before body read) ---
+    if gateway_config.BOT_ENABLED:
+        user_agent = request.headers.get("user-agent", "")
+        bot_result = await get_bot_score(user_agent, client_ip, dict(request.headers))
+        if bot_result is None:
+            if gateway_config.BOT_FAIL_OPEN:
+                pass
+            else:
+                elapsed_ms = (time.perf_counter() - start_time) * 1000
+                _log_gateway_event(
+                    request,
+                    request_id=request_id,
+                    client_ip=client_ip,
+                    decision="block",
+                    total_latency_ms=elapsed_ms,
+                    blocked_by="bot_unavailable",
+                )
+                resp = JSONResponse(
+                    status_code=503,
+                    content={"blocked": True, "message": "Bot service unavailable"},
+                )
+                resp.headers["X-Request-ID"] = request_id
+                return resp
+        elif bot_result.get("action") == "block":
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="bot_block",
+                bot_score=bot_result.get("bot_score"),
+                bot_action="block",
+            )
+            resp = JSONResponse(
+                status_code=403,
+                content={
+                    "blocked": True,
+                    "message": "Request blocked by bot management",
+                    "bot_score": bot_result.get("bot_score"),
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+        elif bot_result.get("action") == "challenge":
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            retry_after = gateway_config.BOT_CHALLENGE_RETRY_AFTER
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="bot_challenge",
+                retry_after_seconds=retry_after,
+                bot_score=bot_result.get("bot_score"),
+                bot_action="challenge",
+            )
+            resp = JSONResponse(
+                status_code=429,
+                content={
+                    "blocked": True,
+                    "message": "Please complete the challenge",
+                    "retry_after_seconds": retry_after,
+                },
+                headers={"Retry-After": str(retry_after)},
             )
             resp.headers["X-Request-ID"] = request_id
             return resp
