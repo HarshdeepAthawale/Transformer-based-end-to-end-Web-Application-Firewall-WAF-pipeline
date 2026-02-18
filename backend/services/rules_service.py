@@ -9,6 +9,7 @@ import json
 from loguru import logger
 
 from backend.models.security_rules import SecurityRule, RulePriority, RuleAction
+from backend.models.rule_packs import RulePack
 
 
 class RulesService:
@@ -185,3 +186,44 @@ class RulesService:
             .filter(SecurityRule.is_active)\
             .order_by(SecurityRule.owasp_category)\
             .all()
+
+    def evaluate_managed_rules(
+        self,
+        method: str,
+        path: str,
+        headers: Dict,
+        query_params: Dict = None,
+        body: str = None,
+    ) -> Dict:
+        """
+        Evaluate request against enabled managed (pack) rules only.
+        Returns first match: { matched, rule_id, rule_name, action, pack_id } or no match.
+        """
+        enabled_packs = self.db.query(RulePack.id).filter(RulePack.enabled == True).all()
+        pack_ids = [p.id for p in enabled_packs]
+        if not pack_ids:
+            return {"matched": False, "rule_id": None, "rule_name": None, "action": None, "pack_id": None}
+
+        packs = self.db.query(RulePack).filter(RulePack.id.in_(pack_ids)).all()
+        pack_id_by_fk = {p.id: p.pack_id for p in packs}
+
+        managed_rules = (
+            self.db.query(SecurityRule)
+            .filter(SecurityRule.rule_pack_id.in_(pack_ids), SecurityRule.is_active == True)
+            .order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc())
+            .all()
+        )
+
+        for rule in managed_rules:
+            if self._rule_matches(rule, method, path, headers, query_params or {}, body):
+                rule.match_count += 1
+                rule.last_matched = datetime.utcnow()
+                self.db.commit()
+                return {
+                    "matched": True,
+                    "rule_id": rule.id,
+                    "rule_name": rule.name,
+                    "action": rule.action.value if rule.action else "block",
+                    "pack_id": pack_id_by_fk.get(rule.rule_pack_id),
+                }
+        return {"matched": False, "rule_id": None, "rule_name": None, "action": None, "pack_id": None}

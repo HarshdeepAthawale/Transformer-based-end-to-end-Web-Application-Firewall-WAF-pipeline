@@ -23,6 +23,7 @@ import {
   FileText,
   Users,
   ClipboardList,
+  Package,
 } from 'lucide-react'
 
 export function Sidebar() {
@@ -45,6 +46,7 @@ export function Sidebar() {
       { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
       { icon: FileSearch, label: 'Threat Intel', href: '/threat-intelligence' },
       { icon: ClipboardList, label: 'Security Rules', href: '/security-rules' },
+      { icon: Package, label: 'Managed Rules', href: '/managed-rules' },
       { icon: Users, label: 'Users', href: '/users', adminOnly: true },
       { icon: FileText, label: 'Audit Logs', href: '/audit-logs' },
     ]

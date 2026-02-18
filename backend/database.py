@@ -52,6 +52,9 @@ def init_db():
     # Migration: add any missing security_events columns (bot_score, attack_score, block_duration_seconds)
     _migrate_security_events_columns()
 
+    # Migration: add rule_packs and security_rules managed-rules columns
+    _migrate_managed_rules_tables()
+
     # Seed default bot score bands if empty
     _seed_bot_score_bands()
 
@@ -90,6 +93,42 @@ def _migrate_security_events_columns():
                     conn.execute(text(f"ALTER TABLE security_events ADD COLUMN {col_name} {col_type}"))
                     conn.commit()
                     logger.info(f"Migration: added {col_name} column to security_events")
+
+
+def _migrate_managed_rules_tables():
+    """Create rule_packs and add rule_pack_id, rule_pack_version, external_id to security_rules."""
+    from sqlalchemy import text
+
+    with engine.connect() as conn:
+        if DATABASE_URL.startswith("sqlite"):
+            result = conn.execute(text("PRAGMA table_info(security_rules)"))
+            columns = [row[1] for row in result]
+            for col_name, col_type in [
+                ("rule_pack_id", "INTEGER"),
+                ("rule_pack_version", "VARCHAR(100)"),
+                ("external_id", "VARCHAR(200)"),
+            ]:
+                if col_name not in columns:
+                    conn.execute(text(f"ALTER TABLE security_rules ADD COLUMN {col_name} {col_type}"))
+                    conn.commit()
+                    logger.info(f"Migration: added {col_name} to security_rules")
+        else:
+            for col_name, col_type in [
+                ("rule_pack_id", "INTEGER"),
+                ("rule_pack_version", "VARCHAR(100)"),
+                ("external_id", "VARCHAR(200)"),
+            ]:
+                result = conn.execute(
+                    text(
+                        "SELECT column_name FROM information_schema.columns "
+                        "WHERE table_name = 'security_rules' AND column_name = :name"
+                    ),
+                    {"name": col_name},
+                )
+                if result.fetchone() is None:
+                    conn.execute(text(f"ALTER TABLE security_rules ADD COLUMN {col_name} {col_type}"))
+                    conn.commit()
+                    logger.info(f"Migration: added {col_name} to security_rules")
 
 
 def _seed_bot_score_bands():

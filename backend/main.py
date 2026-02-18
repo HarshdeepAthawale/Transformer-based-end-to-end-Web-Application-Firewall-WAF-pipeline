@@ -313,6 +313,21 @@ for module_name, prefix, tag in advanced_routes:
 
             app.include_router(_stub, prefix=prefix, tags=[tag])
             logger.info(f"✓ Registered stub route: {prefix} (returns 503)")
+        elif module_name == "audit":
+            logger.error("Install auth deps: pip install 'PyJWT>=2.8.0' then restart the backend.")
+            _audit_stub = APIRouter()
+            _audit_detail = "Audit logs not available. Install PyJWT: pip install 'PyJWT>=2.8.0' and restart the backend."
+
+            @_audit_stub.get("/logs")
+            def _audit_stub_logs():
+                raise HTTPException(status_code=503, detail=_audit_detail)
+
+            @_audit_stub.get("/logs/{log_id}")
+            def _audit_stub_log(log_id: int):
+                raise HTTPException(status_code=503, detail=_audit_detail)
+
+            app.include_router(_audit_stub, prefix=prefix, tags=[tag])
+            logger.info(f"✓ Registered stub route: {prefix} (returns 503)")
     except AttributeError as e:
         logger.error(f"✗ {module_name} missing 'router': {e}")
     except Exception as e:

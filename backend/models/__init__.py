@@ -12,6 +12,7 @@ from backend.models.geo_rules import GeoRule, GeoRuleType
 from backend.models.bot_signatures import BotSignature, BotCategory
 from backend.models.threat_intel import ThreatIntel
 from backend.models.security_rules import SecurityRule, RulePriority, RuleAction
+from backend.models.rule_packs import RulePack
 from backend.models.users import User, UserRole
 from backend.models.audit_log import AuditLog, AuditAction
 from backend.models.settings import AccountSetting
@@ -37,6 +38,7 @@ __all__ = [
     "SecurityRule",
     "RulePriority",
     "RuleAction",
+    "RulePack",
     "User",
     "UserRole",
     "AuditLog",

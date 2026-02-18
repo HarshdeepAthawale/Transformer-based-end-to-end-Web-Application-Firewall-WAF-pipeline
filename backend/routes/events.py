@@ -56,6 +56,8 @@ class IngestEvent(BaseModel):
     attack_score: Optional[int] = None
     bot_score: Optional[int] = None
     bot_action: Optional[str] = None
+    rule_id: Optional[int] = None
+    pack_id: Optional[str] = None
 
 
 class IngestRequest(BaseModel):
@@ -88,6 +90,10 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
             details["attack_score"] = e.attack_score
         if e.bot_action is not None:
             details["bot_action"] = e.bot_action
+        if e.rule_id is not None:
+            details["rule_id"] = e.rule_id
+        if e.pack_id is not None:
+            details["pack_id"] = e.pack_id
 
         ev = SecurityEvent(
             event_type=e.event_type,

@@ -71,6 +71,13 @@ class Config:
     BOT_BAND_BLOCK_MAX: int = int(os.getenv("BOT_BAND_BLOCK_MAX", "29"))
     BOT_BAND_CHALLENGE_MAX: int = int(os.getenv("BOT_BAND_CHALLENGE_MAX", "69"))
 
+    # Managed rules (OWASP CRS + auto-update)
+    MANAGED_RULES_FEED_URL: str = os.getenv("MANAGED_RULES_FEED_URL", "")
+    MANAGED_RULES_FEED_FORMAT: str = os.getenv("MANAGED_RULES_FEED_FORMAT", "json")  # owasp_crs | json
+    MANAGED_RULES_UPDATE_INTERVAL_HOURS: int = int(os.getenv("MANAGED_RULES_UPDATE_INTERVAL_HOURS", "24"))
+    MANAGED_RULES_PACK_ID: str = os.getenv("MANAGED_RULES_PACK_ID", "owasp_crs")
+    MANAGED_RULES_FEED_HEADER: Optional[str] = os.getenv("MANAGED_RULES_FEED_HEADER", None)  # e.g. Bearer token
+
     # Alert notifications (email)
     SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST", None)
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))

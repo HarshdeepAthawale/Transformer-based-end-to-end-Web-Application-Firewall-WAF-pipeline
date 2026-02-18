@@ -1,7 +1,7 @@
 """
 Security rules database model
 """
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text, ForeignKey
 from backend.database import Base
 from datetime import datetime
 import enum
@@ -48,6 +48,11 @@ class SecurityRule(Base):
     owasp_category = Column(String(50), nullable=True)  # A01, A02, etc.
     cwe_id = Column(String(20), nullable=True)  # CWE identifier
     
+    # Managed ruleset (optional): link to rule_packs for feed-synced rules
+    rule_pack_id = Column(Integer, ForeignKey("rule_packs.id", ondelete="SET NULL"), nullable=True, index=True)
+    rule_pack_version = Column(String(100), nullable=True)
+    external_id = Column(String(200), nullable=True, index=True)  # id from feed for deduplication
+
     # Status
     is_active = Column(Boolean, default=True, index=True, nullable=False)
     is_system_rule = Column(Boolean, default=False, nullable=False)  # System rules cannot be deleted
@@ -77,6 +82,9 @@ class SecurityRule(Base):
             "priority": self.priority.value if self.priority else None,
             "owasp_category": self.owasp_category,
             "cwe_id": self.cwe_id,
+            "rule_pack_id": self.rule_pack_id,
+            "rule_pack_version": self.rule_pack_version,
+            "external_id": self.external_id,
             "is_active": self.is_active,
             "is_system_rule": self.is_system_rule,
             "created_by": self.created_by,

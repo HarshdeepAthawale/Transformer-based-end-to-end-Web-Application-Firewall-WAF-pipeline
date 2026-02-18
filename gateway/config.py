@@ -69,6 +69,12 @@ class GatewayConfig:
     BOT_TIMEOUT_SECONDS: float = float(os.getenv("BOT_TIMEOUT_SECONDS", "1.0"))
     BOT_CHALLENGE_RETRY_AFTER: int = int(os.getenv("BOT_CHALLENGE_RETRY_AFTER", "60"))
 
+    # Managed rules (fetch from backend, evaluate on request)
+    MANAGED_RULES_ENABLED: bool = os.getenv("MANAGED_RULES_ENABLED", "false").lower() == "true"
+    MANAGED_RULES_BACKEND_URL: str = os.getenv("MANAGED_RULES_BACKEND_URL", "")
+    MANAGED_RULES_CACHE_TTL_SECONDS: int = int(os.getenv("MANAGED_RULES_CACHE_TTL_SECONDS", "300"))
+    MANAGED_RULES_FAIL_OPEN: bool = os.getenv("MANAGED_RULES_FAIL_OPEN", "true").lower() == "true"
+
     # Event reporting to backend
     BACKEND_EVENTS_URL: str = os.getenv("BACKEND_EVENTS_URL", "")
     BACKEND_EVENTS_ENABLED: bool = os.getenv("BACKEND_EVENTS_ENABLED", "true").lower() == "true"

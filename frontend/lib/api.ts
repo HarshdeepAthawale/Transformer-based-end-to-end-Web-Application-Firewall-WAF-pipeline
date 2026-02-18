@@ -599,6 +599,51 @@ export const securityRulesApi = {
     apiRequest('/api/rules/owasp'),
 }
 
+// Managed rule packs (OWASP CRS + feed-synced)
+export interface ManagedRulePack {
+  id: number
+  name: string
+  pack_id: string
+  source_url: string | null
+  version: string | null
+  enabled: boolean
+  last_synced_at: string | null
+  created_at: string
+  updated_at: string
+  rule_count?: number
+}
+
+export interface ManagedRulesResponse {
+  packs: Array<{
+    pack_id: string
+    name: string
+    version: string
+    enabled: boolean
+    last_synced_at: string | null
+    rules: Array<{ id: number; name: string; pattern: string; applies_to: string; action: string }>
+  }>
+}
+
+export const managedRulesApi = {
+  getPacks: (enabledOnly: boolean = false): Promise<ApiResponse<ManagedRulePack[]>> =>
+    apiRequest(`/api/rules/managed/packs?enabled_only=${enabledOnly}`),
+
+  getManagedRules: (enabledOnly: boolean = true): Promise<ManagedRulesResponse> =>
+    apiRequest(`/api/rules/managed?enabled_only=${enabledOnly}`),
+
+  togglePack: (packId: string, enabled: boolean): Promise<ApiResponse<ManagedRulePack>> =>
+    apiRequest(`/api/rules/managed/packs/${encodeURIComponent(packId)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled }),
+    }),
+
+  syncNow: (packId?: string): Promise<ApiResponse<{ rules_created: number; rules_updated: number; version: string }>> =>
+    apiRequest('/api/rules/managed/sync', {
+      method: 'POST',
+      body: JSON.stringify(packId != null ? { pack_id: packId } : {}),
+    }),
+}
+
 // Users API
 export interface User {
   id: number

@@ -25,6 +25,7 @@ from gateway.ddos_protection import create_ddos_protection
 from gateway.blacklist import create_blacklist_checker
 from gateway.events import report_event, start_event_batcher, stop_event_batcher
 from gateway.bot_score import get_bot_score
+from gateway import managed_rules as managed_rules_module
 
 # Configure logger
 logger.add(
@@ -166,6 +167,7 @@ async def health(request: Request):
         "rate_limit_enabled": gateway_config.RATE_LIMIT_ENABLED,
         "ddos_enabled": gateway_config.DDOS_ENABLED,
         "bot_enabled": gateway_config.BOT_ENABLED,
+        "managed_rules_enabled": gateway_config.MANAGED_RULES_ENABLED,
     }
 
 
@@ -491,6 +493,56 @@ async def gateway_proxy(request: Request, path: str):
 
     # Read body once (needed for both WAF inspection and forwarding)
     body_bytes = await request.body()
+
+    # --- Managed rules (enabled packs from backend) ---
+    if gateway_config.MANAGED_RULES_ENABLED:
+        try:
+            body_str = (body_bytes or b"").decode("utf-8", errors="replace")
+            match = managed_rules_module.evaluate(
+                method=request.method,
+                path=request.url.path,
+                headers=dict(request.headers),
+                query_string=request.url.query or "",
+                body=body_str,
+            )
+            if match:
+                action = (match.get("action") or "block").lower()
+                elapsed_ms = (time.perf_counter() - start_time) * 1000
+                event_payload = {
+                    "event_type": "managed_rule_block" if action == "block" else "managed_rule_log",
+                    "request_id": request_id,
+                    "ip": client_ip,
+                    "method": request.method,
+                    "path": request.url.path,
+                    "decision": "block" if action == "block" else "allow",
+                    "total_latency_ms": elapsed_ms,
+                    "rule_id": match.get("rule_id"),
+                    "pack_id": match.get("pack_id"),
+                }
+                report_event(event_payload)
+                if action == "block":
+                    resp = JSONResponse(
+                        status_code=403,
+                        content={
+                            "blocked": True,
+                            "message": "Request blocked by managed rule",
+                            "rule_id": match.get("rule_id"),
+                            "rule_name": match.get("rule_name"),
+                            "pack_id": match.get("pack_id"),
+                        },
+                    )
+                    resp.headers["X-Request-ID"] = request_id
+                    return resp
+        except Exception as e:
+            if not gateway_config.MANAGED_RULES_FAIL_OPEN:
+                logger.warning(f"Managed rules evaluation failed: {e}")
+                resp = JSONResponse(
+                    status_code=503,
+                    content={"blocked": True, "message": "Managed rules check failed"},
+                )
+                resp.headers["X-Request-ID"] = request_id
+                return resp
+            logger.debug(f"Managed rules evaluation error (fail-open): {e}")
 
     # --- WAF Inspection ---
     should_block = False
