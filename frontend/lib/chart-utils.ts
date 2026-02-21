@@ -70,6 +70,51 @@ export function formatTimeLocal(
 /** @deprecated Use formatTimeLocal – displays in user's local timezone (their country/device). */
 export const formatTimeIST = formatTimeLocal
 
+/** Ranges that show date on chart axis; others show time. */
+export const DATE_AXIS_RANGES: ChartTimeRangeValue[] = ['7d', '30d', '90d']
+
+/**
+ * Format a timestamp for chart x-axis labels based on the selected time range.
+ * Short ranges (1h, 6h, 24h) show time only; 7d/30d/90d show date (e.g. "Feb 15").
+ */
+export function formatChartAxisLabel(
+  timestamp: string | Date,
+  timeRange: string,
+  timezone?: string
+): string {
+  try {
+    let date: Date
+    if (typeof timestamp === 'string') {
+      let timestampStr = timestamp.trim()
+      const hasTimezone =
+        timestampStr.endsWith('Z') ||
+        timestampStr.includes('+') ||
+        (timestampStr.includes('-') &&
+          timestampStr.length > 19 &&
+          (timestampStr[19] === '-' || timestampStr[19] === '+'))
+      if (!hasTimezone && timestampStr.length > 0) {
+        timestampStr = timestampStr.replace(/[^\d\-:T\s]/g, '') + 'Z'
+      }
+      date = new Date(timestampStr)
+      if (isNaN(date.getTime())) date = new Date(timestamp)
+    } else {
+      date = timestamp
+    }
+    if (isNaN(date.getTime())) return 'Invalid Time'
+    const range = (timeRange || '').trim().toLowerCase()
+    const useDate =
+      range === '7d' || range === '30d' || range === '90d'
+    const opts: Intl.DateTimeFormatOptions = useDate
+      ? { month: 'short', day: 'numeric', ...(range === '90d' ? { year: 'numeric' } : {}) }
+      : { hour: 'numeric', minute: '2-digit', hour12: true }
+    if (timezone) opts.timeZone = timezone
+    return new Intl.DateTimeFormat('en-US', opts).format(date)
+  } catch (error) {
+    console.error('Error formatting chart axis label:', error, timestamp)
+    return 'Invalid Time'
+  }
+}
+
 export function roundToMinute(timestamp: string | Date): string {
   const date = typeof timestamp === 'string' ? new Date(timestamp) : timestamp
   date.setUTCSeconds(0, 0)

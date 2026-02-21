@@ -15,6 +15,7 @@ import {
 
 const MAX_POINTS = 60
 const POLL_INTERVAL_MS = 30_000
+const POLL_INTERVAL_LONG_MS = 120_000 // 2 min for 7d/30d/90d to reduce load
 
 export interface UseChartDataResult {
   requestData: ChartDataPoint[]
@@ -144,7 +145,9 @@ export function useChartData(timeRange: string): UseChartDataResult {
       }
       await fetchTopThreats(timeRange)
     }
-    const interval = setInterval(poll, POLL_INTERVAL_MS)
+    const isLongRange = ['7d', '30d', '90d'].includes(timeRange)
+    const intervalMs = isLongRange ? POLL_INTERVAL_LONG_MS : POLL_INTERVAL_MS
+    const interval = setInterval(poll, intervalMs)
 
     const handleTraffic = (data: { was_blocked?: boolean }) => {
       const now = new Date()

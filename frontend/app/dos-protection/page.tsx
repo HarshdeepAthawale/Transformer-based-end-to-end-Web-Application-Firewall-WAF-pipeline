@@ -33,7 +33,7 @@ import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts'
 import { Gauge, Ban, ShieldCheck, AlertCircle, Loader2, ShieldX, ShieldAlert, Activity } from 'lucide-react'
 import { eventsApi, ipApi, ddosApi, type SecurityEventData, type AdaptiveDdosStats } from '@/lib/api'
 import { useTimezone } from '@/contexts/timezone-context'
-import { formatTimeLocal } from '@/lib/chart-utils'
+import { formatTimeLocal, formatChartAxisLabel } from '@/lib/chart-utils'
 
 const MAX_CHART_POINTS = 60
 
@@ -189,7 +189,7 @@ export default function DosProtectionPage() {
         .sort()
         .map((time) => ({
           time,
-          timeFormatted: formatTimeLocal(time, timezone),
+          timeFormatted: formatChartAxisLabel(time, timeRange, timezone),
           rateLimit: rateLimitMap.get(time) ?? 0,
           ddos: ddosMap.get(time) ?? 0,
           blacklist: blacklistMap.get(time) ?? 0,
@@ -198,7 +198,7 @@ export default function DosProtectionPage() {
     }
     return buckets.map((time) => ({
       time,
-      timeFormatted: formatTimeLocal(time, timezone),
+      timeFormatted: formatChartAxisLabel(time, timeRange, timezone),
       rateLimit: rateLimitMap.get(time) ?? 0,
       ddos: ddosMap.get(time) ?? 0,
       blacklist: blacklistMap.get(time) ?? 0,

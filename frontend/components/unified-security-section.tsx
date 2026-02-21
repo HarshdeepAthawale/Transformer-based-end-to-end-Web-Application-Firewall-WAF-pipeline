@@ -35,7 +35,7 @@ import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts'
 import { Loader2 } from 'lucide-react'
 import { dashboardApi, type DashboardUnifiedData, type SecurityEventData } from '@/lib/api'
 import { useTimezone } from '@/contexts/timezone-context'
-import { formatTimeLocal, CHART_TIME_RANGES } from '@/lib/chart-utils'
+import { formatChartAxisLabel, formatTimeLocal, CHART_TIME_RANGES } from '@/lib/chart-utils'
 
 const DASHBOARD_RANGES = [
   { value: '1h', label: '1h' },
@@ -118,7 +118,7 @@ export function UnifiedSecuritySection({ timeRange, onTimeRangeChange }: Unified
   const recentEvents = data?.recent_events ?? []
   const chartData = mergeSeriesIntoTimeline(series).map((row) => ({
     ...row,
-    timeFormatted: formatTimeLocal(row.time, timezone),
+    timeFormatted: formatChartAxisLabel(row.time, timeRange, timezone),
   }))
   const unifiedChartConfig = buildChartConfig(series)
 

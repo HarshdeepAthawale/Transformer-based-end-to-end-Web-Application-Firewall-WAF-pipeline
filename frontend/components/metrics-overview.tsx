@@ -38,17 +38,29 @@ export function MetricsOverview() {
     }
   }
 
-  // Animate value changes
+  // Animate value changes (throttled to reduce re-renders and lag)
   useEffect(() => {
     const interval = setInterval(() => {
-      setAnimatedValues(prev => ({
-        ...prev,
-        requests: prev.requests + (realTimeMetrics.requests - prev.requests) * 0.1,
-        blocked: prev.blocked + (realTimeMetrics.blocked - prev.blocked) * 0.1,
-        attackRate: prev.attackRate + (realTimeMetrics.attackRate - prev.attackRate) * 0.1,
-        threatsPerMinute: prev.threatsPerMinute + (realTimeMetrics.threatsPerMinute - prev.threatsPerMinute) * 0.1,
-      }))
-    }, 100)
+      setAnimatedValues(prev => {
+        const next = {
+          requests: prev.requests + (realTimeMetrics.requests - prev.requests) * 0.1,
+          blocked: prev.blocked + (realTimeMetrics.blocked - prev.blocked) * 0.1,
+          attackRate: prev.attackRate + (realTimeMetrics.attackRate - prev.attackRate) * 0.1,
+          threatsPerMinute: prev.threatsPerMinute + (realTimeMetrics.threatsPerMinute - prev.threatsPerMinute) * 0.1,
+        }
+        // Skip update if effectively unchanged to avoid unnecessary re-renders
+        const eps = 0.5
+        if (
+          Math.abs(next.requests - prev.requests) < eps &&
+          Math.abs(next.blocked - prev.blocked) < eps &&
+          Math.abs(next.attackRate - prev.attackRate) < eps &&
+          Math.abs(next.threatsPerMinute - prev.threatsPerMinute) < eps
+        ) {
+          return prev
+        }
+        return next
+      })
+    }, 250)
 
     return () => clearInterval(interval)
   }, [realTimeMetrics])

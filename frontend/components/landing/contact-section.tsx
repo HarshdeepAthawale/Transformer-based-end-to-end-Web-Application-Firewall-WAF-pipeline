@@ -9,7 +9,7 @@ export function ContactSection() {
   const [formType, setFormType] = useState<'hi' | 'quote'>('hi')
 
   return (
-    <section id="contact" className="py-20 lg:py-28 bg-[var(--positivus-white)]">
+    <section id="contact" className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <h2
@@ -20,7 +20,7 @@ export function ContactSection() {
           </h2>
           <p
             className="text-lg max-w-2xl"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             Questions about securing your applications? We&apos;re here to help.
           </p>
@@ -37,7 +37,7 @@ export function ContactSection() {
                   onChange={() => setFormType('hi')}
                   className="accent-[var(--positivus-green)]"
                 />
-                <span style={{ color: 'var(--positivus-black)' }}>Say Hi</span>
+                <span style={{ color: '#000000' }}>Say Hi</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
@@ -47,7 +47,7 @@ export function ContactSection() {
                   onChange={() => setFormType('quote')}
                   className="accent-[var(--positivus-green)]"
                 />
-                <span style={{ color: 'var(--positivus-black)' }}>Enterprise</span>
+                <span style={{ color: '#000000' }}>Enterprise</span>
               </label>
             </div>
 
@@ -56,7 +56,7 @@ export function ContactSection() {
                 <label
                   htmlFor="name"
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--positivus-black)' }}
+                  style={{ color: '#000000' }}
                 >
                   Name
                 </label>
@@ -67,8 +67,8 @@ export function ContactSection() {
                   required
                   className="rounded-none border-2 w-full max-w-md"
                   style={{
-                    borderColor: 'var(--positivus-gray)',
-                    backgroundColor: 'var(--positivus-white)',
+                    borderColor: '#000000',
+                    backgroundColor: '#ffffff',
                   }}
                 />
               </div>
@@ -76,7 +76,7 @@ export function ContactSection() {
                 <label
                   htmlFor="email"
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--positivus-black)' }}
+                  style={{ color: '#000000' }}
                 >
                   Email *
                 </label>
@@ -88,8 +88,8 @@ export function ContactSection() {
                   required
                   className="rounded-none border-2 w-full max-w-md"
                   style={{
-                    borderColor: 'var(--positivus-gray)',
-                    backgroundColor: 'var(--positivus-white)',
+                    borderColor: '#000000',
+                    backgroundColor: '#ffffff',
                   }}
                 />
               </div>
@@ -97,7 +97,7 @@ export function ContactSection() {
                 <label
                   htmlFor="message"
                   className="block text-sm font-medium mb-2"
-                  style={{ color: 'var(--positivus-black)' }}
+                  style={{ color: '#000000' }}
                 >
                   Message *
                 </label>
@@ -109,8 +109,8 @@ export function ContactSection() {
                   rows={5}
                   className="w-full max-w-md rounded-none border-2 p-3 resize-none"
                   style={{
-                    borderColor: 'var(--positivus-gray)',
-                    backgroundColor: 'var(--positivus-white)',
+                    borderColor: '#000000',
+                    backgroundColor: '#ffffff',
                   }}
                 />
               </div>
@@ -120,8 +120,8 @@ export function ContactSection() {
               type="submit"
               className="rounded-none font-semibold px-8 py-3"
               style={{
-                backgroundColor: 'var(--positivus-black)',
-                color: 'var(--positivus-white)',
+                backgroundColor: '#000000',
+                color: '#ffffff',
               }}
             >
               Send Message
@@ -130,8 +130,8 @@ export function ContactSection() {
 
           <div className="flex justify-center lg:justify-end">
             <div
-              className="w-full max-w-sm aspect-square rounded-2xl flex items-center justify-center"
-              style={{ backgroundColor: 'var(--positivus-green-bg)' }}
+              className="w-full max-w-sm aspect-square rounded-2xl flex items-center justify-center border-2 border-black/10"
+              style={{ backgroundColor: '#E8F5B8' }}
             >
               <MessageSquare
                 className="w-32 h-32 lg:w-40 lg:h-40"

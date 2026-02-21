@@ -1,5 +1,4 @@
 import {
-  LandingHeader,
   HeroSection,
   CompaniesSection,
   ServicesSection,
@@ -12,6 +11,7 @@ import {
   ContactSection,
   LandingFooter,
 } from '@/components/landing'
+import { Header } from '@/components/ui/header-1'
 
 export default function LandingPage() {
   return (
@@ -19,7 +19,7 @@ export default function LandingPage() {
       className="min-h-screen font-[family-name:var(--font-space-grotesk)]"
       style={{ fontFamily: 'var(--font-space-grotesk)' }}
     >
-      <LandingHeader />
+      <Header variant="light" />
       <main>
         <HeroSection />
         <CompaniesSection />

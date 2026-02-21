@@ -41,7 +41,7 @@ export function TestimonialsSection() {
   }, [emblaApi, onSelect])
 
   return (
-    <section className="py-20 lg:py-28 bg-[var(--positivus-gray)]">
+    <section className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <h2
@@ -52,7 +52,7 @@ export function TestimonialsSection() {
           </h2>
           <p
             className="text-lg max-w-2xl"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             Teams securing their applications with us share their experience
           </p>
@@ -67,8 +67,11 @@ export function TestimonialsSection() {
                   className="flex-[0_0_100%] min-w-0 pl-4"
                 >
                   <div
-                    className="p-8 lg:p-12 max-w-3xl mx-auto relative"
-                    style={{ backgroundColor: 'var(--positivus-white)' }}
+                    className="p-8 lg:p-12 max-w-3xl mx-auto relative border-2"
+                    style={{
+                      backgroundColor: '#ffffff',
+                      borderColor: '#000000',
+                    }}
                   >
                     <Quote
                       className="w-12 h-12 mb-6 opacity-30"
@@ -76,14 +79,14 @@ export function TestimonialsSection() {
                     />
                     <p
                       className="text-lg lg:text-xl leading-relaxed mb-8"
-                      style={{ color: 'var(--positivus-black)' }}
+                      style={{ color: '#000000' }}
                     >
                       &quot;{t.quote}&quot;
                     </p>
                     <div>
                       <h5
                         className="font-semibold"
-                        style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                        style={{ color: '#000000', fontFamily: 'var(--font-space-grotesk)' }}
                       >
                         {t.author}
                       </h5>
@@ -103,7 +106,7 @@ export function TestimonialsSection() {
             >
               <ChevronLeft
                 className="w-8 h-8"
-                style={{ color: 'var(--positivus-black)' }}
+                style={{ color: '#000000' }}
               />
             </button>
             <div className="flex gap-2">
@@ -114,7 +117,7 @@ export function TestimonialsSection() {
                   onClick={() => emblaApi?.scrollTo(i)}
                   className="w-2.5 h-2.5 rounded-full transition-all"
                   style={{
-                    backgroundColor: selectedIndex === i ? 'var(--positivus-green)' : 'var(--positivus-gray-dark)',
+                    backgroundColor: selectedIndex === i ? 'var(--positivus-green)' : '#000000',
                     opacity: selectedIndex === i ? 1 : 0.5,
                   }}
                 />
@@ -128,7 +131,7 @@ export function TestimonialsSection() {
             >
               <ChevronRight
                 className="w-8 h-8"
-                style={{ color: 'var(--positivus-black)' }}
+                style={{ color: '#000000' }}
               />
             </button>
           </div>

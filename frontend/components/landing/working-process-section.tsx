@@ -51,7 +51,7 @@ export function WorkingProcessSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section className="py-20 lg:py-28 bg-[var(--positivus-white)]">
+    <section id="how-it-works" className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <h2
@@ -62,7 +62,7 @@ export function WorkingProcessSection() {
           </h2>
           <p
             className="text-lg max-w-2xl"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             Deploy in minutes. Protect in real time. Scale without limits.
           </p>
@@ -78,10 +78,10 @@ export function WorkingProcessSection() {
               <div
                 className="border-2 transition-colors"
                 style={{
-                  borderColor: openIndex === index ? 'var(--positivus-green)' : 'var(--positivus-gray)',
+                  borderColor: openIndex === index ? 'var(--positivus-green)' : '#000000',
                 }}
               >
-                <CollapsibleTrigger className="w-full flex items-center justify-between p-6 lg:p-8 text-left hover:bg-[var(--positivus-gray)]/30 transition-colors">
+                <CollapsibleTrigger className="w-full flex items-center justify-between p-6 lg:p-8 text-left hover:bg-black/5 transition-colors">
                   <div className="flex items-center gap-6">
                     <span
                       className="text-2xl font-bold"
@@ -91,7 +91,7 @@ export function WorkingProcessSection() {
                     </span>
                     <p
                       className="text-xl font-semibold"
-                      style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                      style={{ color: '#000000', fontFamily: 'var(--font-space-grotesk)' }}
                     >
                       {step.title}
                     </p>
@@ -100,14 +100,14 @@ export function WorkingProcessSection() {
                     className={`w-6 h-6 flex-shrink-0 transition-transform ${
                       openIndex === index ? 'rotate-45' : ''
                     }`}
-                    style={{ color: 'var(--positivus-black)' }}
+                    style={{ color: '#000000' }}
                   />
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <div className="px-6 lg:px-8 pb-6 lg:pb-8 pt-0">
                     <p
                       className="text-base max-w-3xl"
-                      style={{ color: 'var(--positivus-gray-dark)' }}
+                      style={{ color: '#000000' }}
                     >
                       {step.description}
                     </p>

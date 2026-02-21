@@ -8,7 +8,7 @@ const team = [
 
 export function TeamSection() {
   return (
-    <section id="about" className="py-20 lg:py-28 bg-[var(--positivus-white)]">
+    <section id="about" className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-16">
           <h2
@@ -19,7 +19,7 @@ export function TeamSection() {
           </h2>
           <p
             className="text-lg max-w-2xl"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             We build security that works at the speed of the internet. Our team combines ML expertise
             with deep application security knowledge to protect what matters.
@@ -31,7 +31,7 @@ export function TeamSection() {
             <div
               key={member.name}
               className="border-2 p-6 transition-colors hover:border-[var(--positivus-green)]"
-              style={{ borderColor: 'var(--positivus-gray)' }}
+              style={{ borderColor: '#000000' }}
             >
               <div
                 className="w-14 h-14 rounded-full flex items-center justify-center mb-4"
@@ -42,13 +42,13 @@ export function TeamSection() {
                   style={{ color: 'var(--positivus-green)' }}
                 />
               </div>
-              <h4 className="font-semibold mb-1" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
+              <h4 className="font-semibold mb-1" style={{ color: '#000000', fontFamily: 'var(--font-space-grotesk)' }}>
                 {member.name}
               </h4>
-              <p className="text-sm mb-4" style={{ color: 'var(--positivus-gray-dark)' }}>
+              <p className="text-sm mb-4" style={{ color: '#000000' }}>
                 {member.role}
               </p>
-              <p className="text-sm" style={{ color: 'var(--positivus-gray-dark)' }}>
+              <p className="text-sm" style={{ color: '#000000' }}>
                 {member.bio}
               </p>
             </div>

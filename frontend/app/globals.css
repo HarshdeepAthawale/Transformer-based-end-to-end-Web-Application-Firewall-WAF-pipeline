@@ -15,6 +15,8 @@
   --positivus-gray: #F2F2F2;
   --positivus-gray-dark: #707A89;
   --positivus-white: #FFFFFF;
+  /* Landing: header, trust strip, CTA, customers wrapper, footer */
+  --landing-dark: #191A23;
 
   /* Positivus theme - Dashboard aligned with landing/login */
   --background: var(--positivus-gray);
@@ -82,6 +84,7 @@
   --positivus-white: #0a0a0a;
   --positivus-black: #ffffff;
   --positivus-gray: #0a0a0a;
+  --landing-dark: #191A23;
   --positivus-gray-dark: #a1a1aa;
   --positivus-green: #C5E246;
   --positivus-green-bg: #1a2a0a;
@@ -150,6 +153,7 @@
 @layer base {
   html {
     transition: background-color 0.2s ease, color 0.2s ease;
+    scroll-padding-top: 6rem; /* avoid fixed header when scrolling to anchors */
   }
 
   * {

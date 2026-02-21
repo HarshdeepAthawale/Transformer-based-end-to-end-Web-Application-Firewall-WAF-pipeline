@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 
 const caseStudies = [
@@ -20,9 +21,9 @@ const caseStudies = [
 
 export function CaseStudiesSection() {
   return (
-    <section id="customers" className="py-20 lg:py-28 bg-[var(--positivus-white)]">
+    <section id="customers" className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mb-16" id="solutions">
+        <div className="mb-16">
           <h2
             className="text-3xl lg:text-4xl font-bold mb-4"
             style={{ color: 'var(--positivus-green)', fontFamily: 'var(--font-space-grotesk)' }}
@@ -31,24 +32,25 @@ export function CaseStudiesSection() {
           </h2>
           <p
             className="text-lg max-w-2xl"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             See how teams across industries secure their applications and stop attacks in real time
           </p>
         </div>
 
-        <div
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-6 lg:p-8"
-          style={{ backgroundColor: 'var(--positivus-black)' }}
-        >
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {caseStudies.map((study, i) => (
             <div
               key={i}
-              className="group p-6 lg:p-8 flex flex-col justify-between border border-[var(--positivus-gray-dark)]/30 hover:border-[var(--positivus-green)]/50 transition-colors"
+              className="group p-6 lg:p-8 flex flex-col justify-between border-2 transition-colors hover:border-[var(--positivus-green)]/50"
+              style={{
+                backgroundColor: '#ffffff',
+                borderColor: '#000000',
+              }}
             >
               <p
                 className="text-base lg:text-lg mb-4"
-                style={{ color: 'var(--positivus-white)' }}
+                style={{ color: '#000000' }}
               >
                 {study.description}
               </p>
@@ -58,10 +60,13 @@ export function CaseStudiesSection() {
               >
                 {study.metric}
               </span>
-              <span className="flex items-center gap-2 text-sm font-medium text-[var(--positivus-green)] group-hover:gap-3 transition-all">
+              <Link
+                href="#"
+                className="flex items-center gap-2 text-sm font-medium text-[var(--positivus-green)] group-hover:gap-3 transition-all w-fit"
+              >
                 <ArrowRight className="w-4 h-4" />
                 Learn more
-              </span>
+              </Link>
             </div>
           ))}
         </div>

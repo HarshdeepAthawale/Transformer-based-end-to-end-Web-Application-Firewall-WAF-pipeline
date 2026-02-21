@@ -69,7 +69,7 @@ const plans = [
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="py-20 lg:py-28 bg-[var(--positivus-gray)]">
+    <section id="pricing" className="py-20 lg:py-28 bg-[#ffffff]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2
@@ -80,7 +80,7 @@ export function PricingSection() {
           </h2>
           <p
             className="text-lg max-w-2xl mx-auto"
-            style={{ color: 'var(--positivus-gray-dark)' }}
+            style={{ color: '#000000' }}
           >
             Start free. Scale as you grow. No surprises.
           </p>
@@ -94,8 +94,8 @@ export function PricingSection() {
                 plan.highlight ? 'md:-mt-2 md:mb-2 md:scale-[1.02]' : ''
               }`}
               style={{
-                backgroundColor: 'var(--positivus-white)',
-                borderColor: 'var(--positivus-black)',
+                backgroundColor: '#ffffff',
+                borderColor: plan.highlight ? 'var(--positivus-green)' : '#000000',
               }}
             >
               {plan.highlight && (
@@ -103,7 +103,7 @@ export function PricingSection() {
                   className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-semibold uppercase tracking-wide"
                   style={{
                     backgroundColor: 'var(--positivus-green)',
-                    color: 'var(--positivus-black)',
+                    color: '#000000',
                   }}
                 >
                   Most popular
@@ -111,18 +111,18 @@ export function PricingSection() {
               )}
               <h3
                 className="text-2xl font-bold mb-2"
-                style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                style={{ color: '#000000', fontFamily: 'var(--font-space-grotesk)' }}
               >
                 {plan.name}
               </h3>
-              <p className="text-4xl font-bold mb-6" style={{ color: 'var(--positivus-black)' }}>
+              <p className="text-4xl font-bold mb-6" style={{ color: '#000000' }}>
                 {plan.price}
                 {plan.priceNote && (
-                  <span className="text-xl font-normal text-[var(--positivus-gray-dark)]">{plan.priceNote}</span>
+                  <span className="text-xl font-normal text-[#000000]">{plan.priceNote}</span>
                 )}
               </p>
               {plan.description && (
-                <p className="text-sm mb-4" style={{ color: 'var(--positivus-gray-dark)' }}>
+                <p className="text-sm mb-4" style={{ color: '#000000' }}>
                   {plan.description}
                 </p>
               )}
@@ -130,7 +130,7 @@ export function PricingSection() {
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-center gap-3">
                     <Check className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--positivus-green)' }} />
-                    <span style={{ color: 'var(--positivus-black)' }}>{feature}</span>
+                    <span style={{ color: '#000000' }}>{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -141,13 +141,13 @@ export function PricingSection() {
                 style={
                   plan.outline
                     ? {
-                        borderColor: 'var(--positivus-black)',
-                        color: 'var(--positivus-black)',
+                        borderColor: '#000000',
+                        color: '#000000',
                         backgroundColor: 'transparent',
                       }
                     : {
-                        backgroundColor: 'var(--positivus-black)',
-                        color: 'var(--positivus-white)',
+                        backgroundColor: '#000000',
+                        color: '#ffffff',
                       }
                 }
               >

@@ -14,7 +14,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useChartData } from '@/hooks/use-chart-data'
 import { useTimezone } from '@/contexts/timezone-context'
-import { formatTimeLocal, CHART_TIME_RANGES } from '@/lib/chart-utils'
+import { formatChartAxisLabel, CHART_TIME_RANGES } from '@/lib/chart-utils'
 
 const requestVolumeChartConfig = {
   requests: { label: 'Total Requests', color: 'var(--chart-1)' },
@@ -40,9 +40,9 @@ export function ChartsSection({ timeRange, onTimeRangeChange }: ChartsSectionPro
     () =>
       requestData.map((point) => ({
         ...point,
-        timeFormatted: formatTimeLocal(point.time || '', timezone),
+        timeFormatted: formatChartAxisLabel(point.time || '', timeRange, timezone),
       })),
-    [requestData, timezone]
+    [requestData, timeRange, timezone]
   )
 
   if (isLoading) {
