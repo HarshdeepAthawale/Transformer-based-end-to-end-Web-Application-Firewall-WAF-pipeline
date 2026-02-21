@@ -24,6 +24,8 @@ import {
   Users,
   ClipboardList,
   Package,
+  Cpu,
+  Lock,
 } from 'lucide-react'
 
 export function Sidebar() {
@@ -41,6 +43,9 @@ export function Sidebar() {
       { icon: Eye, label: 'Traffic', href: '/traffic' },
       { icon: AlertTriangle, label: 'Threats', href: '/threats' },
       { icon: ShieldCheck, label: 'DoS/DDoS Protection', href: '/dos-protection' },
+      { icon: FileSearch, label: 'Upload Scanning', href: '/upload-scanning' },
+      { icon: Cpu, label: 'Firewall for AI', href: '/firewall-ai' },
+      { icon: Lock, label: 'Credential protection', href: '/credential-protection' },
       { icon: Ban, label: 'IP Management', href: '/ip-management' },
       { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
       { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },

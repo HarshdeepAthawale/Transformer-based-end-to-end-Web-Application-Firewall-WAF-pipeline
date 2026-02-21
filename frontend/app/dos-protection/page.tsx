@@ -30,8 +30,8 @@ import {
   type ChartConfig,
 } from '@/components/ui/chart'
 import { AreaChart, Area, XAxis, CartesianGrid } from 'recharts'
-import { Gauge, Ban, ShieldCheck, AlertCircle, Loader2, ShieldX, ShieldAlert } from 'lucide-react'
-import { eventsApi, ipApi, type SecurityEventData } from '@/lib/api'
+import { Gauge, Ban, ShieldCheck, AlertCircle, Loader2, ShieldX, ShieldAlert, Activity } from 'lucide-react'
+import { eventsApi, ipApi, ddosApi, type SecurityEventData, type AdaptiveDdosStats } from '@/lib/api'
 import { useTimezone } from '@/contexts/timezone-context'
 import { formatTimeLocal } from '@/lib/chart-utils'
 
@@ -120,6 +120,7 @@ export default function DosProtectionPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [blacklistLoading, setBlacklistLoading] = useState<string | null>(null)
+  const [adaptiveDdos, setAdaptiveDdos] = useState<AdaptiveDdosStats | null>(null)
   const { timezone } = useTimezone()
 
   useEffect(() => {
@@ -127,10 +128,11 @@ export default function DosProtectionPage() {
       setLoading(true)
       setError(null)
       try {
-        const [res, wafRes, statsRes] = await Promise.all([
+        const [res, wafRes, statsRes, adaptiveRes] = await Promise.all([
           eventsApi.getDosOverview(timeRange, 100),
           eventsApi.getWafEvents(timeRange, 100),
           eventsApi.getStats(timeRange),
+          ddosApi.getAdaptiveDdosStats(),
         ])
         if (res.success && res.data) {
           setOverviewData(res.data)
@@ -140,6 +142,9 @@ export default function DosProtectionPage() {
         }
         if (statsRes.success && statsRes.data) {
           setWafBlockCount(statsRes.data.waf_block_count ?? 0)
+        }
+        if (adaptiveRes.success && adaptiveRes.data) {
+          setAdaptiveDdos(adaptiveRes.data)
         }
       } catch (err: unknown) {
         const e = err as { isNetworkError?: boolean; message?: string }
@@ -331,6 +336,58 @@ export default function DosProtectionPage() {
                   <p className="text-xs mt-1" style={{ color: 'var(--positivus-gray-dark)' }}>Last {timeRange}</p>
                 </Card>
               </div>
+
+              {/* Adaptive DDoS */}
+              <Card
+                className="border-2"
+                style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+              >
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Activity size={20} style={{ color: 'var(--positivus-green)' }} />
+                    <CardTitle className="text-lg" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>
+                      Adaptive DDoS
+                    </CardTitle>
+                  </div>
+                  <CardDescription>
+                    Auto-tuned burst threshold from traffic baseline (P{adaptiveDdos?.config?.percentile ?? 95}); gateway reads from Redis.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {!adaptiveDdos ? (
+                    <p className="text-muted-foreground text-sm">Loading…</p>
+                  ) : !adaptiveDdos.enabled ? (
+                    <p className="text-muted-foreground text-sm">Adaptive DDoS is disabled. Enable ADAPTIVE_DDOS_ENABLED in backend and gateway to auto-tune the burst threshold.</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <p className="font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>Current threshold</p>
+                        <p className="text-lg font-semibold" style={{ color: 'var(--positivus-black)' }}>
+                          {adaptiveDdos.current_threshold != null ? adaptiveDdos.current_threshold : '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>Baseline (P{adaptiveDdos.config?.percentile ?? 95})</p>
+                        <p className="text-lg font-semibold" style={{ color: 'var(--positivus-black)' }}>
+                          {adaptiveDdos.baseline_percentile_value != null ? adaptiveDdos.baseline_percentile_value : '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>Last updated</p>
+                        <p className="font-mono text-xs" style={{ color: 'var(--positivus-gray-dark)' }}>
+                          {adaptiveDdos.last_updated ? formatTimeLocal(adaptiveDdos.last_updated, timezone) : '—'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="font-medium" style={{ color: 'var(--positivus-gray-dark)' }}>Config</p>
+                        <p className="text-xs" style={{ color: 'var(--positivus-gray-dark)' }}>
+                          ×{adaptiveDdos.config?.multiplier ?? '—'} min {adaptiveDdos.config?.threshold_min ?? '—'} max {adaptiveDdos.config?.threshold_max ?? '—'} · {adaptiveDdos.learning_window_minutes}m window
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
 
               {/* Chart */}
               <Card

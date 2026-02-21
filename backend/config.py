@@ -78,6 +78,50 @@ class Config:
     MANAGED_RULES_PACK_ID: str = os.getenv("MANAGED_RULES_PACK_ID", "owasp_crs")
     MANAGED_RULES_FEED_HEADER: Optional[str] = os.getenv("MANAGED_RULES_FEED_HEADER", None)  # e.g. Bearer token
 
+    # Malicious upload scanning (ClamAV or cloud API)
+    UPLOAD_SCAN_ENABLED: bool = os.getenv("UPLOAD_SCAN_ENABLED", "false").lower() == "true"
+    UPLOAD_SCAN_ENGINE: str = os.getenv("UPLOAD_SCAN_ENGINE", "clamav")  # clamav | cloud
+    CLAMAV_SOCKET: str = os.getenv("CLAMAV_SOCKET", "")
+    CLAMAV_TIMEOUT_SECONDS: float = float(os.getenv("CLAMAV_TIMEOUT_SECONDS", "30"))
+    UPLOAD_SCAN_CLOUD_URL: str = os.getenv("UPLOAD_SCAN_CLOUD_URL", "")
+    UPLOAD_SCAN_CLOUD_API_KEY: Optional[str] = os.getenv("UPLOAD_SCAN_CLOUD_API_KEY", None)
+    UPLOAD_SCAN_POLICY_INFECTED: str = os.getenv("UPLOAD_SCAN_POLICY_INFECTED", "block")  # block | quarantine | log
+    UPLOAD_SCAN_QUARANTINE_DIR: str = os.getenv("UPLOAD_SCAN_QUARANTINE_DIR", "")
+    UPLOAD_SCAN_MAX_FILE_BYTES: int = int(os.getenv("UPLOAD_SCAN_MAX_FILE_BYTES", str(50 * 1024 * 1024)))  # 50MB
+    UPLOAD_SCAN_PATH_PREFIXES: str = os.getenv("UPLOAD_SCAN_PATH_PREFIXES", "")  # comma-separated; empty = all
+    UPLOAD_SCAN_SKIP_IF_OVER_MAX: bool = os.getenv("UPLOAD_SCAN_SKIP_IF_OVER_MAX", "true").lower() == "true"
+
+    # Adaptive DDoS protection (learn baseline, auto-tune burst threshold)
+    ADAPTIVE_DDOS_ENABLED: bool = os.getenv("ADAPTIVE_DDOS_ENABLED", "false").lower() == "true"
+    ADAPTIVE_DDOS_LEARNING_WINDOW_MINUTES: int = int(os.getenv("ADAPTIVE_DDOS_LEARNING_WINDOW_MINUTES", "60"))
+    ADAPTIVE_DDOS_PERCENTILE: float = float(os.getenv("ADAPTIVE_DDOS_PERCENTILE", "95"))
+    ADAPTIVE_DDOS_MULTIPLIER: float = float(os.getenv("ADAPTIVE_DDOS_MULTIPLIER", "1.5"))
+    ADAPTIVE_DDOS_THRESHOLD_MIN: int = int(os.getenv("ADAPTIVE_DDOS_THRESHOLD_MIN", "20"))
+    ADAPTIVE_DDOS_THRESHOLD_MAX: int = int(os.getenv("ADAPTIVE_DDOS_THRESHOLD_MAX", "500"))
+    ADAPTIVE_DDOS_UPDATE_INTERVAL_MINUTES: int = int(os.getenv("ADAPTIVE_DDOS_UPDATE_INTERVAL_MINUTES", "15"))
+    ADAPTIVE_DDOS_REDIS_KEY: str = os.getenv("ADAPTIVE_DDOS_REDIS_KEY", "waf:ddos:adaptive_threshold")
+    ADAPTIVE_DDOS_REDIS_KEY_META: str = os.getenv("ADAPTIVE_DDOS_REDIS_KEY_META", "waf:ddos:adaptive_meta")
+
+    # Firewall for AI (LLM endpoint protection)
+    FIREWALL_AI_ENABLED: bool = os.getenv("FIREWALL_AI_ENABLED", "false").lower() == "true"
+    FIREWALL_AI_PROMPT_PATTERNS_URL: str = os.getenv("FIREWALL_AI_PROMPT_PATTERNS_URL", "")
+    FIREWALL_AI_PII_PATTERNS_URL: str = os.getenv("FIREWALL_AI_PII_PATTERNS_URL", "")
+    FIREWALL_AI_ACTION_PROMPT_MATCH: str = os.getenv("FIREWALL_AI_ACTION_PROMPT_MATCH", "block")  # block | log | challenge
+    FIREWALL_AI_ACTION_PII: str = os.getenv("FIREWALL_AI_ACTION_PII", "log")  # block | log | redact
+    FIREWALL_AI_ABUSE_RATE_PER_MINUTE: int = int(os.getenv("FIREWALL_AI_ABUSE_RATE_PER_MINUTE", "60"))
+    FIREWALL_AI_PATTERNS_REFRESH_SECONDS: int = int(os.getenv("FIREWALL_AI_PATTERNS_REFRESH_SECONDS", "300"))
+
+    # Credential leak protection (HIBP k-anonymity)
+    CREDENTIAL_LEAK_ENABLED: bool = os.getenv("CREDENTIAL_LEAK_ENABLED", "false").lower() == "true"
+    CREDENTIAL_LEAK_API_URL: str = os.getenv("CREDENTIAL_LEAK_API_URL", "https://api.pwnedpasswords.com/range/")
+    CREDENTIAL_LEAK_API_KEY: Optional[str] = os.getenv("CREDENTIAL_LEAK_API_KEY", None)
+    CREDENTIAL_LEAK_LOGIN_PATHS: str = os.getenv("CREDENTIAL_LEAK_LOGIN_PATHS", "/login,/api/auth/login")
+    CREDENTIAL_LEAK_PASSWORD_FIELD: str = os.getenv("CREDENTIAL_LEAK_PASSWORD_FIELD", "password")
+    CREDENTIAL_LEAK_USERNAME_FIELD: str = os.getenv("CREDENTIAL_LEAK_USERNAME_FIELD", "username")
+    CREDENTIAL_LEAK_ACTION: str = os.getenv("CREDENTIAL_LEAK_ACTION", "block")  # block | flag
+    CREDENTIAL_LEAK_TIMEOUT_SECONDS: float = float(os.getenv("CREDENTIAL_LEAK_TIMEOUT_SECONDS", "5"))
+    CREDENTIAL_LEAK_INCLUDE_HASH_PREFIX_IN_EVENTS: bool = os.getenv("CREDENTIAL_LEAK_INCLUDE_HASH_PREFIX_IN_EVENTS", "false").lower() == "true"
+
     # Alert notifications (email)
     SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST", None)
     SMTP_PORT: int = int(os.getenv("SMTP_PORT", "587"))

@@ -58,6 +58,20 @@ class IngestEvent(BaseModel):
     bot_action: Optional[str] = None
     rule_id: Optional[int] = None
     pack_id: Optional[str] = None
+    # Upload scan
+    upload_scan_result: Optional[str] = None
+    upload_scan_signature: Optional[str] = None
+    upload_filename: Optional[str] = None
+    upload_size_bytes: Optional[int] = None
+    upload_scan_engine: Optional[str] = None
+    upload_content_type: Optional[str] = None
+    # Firewall for AI
+    firewall_ai_reason: Optional[str] = None
+    firewall_ai_pattern: Optional[str] = None
+    firewall_ai_action: Optional[str] = None
+    # Credential leak (no password; optional hash prefix for debugging)
+    credential_leak_username: Optional[str] = None
+    credential_leak_hash_prefix: Optional[str] = None
 
 
 class IngestRequest(BaseModel):
@@ -94,6 +108,28 @@ async def ingest_events(body: IngestRequest, db: Session = Depends(get_db)):
             details["rule_id"] = e.rule_id
         if e.pack_id is not None:
             details["pack_id"] = e.pack_id
+        if e.upload_scan_result is not None:
+            details["upload_scan_result"] = e.upload_scan_result
+        if e.upload_scan_signature is not None:
+            details["upload_scan_signature"] = e.upload_scan_signature
+        if e.upload_filename is not None:
+            details["upload_filename"] = e.upload_filename
+        if e.upload_size_bytes is not None:
+            details["upload_size_bytes"] = e.upload_size_bytes
+        if e.upload_scan_engine is not None:
+            details["upload_scan_engine"] = e.upload_scan_engine
+        if e.upload_content_type is not None:
+            details["upload_content_type"] = e.upload_content_type
+        if e.firewall_ai_reason is not None:
+            details["firewall_ai_reason"] = e.firewall_ai_reason
+        if e.firewall_ai_pattern is not None:
+            details["firewall_ai_pattern"] = e.firewall_ai_pattern
+        if e.firewall_ai_action is not None:
+            details["firewall_ai_action"] = e.firewall_ai_action
+        if e.credential_leak_username is not None:
+            details["credential_leak_username"] = e.credential_leak_username
+        if e.credential_leak_hash_prefix is not None:
+            details["credential_leak_hash_prefix"] = e.credential_leak_hash_prefix
 
         ev = SecurityEvent(
             event_type=e.event_type,
@@ -280,6 +316,111 @@ async def list_ddos_events(
         .all()
     )
     return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/upload-scans")
+async def list_upload_scan_events(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d"),
+    limit: int = Query(100, le=500),
+    db: Session = Depends(get_db),
+):
+    """List upload scan events (infected and clean) with filename, size, result, signature."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    rows = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("upload_scan_infected", "upload_scan_clean")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/credential-leak")
+async def list_credential_leak_events(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d"),
+    limit: int = Query(100, le=500),
+    db: Session = Depends(get_db),
+):
+    """List credential leak events (block/flag). No password or sensitive data."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    rows = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("credential_leak_block", "credential_leak_flag")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/firewall-ai")
+async def list_firewall_ai_events(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d"),
+    limit: int = Query(100, le=500),
+    db: Session = Depends(get_db),
+):
+    """List Firewall-for-AI events (prompt_block, pii, abuse_rate)."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    rows = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(
+                ("firewall_ai_prompt_block", "firewall_ai_pii", "firewall_ai_abuse_rate")
+            ),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .order_by(SecurityEvent.timestamp.desc())
+        .limit(limit)
+        .all()
+    )
+    return {"success": True, "data": [r.to_dict() for r in rows]}
+
+
+@router.get("/upload-scan-stats")
+async def get_upload_scan_stats(
+    range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d"),
+    db: Session = Depends(get_db),
+):
+    """Get upload scan counts: infected_count, scanned_count."""
+    from backend.core.time_range import parse_time_range
+
+    start_time, _ = parse_time_range(range)
+    infected_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type == "upload_scan_infected",
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+    scanned_count = (
+        db.query(SecurityEvent)
+        .filter(
+            SecurityEvent.event_type.in_(("upload_scan_infected", "upload_scan_clean")),
+            SecurityEvent.timestamp >= start_time,
+        )
+        .count()
+    )
+    return {
+        "success": True,
+        "data": {
+            "infected_count": infected_count,
+            "scanned_count": scanned_count,
+        },
+    }
 
 
 @router.get("/dos-overview")

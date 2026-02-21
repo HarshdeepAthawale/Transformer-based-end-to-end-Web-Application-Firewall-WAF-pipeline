@@ -24,6 +24,11 @@ from backend.routes import (
     threats,
     analytics,
     events,
+    scan,
+    stats,
+    firewall_ai,
+    ddos,
+    credential_leak,
 )
 from backend.routes import health, test, debug
 from backend.websocket import router as websocket_router
@@ -255,6 +260,11 @@ app.include_router(threats.router, prefix="/api/threats", tags=["threats"])
 
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(events.router, prefix="/api/events", tags=["events"])
+app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
+app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
+app.include_router(firewall_ai.router, prefix="/api/firewall-ai", tags=["firewall-ai"])
+app.include_router(ddos.router, prefix="/api/ddos", tags=["ddos"])
+app.include_router(credential_leak.router, prefix="/api/credential-leak", tags=["credential-leak"])
 
 # WAF service routes (includes /middleware-metrics)
 try:

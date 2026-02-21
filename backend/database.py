@@ -58,6 +58,9 @@ def init_db():
     # Seed default bot score bands if empty
     _seed_bot_score_bands()
 
+    # Seed default Firewall-for-AI prompt-injection pattern if empty (no hardcoded patterns in app code)
+    _seed_firewall_ai_patterns()
+
     logger.info("Database initialized successfully - all tables created")
 
 
@@ -129,6 +132,31 @@ def _migrate_managed_rules_tables():
                     conn.execute(text(f"ALTER TABLE security_rules ADD COLUMN {col_name} {col_type}"))
                     conn.commit()
                     logger.info(f"Migration: added {col_name} to security_rules")
+
+
+def _seed_firewall_ai_patterns():
+    """Seed one default prompt-injection pattern if firewall_ai_patterns table is empty."""
+    try:
+        from backend.models.firewall_ai_pattern import FirewallAIPattern
+
+        db = SessionLocal()
+        try:
+            count = db.query(FirewallAIPattern).count()
+            if count == 0:
+                db.add(
+                    FirewallAIPattern(
+                        pattern_type="prompt_injection",
+                        pattern_value="ignore previous instructions",
+                        is_active=True,
+                        source="manual",
+                    )
+                )
+                db.commit()
+                logger.info("Seeded default Firewall-for-AI prompt-injection pattern")
+        finally:
+            db.close()
+    except Exception as e:
+        logger.debug(f"Firewall AI patterns seed skipped: {e}")
 
 
 def _seed_bot_score_bands():

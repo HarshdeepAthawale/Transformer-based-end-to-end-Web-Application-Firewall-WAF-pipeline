@@ -19,6 +19,8 @@ from backend.models.settings import AccountSetting
 from backend.models.security_event import SecurityEvent
 from backend.models.verified_bots import VerifiedBot
 from backend.models.bot_score_bands import BotScoreBand
+from backend.models.llm_endpoint import LLMEndpoint
+from backend.models.firewall_ai_pattern import FirewallAIPattern
 
 __all__ = [
     "Metrics",
@@ -47,4 +49,6 @@ __all__ = [
     "SecurityEvent",
     "VerifiedBot",
     "BotScoreBand",
+    "LLMEndpoint",
+    "FirewallAIPattern",
 ]

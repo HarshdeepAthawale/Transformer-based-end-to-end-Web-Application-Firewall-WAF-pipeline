@@ -7,6 +7,7 @@ from backend.tasks.log_processor import LogProcessor
 from backend.tasks.metrics_aggregator import MetricsAggregator
 from backend.tasks.ip_reputation_updater import IPReputationUpdater
 from backend.tasks.managed_rules_sync_task import ManagedRulesSyncTask
+from backend.tasks.adaptive_ddos_job import AdaptiveDDoSJob
 
 
 # Global instances
@@ -14,11 +15,12 @@ log_processor = None
 metrics_aggregator = None
 ip_reputation_updater = None
 managed_rules_sync_task = None
+adaptive_ddos_job = None
 
 
 def start_background_workers():
     """Start all background workers"""
-    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task
+    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job
 
     logger.info("Starting background workers...")
     
@@ -57,10 +59,17 @@ def start_background_workers():
     except Exception as e:
         logger.error(f"Failed to start managed rules sync task: {e}")
 
+    # Adaptive DDoS (recompute threshold from Redis counters)
+    try:
+        adaptive_ddos_job = AdaptiveDDoSJob()
+        adaptive_ddos_job.start()
+    except Exception as e:
+        logger.error(f"Failed to start adaptive DDoS job: {e}")
+
 
 def stop_background_workers():
     """Stop all background workers"""
-    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task
+    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job
 
     logger.info("Stopping background workers...")
 
@@ -75,5 +84,8 @@ def stop_background_workers():
 
     if managed_rules_sync_task:
         managed_rules_sync_task.stop()
+
+    if adaptive_ddos_job:
+        adaptive_ddos_job.stop()
 
     logger.info("Background workers stopped")

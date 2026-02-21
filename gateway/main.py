@@ -26,6 +26,9 @@ from gateway.blacklist import create_blacklist_checker
 from gateway.events import report_event, start_event_batcher, stop_event_batcher
 from gateway.bot_score import get_bot_score
 from gateway import managed_rules as managed_rules_module
+from gateway.upload_scan import is_upload_request, process_upload_scan
+from gateway.firewall_ai import evaluate_request as firewall_ai_evaluate
+from gateway.credential_leak import process_credential_leak
 
 # Configure logger
 logger.add(
@@ -168,6 +171,9 @@ async def health(request: Request):
         "ddos_enabled": gateway_config.DDOS_ENABLED,
         "bot_enabled": gateway_config.BOT_ENABLED,
         "managed_rules_enabled": gateway_config.MANAGED_RULES_ENABLED,
+        "upload_scan_enabled": gateway_config.UPLOAD_SCAN_ENABLED,
+        "firewall_ai_enabled": gateway_config.FIREWALL_AI_ENABLED,
+        "credential_leak_enabled": gateway_config.CREDENTIAL_LEAK_ENABLED,
     }
 
 
@@ -493,6 +499,104 @@ async def gateway_proxy(request: Request, path: str):
 
     # Read body once (needed for both WAF inspection and forwarding)
     body_bytes = await request.body()
+
+    # --- Upload scan (multipart or path prefix; backend performs scan) ---
+    content_type = request.headers.get("content-type") or ""
+    if is_upload_request(content_type, request.url.path) and body_bytes:
+        should_block, scan_result, err_msg = await process_upload_scan(
+            body_bytes,
+            content_type,
+            request.url.path,
+            client_ip,
+            request.method,
+        )
+        if should_block:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="upload_scan_infected",
+            )
+            resp = JSONResponse(
+                status_code=413 if err_msg == "File too large" else 403,
+                content={
+                    "blocked": True,
+                    "message": err_msg or "Malicious file detected",
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+    # --- Firewall for AI (LLM endpoint protection) ---
+    if gateway_config.FIREWALL_AI_ENABLED:
+        should_block_fa, event_type_fa, pattern_fa = await firewall_ai_evaluate(
+            path=request.url.path,
+            method=request.method,
+            body=body_bytes,
+            headers=dict(request.headers),
+            client_ip=client_ip,
+        )
+        if should_block_fa and event_type_fa:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by=event_type_fa,
+            )
+            reason = "prompt_injection" if "prompt" in event_type_fa else "pii" if "pii" in event_type_fa else "abuse_rate"
+            report_event({
+                "event_type": event_type_fa,
+                "ip": client_ip,
+                "method": request.method,
+                "path": request.url.path,
+                "firewall_ai_reason": reason,
+                "firewall_ai_pattern": pattern_fa,
+                "firewall_ai_action": "block",
+            })
+            resp = JSONResponse(
+                status_code=403,
+                content={
+                    "blocked": True,
+                    "message": "Request blocked by Firewall for AI",
+                    "reason": reason,
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
+
+    # --- Credential leak (login paths: check password against HIBP via backend) ---
+    if gateway_config.CREDENTIAL_LEAK_ENABLED and body_bytes:
+        should_block_cl, event_type_cl = await process_credential_leak(
+            body_bytes,
+            request.url.path,
+            client_ip,
+            request.method,
+        )
+        if should_block_cl:
+            elapsed_ms = (time.perf_counter() - start_time) * 1000
+            _log_gateway_event(
+                request,
+                request_id=request_id,
+                client_ip=client_ip,
+                decision="block",
+                total_latency_ms=elapsed_ms,
+                blocked_by="credential_leak_block",
+            )
+            resp = JSONResponse(
+                status_code=403,
+                content={
+                    "blocked": True,
+                    "message": "Password has been found in a data breach; please choose a different password",
+                },
+            )
+            resp.headers["X-Request-ID"] = request_id
+            return resp
 
     # --- Managed rules (enabled packs from backend) ---
     if gateway_config.MANAGED_RULES_ENABLED:

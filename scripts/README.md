@@ -63,6 +63,12 @@ python3 01_sql_injection.py
 | `finetune_waf_model.py` | Fine-tune DistilBERT model | `python3 finetune_waf_model.py` |
 | `start_waf_service.py` | Start WAF API service | `python3 start_waf_service.py` |
 
+### Presentation deck
+
+| Script | Purpose | Usage |
+|--------|---------|-------|
+| `update_pitch_deck.py` | Update a PowerPoint deck from [PRESENTATION_PITCH_CONTENT.md](../PRESENTATION_PITCH_CONTENT.md) | See [Pitch deck update](#pitch-deck-update) below |
+
 ## Environment Variables
 
 Configure these before running scripts:
@@ -190,6 +196,30 @@ When adding new scripts:
 3. Follow the naming convention: `<purpose>_<target>.py/sh`
 4. Add error handling and helpful error messages
 5. Update the test suite if adding new attack patterns
+
+## Pitch deck update
+
+Use `update_pitch_deck.py` to fill a PowerPoint template with the WAF pitch content (18 slides). Requires `pip install python-pptx` (or use the project `requirements.txt`).
+
+```bash
+# Install dependency (if not already)
+pip install python-pptx
+
+# Inspect an existing .pptx (slide count and placeholder layout)
+python scripts/update_pitch_deck.py --inspect --pptx /path/to/your.pptx
+
+# Update the deck (writes a new file; does not overwrite the original)
+python scripts/update_pitch_deck.py --pptx "/path/to/Black Elegant...pptx" [--out /path/to/output.pptx]
+
+# Default: reads PRESENTATION_PITCH_CONTENT.md from repo root; writes to <pptx_stem>_WAF_updated.pptx
+python scripts/update_pitch_deck.py
+
+# Export only: generate SLIDE_CONTENT_FOR_DECK.md for manual paste into Canva/PowerPoint
+python scripts/update_pitch_deck.py --export-md SLIDE_CONTENT_FOR_DECK.md --pptx /path/to/any.pptx
+```
+
+- **Canva:** The script cannot edit Canva directly. Use the generated [SLIDE_CONTENT_FOR_DECK.md](../SLIDE_CONTENT_FOR_DECK.md) (or the updated .pptx) to copy title and body text into each slide in the Canva editor. For slides 5 and 6, add the architecture/flow diagrams from the Mermaid blocks in PRESENTATION_PITCH_CONTENT.md or redraw them in Canva.
+- **Output:** By default the script writes a new file (e.g. `Black Elegant..._WAF_updated.pptx`) so the original template is unchanged.
 
 ## See Also
 

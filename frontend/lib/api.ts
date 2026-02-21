@@ -286,6 +286,50 @@ export const eventsApi = {
     apiRequest(`/api/events/waf?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
 }
 
+// Adaptive DDoS (auto-tuned burst threshold)
+export interface AdaptiveDdosStats {
+  enabled: boolean
+  current_threshold: number | null
+  baseline_percentile_value: number | null
+  last_updated: string | null
+  learning_window_minutes: number
+  config: {
+    multiplier: number
+    threshold_min: number
+    threshold_max: number
+    percentile: number
+  }
+}
+
+export const ddosApi = {
+  getAdaptiveDdosStats: (): Promise<ApiResponse<AdaptiveDdosStats>> =>
+    apiRequest('/api/ddos/adaptive-stats'),
+}
+
+// Credential leak protection (HIBP)
+export interface CredentialLeakEventData {
+  id: number
+  timestamp: string
+  event_type: 'credential_leak_block' | 'credential_leak_flag'
+  ip: string
+  method?: string
+  path?: string
+  details?: string
+}
+
+export interface CredentialLeakStats {
+  blocked_count: number
+  flagged_count: number
+}
+
+export const credentialLeakApi = {
+  getCredentialLeakEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<CredentialLeakEventData[]>> =>
+    apiRequest(`/api/events/credential-leak?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
+
+  getCredentialLeakStats: (range: string = '24h'): Promise<ApiResponse<CredentialLeakStats>> =>
+    apiRequest(`/api/stats/credential-leak?range=${range}`),
+}
+
 // Traffic API
 export const trafficApi = {
   getRecent: (limit: number = 50): Promise<ApiResponse<TrafficData[]>> =>
@@ -535,6 +579,87 @@ export const botApi = {
 export const botEventsApi = {
   getBotEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<SecurityEventData[]>> =>
     apiRequest(`/api/events/bot?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
+}
+
+// Upload scan events and stats (malicious file scanning)
+export interface UploadScanEvent {
+  id: number
+  timestamp: string
+  event_type: 'upload_scan_infected' | 'upload_scan_clean'
+  ip: string
+  method?: string
+  path?: string
+  details?: string
+  upload_scan_result?: string
+  upload_filename?: string
+  upload_size_bytes?: number
+  upload_scan_signature?: string
+  upload_scan_engine?: string
+}
+
+export interface UploadScanStats {
+  infected_count: number
+  scanned_count: number
+}
+
+export const uploadScanApi = {
+  getUploadScanEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<UploadScanEvent[]>> =>
+    apiRequest(`/api/events/upload-scans?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
+
+  getUploadScanStats: (range: string = '24h'): Promise<ApiResponse<UploadScanStats>> =>
+    apiRequest(`/api/events/upload-scan-stats?range=${range}`),
+}
+
+// Firewall for AI (LLM endpoint protection)
+export interface LLMEndpointData {
+  id: number
+  path_pattern: string
+  methods: string
+  label: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface FirewallAIEventData {
+  id: number
+  timestamp: string
+  event_type: 'firewall_ai_prompt_block' | 'firewall_ai_pii' | 'firewall_ai_abuse_rate'
+  ip: string
+  method?: string
+  path?: string
+  details?: string
+}
+
+export const firewallAiApi = {
+  getLlmEndpoints: (activeOnly: boolean = false): Promise<ApiResponse<LLMEndpointData[]>> =>
+    apiRequest(`/api/firewall-ai/endpoints?active_only=${activeOnly}`),
+
+  createLlmEndpoint: (body: {
+    path_pattern: string
+    methods?: string
+    label?: string
+    is_active?: boolean
+  }): Promise<ApiResponse<LLMEndpointData>> =>
+    apiRequest('/api/firewall-ai/endpoints', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  updateLlmEndpoint: (
+    id: number,
+    body: { path_pattern?: string; methods?: string; label?: string; is_active?: boolean }
+  ): Promise<ApiResponse<LLMEndpointData>> =>
+    apiRequest(`/api/firewall-ai/endpoints/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+
+  deleteLlmEndpoint: (id: number): Promise<ApiResponse<void>> =>
+    apiRequest(`/api/firewall-ai/endpoints/${id}`, { method: 'DELETE' }),
+
+  getFirewallAiEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<FirewallAIEventData[]>> =>
+    apiRequest(`/api/events/firewall-ai?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
 }
 
 // Threat Intelligence API

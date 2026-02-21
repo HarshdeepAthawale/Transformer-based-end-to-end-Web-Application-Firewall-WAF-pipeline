@@ -1,0 +1,30 @@
+"""LLM endpoints: path patterns and methods for Firewall-for-AI."""
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from backend.database import Base
+from datetime import datetime
+
+
+class LLMEndpoint(Base):
+    """Labeled LLM endpoint: path_pattern (prefix or regex), methods, label."""
+
+    __tablename__ = "llm_endpoints"
+
+    id = Column(Integer, primary_key=True, index=True)
+    path_pattern = Column(String(500), nullable=False)  # e.g. /api/chat, /v1/completions (prefix match) or regex
+    methods = Column(String(100), nullable=False)       # e.g. POST or POST,PUT
+    label = Column(String(100), nullable=False)         # e.g. chat
+    is_active = Column(Boolean, default=True, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "path_pattern": self.path_pattern,
+            "methods": self.methods,
+            "label": self.label,
+            "is_active": self.is_active,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
