@@ -1,16 +1,15 @@
 """Agent experience store — SQLAlchemy model for conversation turns and feedback."""
 
-from datetime import datetime
-
 from sqlalchemy import Column, DateTime, Index, Integer, String, Text
 from backend.database import Base
+from backend.lib.datetime_utils import utc_now
 
 
 class AgentExperience(Base):
     __tablename__ = "agent_experiences"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=utc_now, index=True)
     session_id = Column(String(64), index=True, nullable=False)
     user_id = Column(Integer, nullable=True)
 

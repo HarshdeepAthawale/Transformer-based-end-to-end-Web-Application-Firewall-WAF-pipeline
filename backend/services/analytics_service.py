@@ -4,6 +4,7 @@ Analytics Service
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from typing import Dict, List
 
 from backend.models.metrics import Metrics
@@ -103,6 +104,6 @@ class AnalyticsService:
             "other": other,
             "time_range": {
                 "start": start_time.isoformat(),
-                "end": datetime.utcnow().isoformat()
+                "end": utc_now().isoformat()
             }
         }

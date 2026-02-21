@@ -3,7 +3,7 @@ IP Reputation database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Float, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class IPReputation(Base):
@@ -11,7 +11,7 @@ class IPReputation(Base):
     __tablename__ = "ip_reputation"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # IP information
     ip = Column(String(45), nullable=False, index=True)  # IPv4 or IPv6

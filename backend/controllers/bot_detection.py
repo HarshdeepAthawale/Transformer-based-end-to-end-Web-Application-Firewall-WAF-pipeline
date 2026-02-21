@@ -1,5 +1,5 @@
 """Bot detection controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.bot_detection import BotDetectionService
@@ -12,7 +12,7 @@ def get_signatures(db: Session, active_only: bool) -> dict:
     return {
         "success": True,
         "data": [s.to_dict() for s in sigs],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -34,4 +34,4 @@ def add_signature(
         action=action,
         is_whitelisted=is_whitelisted,
     )
-    return {"success": True, "data": sig.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": sig.to_dict(), "timestamp": utc_now().isoformat()}

@@ -5,6 +5,7 @@ Metrics Service
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime, timedelta
+from backend.lib.datetime_utils import utc_now
 from typing import List
 import time
 
@@ -30,7 +31,7 @@ class MetricsService:
             return cached
 
         # Get metrics from last 5 minutes of traffic logs
-        five_min_ago = datetime.utcnow() - timedelta(minutes=5)
+        five_min_ago = utc_now() - timedelta(minutes=5)
 
         traffic_stats = (
             self.db.query(
@@ -65,7 +66,7 @@ class MetricsService:
             "attackRate": round(attack_rate, 2),
             "threatsPerMinute": round(threats_per_minute, 2),
             "uptime": int(time.time() - self._start_time),
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         }
 
         # Cache for 5 seconds

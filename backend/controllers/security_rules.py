@@ -1,5 +1,5 @@
 """Security rules controller (Feature 9 API)."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.rules_service import RulesService
@@ -19,7 +19,7 @@ def get_rules(
         "success": True,
         "data": [r.to_dict() for r in rules],
         "total": total,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -58,13 +58,13 @@ def create_rule(
         match_conditions=match_conditions,
         is_active=is_active,
     )
-    return {"success": True, "data": rule.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": rule.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def update_rule(db: Session, rule_id: int, **kwargs) -> dict | None:
     service = RulesService(db)
     rule = service.update_rule(rule_id, **kwargs)
-    return {"success": True, "data": rule.to_dict(), "timestamp": datetime.utcnow().isoformat()} if rule else None
+    return {"success": True, "data": rule.to_dict(), "timestamp": utc_now().isoformat()} if rule else None
 
 
 def delete_rule(db: Session, rule_id: int) -> bool:
@@ -78,5 +78,5 @@ def get_owasp_rules(db: Session) -> dict:
     return {
         "success": True,
         "data": [r.to_dict() for r in rules],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

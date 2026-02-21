@@ -1,12 +1,10 @@
 """Background task: sync managed rules from feed on an interval."""
 import threading
-import time
 from loguru import logger
 
 from backend.config import config
 from backend.database import SessionLocal
 from backend.services import managed_rules_sync
-from backend.models.rule_packs import RulePack
 
 
 class ManagedRulesSyncTask:

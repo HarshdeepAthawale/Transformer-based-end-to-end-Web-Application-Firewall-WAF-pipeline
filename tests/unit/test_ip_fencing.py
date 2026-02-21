@@ -1,7 +1,8 @@
 """Unit tests for IP fencing service."""
 
 import pytest
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -122,7 +123,7 @@ def test_expired_temporary_block_not_blocked(ip_fencing, db_session):
         block_type=IPBlockType.TEMPORARY,
         is_range=False,
         is_active=True,
-        expires_at=datetime.utcnow() - timedelta(hours=1),
+        expires_at=utc_now() - timedelta(hours=1),
         source="manual",
     )
     db_session.add(entry)

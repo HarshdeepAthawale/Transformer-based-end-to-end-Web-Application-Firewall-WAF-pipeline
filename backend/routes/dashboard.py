@@ -1,6 +1,6 @@
 """Unified security dashboard: overview, charts, recent events from security_events."""
 
-from typing import Any, Optional
+from typing import Optional
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session

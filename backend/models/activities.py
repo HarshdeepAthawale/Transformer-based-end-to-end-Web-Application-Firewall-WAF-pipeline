@@ -3,7 +3,7 @@ Activities database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Enum, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -17,7 +17,7 @@ class Activity(Base):
     __tablename__ = "activities"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     type = Column(Enum(ActivityType), nullable=False, index=True)
     title = Column(String(255), nullable=False)

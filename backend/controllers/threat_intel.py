@@ -1,5 +1,7 @@
 """Threat intelligence controller."""
 from datetime import datetime
+
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -17,7 +19,7 @@ def get_feeds(
     return {
         "success": True,
         "data": [t.to_dict() for t in threats],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -42,10 +44,10 @@ def add_threat(
         description=description,
         expires_at=expires_at,
     )
-    return {"success": True, "data": threat.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": threat.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def check_ip(db: Session, ip: str) -> dict:
     service = ThreatIntelService(db)
     result = service.check_threat(ip)
-    return {"success": True, "data": result, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": result, "timestamp": utc_now().isoformat()}

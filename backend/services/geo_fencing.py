@@ -1,9 +1,12 @@
 """
 Geo-fencing Service
 """
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 from typing import Dict, List
-from datetime import datetime
+
+from backend.lib.datetime_utils import utc_now
 
 from backend.models.geo_rules import GeoRule, GeoRuleType
 try:
@@ -93,7 +96,7 @@ class GeoFencingService:
             if rule.country_code == country_code:
                 # Update statistics
                 rule.blocked_requests += 1
-                rule.last_applied = datetime.utcnow()
+                rule.last_applied = utc_now()
                 self.db.commit()
                 
                 return {

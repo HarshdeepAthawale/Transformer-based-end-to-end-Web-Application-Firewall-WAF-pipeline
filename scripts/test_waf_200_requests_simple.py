@@ -162,14 +162,14 @@ def send_request(request_config: Dict) -> Dict:
                    "anomaly" in response_data.get("message", "").lower():
                     result["blocked_by_waf"] = True
                     result["response_body"] = response_data
-            except:
+            except Exception:
                 result["blocked_by_waf"] = True  # 403 likely means blocked
         elif response.status_code in [200, 201, 404, 405]:
             # 404/405 are OK - endpoint might not exist, but WAF didn't block
             result["allowed"] = True
             try:
                 result["response_body"] = response.json()
-            except:
+            except Exception:
                 result["response_body"] = response.text[:200]
         
     except requests.exceptions.RequestException as e:

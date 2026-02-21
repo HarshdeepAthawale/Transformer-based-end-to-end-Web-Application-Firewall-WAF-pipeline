@@ -1,5 +1,7 @@
 """Audit controller."""
 from datetime import datetime
+
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from typing import Optional
 
@@ -32,7 +34,7 @@ def get_logs(
     return {
         "success": True,
         "data": [log.to_dict() for log in logs],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -42,6 +44,6 @@ def get_log(db: Session, log_id: int) -> dict:
         return {
             "success": False,
             "message": "Audit log not found",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         }
-    return {"success": True, "data": log.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": log.to_dict(), "timestamp": utc_now().isoformat()}

@@ -10,7 +10,6 @@ import httpx
 from loguru import logger
 
 from gateway.config import gateway_config
-from gateway.events import report_event
 
 # Cache: list of endpoint dicts; path_pattern, methods, label
 _cached_endpoints: list[dict[str, Any]] = []

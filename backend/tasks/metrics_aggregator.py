@@ -4,7 +4,8 @@ Metrics Aggregator Background Worker
 
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from loguru import logger
 from sqlalchemy import func
 
@@ -57,7 +58,7 @@ class MetricsAggregator:
         db = SessionLocal()
         try:
             # Get time window (last minute)
-            end_time = datetime.utcnow()
+            end_time = utc_now()
             start_time = end_time - timedelta(minutes=1)
 
             # Aggregate from traffic logs

@@ -3,7 +3,7 @@ Verified Bots Service - CRUD and sync from URL.
 """
 
 import re
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from typing import List, Optional
 
 import httpx
@@ -78,7 +78,7 @@ class VerifiedBotsService:
         if not isinstance(data, list):
             raise ValueError("Expected JSON array")
 
-        now = datetime.utcnow()
+        now = utc_now()
         count = 0
         for item in data:
             if not isinstance(item, dict):

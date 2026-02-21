@@ -4,7 +4,8 @@ evaluates block rate and DDoS count rules; creates alerts and sends webhook.
 No hardcoded thresholds; from settings or config.
 """
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from typing import Any, Dict
 
 from sqlalchemy.orm import Session
@@ -78,7 +79,7 @@ def evaluate_rules(db: Session) -> None:
     """
     cfg = _get_alerting_config(db)
     window_minutes = cfg["block_rate_window_minutes"]
-    start_time = datetime.utcnow() - timedelta(minutes=window_minutes)
+    start_time = utc_now() - timedelta(minutes=window_minutes)
 
     # Total events in window
     total = db.query(func.count(SecurityEvent.id)).filter(

@@ -4,7 +4,7 @@ Rate limit configuration - API-driven config for gateway (Feature 9).
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class RateLimitConfig(Base):
@@ -19,7 +19,7 @@ class RateLimitConfig(Base):
     burst = Column(Integer, nullable=True)  # optional burst allowance
     zone_id = Column(String(100), nullable=True, index=True, default="default")
     is_active = Column(Boolean, default=True, nullable=False, index=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
 
     def to_dict(self):
         return {

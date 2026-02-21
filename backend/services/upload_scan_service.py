@@ -5,7 +5,6 @@ Returns result (clean | infected), signature, and engine name.
 
 import socket
 import struct
-from typing import Optional
 
 import httpx
 from loguru import logger

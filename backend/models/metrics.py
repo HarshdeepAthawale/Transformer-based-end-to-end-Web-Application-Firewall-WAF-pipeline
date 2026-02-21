@@ -4,7 +4,7 @@ Metrics database model
 
 from sqlalchemy import Column, Integer, Float, DateTime
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class Metrics(Base):
@@ -13,7 +13,7 @@ class Metrics(Base):
     __tablename__ = "metrics"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
 
     # Request metrics
     total_requests = Column(Integer, default=0, nullable=False)

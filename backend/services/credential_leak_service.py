@@ -4,7 +4,6 @@ Only SHA-1 prefix (5 chars) is sent; full password is never stored or logged.
 """
 
 import hashlib
-from typing import Optional
 
 import httpx
 from loguru import logger

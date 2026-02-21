@@ -3,7 +3,7 @@ import hashlib
 import json
 import secrets
 import uuid
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.models.users import User, UserRole
@@ -27,13 +27,13 @@ def login(db: Session, username: str, password: str) -> dict:
         raise ValueError("Invalid credentials")
     if not user.is_active:
         raise PermissionError("User account is inactive")
-    user.last_login = datetime.utcnow()
+    user.last_login = utc_now()
     db.commit()
     token = create_access_token(user.id, user.username, user.role)
     return {
         "success": True,
         "data": {"token": token, "user": user.to_dict()},
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -42,7 +42,7 @@ def get_users(db: Session) -> dict:
     return {
         "success": True,
         "data": [u.to_dict() for u in users],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -66,14 +66,14 @@ def create_user(
     db.add(user)
     db.commit()
     db.refresh(user)
-    return {"success": True, "data": user.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": user.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def get_me(user: User) -> dict:
     return {
         "success": True,
         "data": user.to_dict(),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -91,7 +91,7 @@ def list_api_keys(user: User) -> dict:
     return {
         "success": True,
         "data": out,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -100,7 +100,7 @@ def create_api_key(db: Session, user: User, name: str = "") -> dict:
     key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
     key_id = str(uuid.uuid4())
     prefix = raw_key[:12] + "…"
-    created_at = datetime.utcnow().isoformat()
+    created_at = utc_now().isoformat()
     keys_list = _get_keys_list(user)
     keys_list.append({
         "id": key_id,
@@ -120,7 +120,7 @@ def create_api_key(db: Session, user: User, name: str = "") -> dict:
             "created_at": created_at,
         },
         "message": "Copy the key now; it will not be shown again.",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -134,5 +134,5 @@ def revoke_api_key(db: Session, user: User, key_id: str) -> dict:
     return {
         "success": True,
         "data": {"revoked": key_id},
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

@@ -3,7 +3,7 @@ Security Rules Service
 """
 from sqlalchemy.orm import Session
 from typing import Dict, List
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import re
 import json
 from loguru import logger
@@ -57,7 +57,7 @@ class RulesService:
             if self._rule_matches(rule, method, path, headers, query_params, body):
                 # Update statistics
                 rule.match_count += 1
-                rule.last_matched = datetime.utcnow()
+                rule.last_matched = utc_now()
                 self.db.commit()
                 
                 return {
@@ -261,7 +261,7 @@ class RulesService:
         Evaluate request against enabled managed (pack) rules only.
         Returns first match: { matched, rule_id, rule_name, action, pack_id } or no match.
         """
-        enabled_packs = self.db.query(RulePack.id).filter(RulePack.enabled == True).all()
+        enabled_packs = self.db.query(RulePack.id).filter(RulePack.enabled).all()
         pack_ids = [p.id for p in enabled_packs]
         if not pack_ids:
             return {"matched": False, "rule_id": None, "rule_name": None, "action": None, "pack_id": None}
@@ -271,7 +271,7 @@ class RulesService:
 
         managed_rules = (
             self.db.query(SecurityRule)
-            .filter(SecurityRule.rule_pack_id.in_(pack_ids), SecurityRule.is_active == True)
+            .filter(SecurityRule.rule_pack_id.in_(pack_ids), SecurityRule.is_active)
             .order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc())
             .all()
         )
@@ -279,7 +279,7 @@ class RulesService:
         for rule in managed_rules:
             if self._rule_matches(rule, method, path, headers, query_params or {}, body):
                 rule.match_count += 1
-                rule.last_matched = datetime.utcnow()
+                rule.last_matched = utc_now()
                 self.db.commit()
                 return {
                     "matched": True,

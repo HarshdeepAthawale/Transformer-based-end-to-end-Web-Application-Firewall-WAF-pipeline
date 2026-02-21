@@ -5,6 +5,7 @@ Security events: rate limit hits and DDoS blocks.
 from sqlalchemy import Column, Integer, String, DateTime, Text
 from backend.database import Base
 from datetime import datetime, timezone
+from backend.lib.datetime_utils import utc_now
 
 
 class SecurityEvent(Base):
@@ -13,7 +14,7 @@ class SecurityEvent(Base):
     __tablename__ = "security_events"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
 
     event_type = Column(String(50), nullable=False, index=True)
     ip = Column(String(45), nullable=False, index=True)

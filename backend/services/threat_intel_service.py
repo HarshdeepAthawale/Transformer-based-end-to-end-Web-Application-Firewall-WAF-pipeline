@@ -4,6 +4,7 @@ Threat Intelligence Service
 from sqlalchemy.orm import Session
 from typing import Dict, List
 from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from loguru import logger
 
 from backend.models.threat_intel import ThreatIntel
@@ -41,7 +42,7 @@ class ThreatIntelService:
         
         if ip_threat:
             # Check if expired
-            if ip_threat.expires_at and ip_threat.expires_at < datetime.utcnow():
+            if ip_threat.expires_at and ip_threat.expires_at < utc_now():
                 ip_threat.is_active = False
                 self.db.commit()
             else:
@@ -121,8 +122,8 @@ class ThreatIntelService:
             source=source,
             description=description,
             expires_at=expires_at,
-            first_seen=datetime.utcnow(),
-            last_seen=datetime.utcnow()
+            first_seen=utc_now(),
+            last_seen=utc_now()
         )
         
         self.db.add(threat)
@@ -149,7 +150,7 @@ class ThreatIntelService:
     def cleanup_expired(self):
         """Remove expired threat intelligence entries"""
         expired = self.db.query(ThreatIntel)\
-            .filter(ThreatIntel.expires_at < datetime.utcnow())\
+            .filter(ThreatIntel.expires_at < utc_now())\
             .filter(ThreatIntel.is_active)\
             .all()
         

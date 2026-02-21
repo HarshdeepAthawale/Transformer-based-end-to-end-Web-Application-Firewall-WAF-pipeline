@@ -3,7 +3,7 @@ Bot signatures database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -20,7 +20,7 @@ class BotSignature(Base):
     __tablename__ = "bot_signatures"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Signature details
     user_agent_pattern = Column(String(500), nullable=False, index=True)  # Regex pattern

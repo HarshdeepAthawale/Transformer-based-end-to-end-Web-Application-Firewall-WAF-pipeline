@@ -52,7 +52,7 @@ def check_waf_service():
         if response.status_code == 200:
             print("\033[92m✓ WAF Backend is running\033[0m")
             return True
-    except:
+    except Exception:
         pass
 
     print("\033[91m✗ WAF Backend is not available at http://localhost:3001\033[0m")
@@ -120,22 +120,22 @@ def run_test(script_path: Path, name: str) -> dict:
             if 'Blocked:' in clean_line:
                 try:
                     blocked = int(clean_line.split(':')[1].strip().split()[0])
-                except:
+                except (ValueError, IndexError):
                     pass
             elif 'Missed:' in clean_line:
                 try:
                     missed = int(clean_line.split(':')[1].strip().split()[0])
-                except:
+                except (ValueError, IndexError):
                     pass
             elif 'Errors:' in clean_line:
                 try:
                     errors = int(clean_line.split(':')[1].strip().split()[0])
-                except:
+                except (ValueError, IndexError):
                     pass
             elif 'Total Tests:' in clean_line:
                 try:
                     total = int(clean_line.split(':')[1].strip())
-                except:
+                except (ValueError, IndexError):
                     pass
 
         # Print filtered output (just [BLOCKED] and [MISSED] lines)

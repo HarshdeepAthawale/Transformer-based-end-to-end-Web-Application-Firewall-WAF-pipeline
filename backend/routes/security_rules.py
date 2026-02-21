@@ -1,5 +1,5 @@
 """Security Rules API endpoints (Feature 9: API-first WAF rules)."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, Query, Body, HTTPException
@@ -68,7 +68,7 @@ FEED_FILE_FALLBACK = _resolve_dir / "data" / "managed-rules-feed.json"
 async def get_managed_rules_config():
     """Return whether feed URL is configured (no URL exposed)."""
     feed_configured = bool((config.MANAGED_RULES_FEED_URL or "").strip())
-    return {"success": True, "data": {"feed_url_configured": feed_configured}, "timestamp": datetime.utcnow().isoformat() + "Z"}
+    return {"success": True, "data": {"feed_url_configured": feed_configured}, "timestamp": utc_now().isoformat() + "Z"}
 
 
 @router.get("/managed/feed")

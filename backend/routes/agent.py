@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
@@ -63,7 +63,7 @@ async def chat(body: ChatRequest, request: Request, db: Session = Depends(get_db
     return {
         "success": True,
         "data": result,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -109,7 +109,7 @@ async def submit_feedback(
     return {
         "success": True,
         "message": "Feedback recorded",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -140,7 +140,7 @@ async def execute_action(
     return {
         "success": True,
         "data": result,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -154,5 +154,5 @@ async def get_history(session_id: str, db: Session = Depends(get_db)):
     return {
         "success": True,
         "data": [e.to_dict() for e in experiences],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

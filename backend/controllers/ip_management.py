@@ -1,5 +1,5 @@
 """IP management controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
 
@@ -14,7 +14,7 @@ def get_blacklist(db: Session, limit: int) -> dict:
     return {
         "success": True,
         "data": [e.to_dict() for e in entries],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -24,7 +24,7 @@ def get_whitelist(db: Session, limit: int) -> dict:
     return {
         "success": True,
         "data": [e.to_dict() for e in entries],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -45,13 +45,13 @@ def add_to_blacklist(
         if REDIS_REQUIRED_MSG in str(e):
             raise HTTPException(status_code=503, detail=str(e))
         raise
-    return {"success": True, "data": entry.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": entry.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def add_to_whitelist(db: Session, *, ip: str, reason: str | None = None) -> dict:
     service = IPFencingService(db)
     entry = service.add_to_whitelist(ip=ip, reason=reason)
-    return {"success": True, "data": entry.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": entry.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def remove_from_list(db: Session, ip: str, list_type: str) -> dict:
@@ -72,7 +72,7 @@ def remove_from_list(db: Session, ip: str, list_type: str) -> dict:
     return {
         "success": success,
         "message": f"IP {ip} removed from {list_type}" if success else f"IP {ip} not found in {list_type}",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -80,5 +80,5 @@ def get_ip_reputation(db: Session, ip: str) -> dict:
     service = IPFencingService(db)
     rep = service.get_ip_reputation(ip)
     if not rep:
-        return {"success": False, "message": "IP reputation not found", "timestamp": datetime.utcnow().isoformat()}
-    return {"success": True, "data": rep.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+        return {"success": False, "message": "IP reputation not found", "timestamp": utc_now().isoformat()}
+    return {"success": True, "data": rep.to_dict(), "timestamp": utc_now().isoformat()}

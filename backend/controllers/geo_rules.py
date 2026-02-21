@@ -1,5 +1,5 @@
 """Geo rules controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
@@ -14,7 +14,7 @@ def get_rules(db: Session, active_only: bool) -> dict:
     return {
         "success": True,
         "data": [r.to_dict() for r in rules],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -38,11 +38,11 @@ def create_rule(
         exception_ips=exception_ips,
         reason=reason,
     )
-    return {"success": True, "data": rule.to_dict(), "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": rule.to_dict(), "timestamp": utc_now().isoformat()}
 
 
 def get_geographic_stats(db: Session, range_str: str) -> dict:
     service = GeoFencingService(db)
     start_time, _ = parse_time_range(range_str)
     stats = service.get_geographic_stats(start_time)
-    return {"success": True, "data": stats, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": stats, "timestamp": utc_now().isoformat()}

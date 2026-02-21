@@ -1,5 +1,5 @@
 """Managed rules (rule packs) controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.models.rule_packs import RulePack
@@ -12,13 +12,13 @@ def get_managed_packs(db: Session, enabled_only: bool = True) -> dict:
     """List rule packs with optional filter by enabled. Returns packs with rule count."""
     query = db.query(RulePack)
     if enabled_only:
-        query = query.filter(RulePack.enabled == True)
+        query = query.filter(RulePack.enabled)
     packs = query.order_by(RulePack.name).all()
     result = []
     for p in packs:
         count = db.query(SecurityRule).filter(
             SecurityRule.rule_pack_id == p.id,
-            SecurityRule.is_active == True,
+            SecurityRule.is_active,
         ).count()
         d = p.to_dict()
         d["rule_count"] = count
@@ -26,7 +26,7 @@ def get_managed_packs(db: Session, enabled_only: bool = True) -> dict:
     return {
         "success": True,
         "data": result,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -35,15 +35,15 @@ def get_managed_rules_for_gateway(db: Session, enabled_only: bool = True) -> dic
     Response for GET /api/rules/managed?enabled_only=true.
     Shape: { "packs": [ { "pack_id", "version", "rules": [ { "id", "name", "pattern", "applies_to", "action" } ] } ] }
     """
-    query = db.query(RulePack).filter(RulePack.enabled == True)
+    query = db.query(RulePack).filter(RulePack.enabled)
     if enabled_only:
-        query = query.filter(RulePack.enabled == True)
+        query = query.filter(RulePack.enabled)
     packs = query.all()
     packs_payload = []
     for p in packs:
         rules = (
             db.query(SecurityRule)
-            .filter(SecurityRule.rule_pack_id == p.id, SecurityRule.is_active == True)
+            .filter(SecurityRule.rule_pack_id == p.id, SecurityRule.is_active)
             .all()
         )
         packs_payload.append({
@@ -70,15 +70,15 @@ def toggle_pack(db: Session, pack_id: str, enabled: bool) -> dict:
     """Enable or disable a rule pack by pack_id."""
     pack = db.query(RulePack).filter(RulePack.pack_id == pack_id).first()
     if not pack:
-        return {"success": False, "message": "Pack not found", "timestamp": datetime.utcnow().isoformat()}
+        return {"success": False, "message": "Pack not found", "timestamp": utc_now().isoformat()}
     pack.enabled = bool(enabled)
-    pack.updated_at = datetime.utcnow()
+    pack.updated_at = utc_now()
     db.commit()
     db.refresh(pack)
     return {
         "success": True,
         "data": pack.to_dict(),
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -92,7 +92,7 @@ def sync_managed_rules(db: Session, pack_id: str | None = None) -> dict:
         return {
             "success": False,
             "message": "MANAGED_RULES_FEED_URL is not set",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         }
     if pack_id:
         pack = db.query(RulePack).filter(RulePack.pack_id == pack_id).first()
@@ -100,7 +100,7 @@ def sync_managed_rules(db: Session, pack_id: str | None = None) -> dict:
             return {
                 "success": False,
                 "message": f"Pack {pack_id} not found or has no source_url",
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": utc_now().isoformat(),
             }
         name, source_url, feed_format = pack.name, pack.source_url, "json"
     else:
@@ -122,10 +122,10 @@ def sync_managed_rules(db: Session, pack_id: str | None = None) -> dict:
             "success": False,
             "message": result["error"],
             "detail": result,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         }
     return {
         "success": True,
         "data": result,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

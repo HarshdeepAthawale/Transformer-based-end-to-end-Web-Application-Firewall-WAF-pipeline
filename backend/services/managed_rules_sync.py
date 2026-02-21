@@ -4,14 +4,13 @@ No hardcoded rule content or URLs; all from config/DB.
 """
 import re
 import json
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from typing import Any, Dict, List, Optional
 
 import httpx
 from loguru import logger
 from sqlalchemy.orm import Session
 
-from backend.config import config
 from backend.models.rule_packs import RulePack
 from backend.models.security_rules import SecurityRule, RuleAction
 
@@ -166,7 +165,7 @@ def sync_pack(
         return {"rules_created": 0, "rules_updated": 0, "version": pack.version, "error": str(e)}
 
     rules_data = parse_feed(raw, feed_format)
-    version = version_from_feed or (datetime.utcnow().strftime("%Y%m%d%H%M") if not version_from_feed else pack.version)
+    version = version_from_feed or (utc_now().strftime("%Y%m%d%H%M") if not version_from_feed else pack.version)
 
     rules_created = 0
     rules_updated = 0
@@ -216,9 +215,9 @@ def sync_pack(
             existing_by_pattern_name[(new_rule.pattern, new_rule.name)] = new_rule
 
     pack.version = version
-    pack.last_synced_at = datetime.utcnow()
+    pack.last_synced_at = utc_now()
     pack.source_url = source_url
-    pack.updated_at = datetime.utcnow()
+    pack.updated_at = utc_now()
     db.commit()
 
     logger.info(f"Managed rules sync {pack_id}: created={rules_created}, updated={rules_updated}, version={version}")

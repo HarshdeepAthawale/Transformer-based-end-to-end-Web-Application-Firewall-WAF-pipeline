@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { ThumbsUp, ThumbsDown, User, Bot, Wrench } from 'lucide-react'
 import { IntentBadge } from './intent-badge'
 import { SuggestedActionButton } from './suggested-action-button'
@@ -83,7 +84,7 @@ export function ChatMessage({ message }: Props) {
             <p className="text-sm" style={{ fontFamily: 'var(--font-space-grotesk)' }}>{message.content}</p>
           ) : (
             <div className="prose prose-sm max-w-none text-sm [&_table]:text-xs [&_th]:px-2 [&_td]:px-2 [&_th]:py-1 [&_td]:py-1 [&_table]:border-collapse [&_th]:border [&_td]:border" style={{ fontFamily: 'var(--font-space-grotesk)' }}>
-              <ReactMarkdown>{message.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown>
             </div>
           )}
         </div>

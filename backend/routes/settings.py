@@ -6,6 +6,7 @@ from typing import Any, Dict
 from backend.database import get_db
 from backend.auth import require_waf_api_auth
 from backend.controllers import settings as ctrl
+from backend.lib.datetime_utils import utc_now
 
 router = APIRouter()
 
@@ -17,7 +18,7 @@ async def get_settings(db: Session = Depends(get_db)):
     return {
         "success": True,
         "data": data,
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -32,7 +33,7 @@ async def update_settings(
         "success": True,
         "data": data,
         "message": "Settings updated",
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -43,7 +44,7 @@ async def get_retention():
     return {
         "success": True,
         "data": data,
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -54,7 +55,7 @@ async def get_alerting_settings(db: Session = Depends(get_db)):
     return {
         "success": True,
         "data": data,
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -70,5 +71,5 @@ async def update_alerting_settings(
         "success": True,
         "data": data,
         "message": "Alerting settings updated",
-        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

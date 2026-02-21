@@ -225,7 +225,7 @@ export default function SettingsPage() {
   return (
     <div className="flex h-screen bg-background text-foreground">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header timeRange={timeRange} onTimeRangeChange={setTimeRange} />
         <main className="flex-1 overflow-auto">
           <div className="p-6 max-w-4xl mx-auto">

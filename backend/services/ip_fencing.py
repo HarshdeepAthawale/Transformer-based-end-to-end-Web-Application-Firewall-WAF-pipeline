@@ -2,7 +2,8 @@
 IP Fencing Service
 """
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import timedelta, timezone
+from backend.lib.datetime_utils import utc_now
 from typing import List, Optional, Tuple
 import ipaddress
 from loguru import logger
@@ -35,11 +36,16 @@ class IPFencingService:
             .first()
         
         if exact_match:
-            # Check if temporary block expired
-            if exact_match.expires_at and exact_match.expires_at < datetime.utcnow():
-                exact_match.is_active = False
-                self.db.commit()
-                return False, None
+            # Check if temporary block expired (expires_at may be naive from DB)
+            now = utc_now()
+            exp = exact_match.expires_at
+            if exp is not None:
+                if exp.tzinfo is None:
+                    exp = exp.replace(tzinfo=timezone.utc)
+                if exp < now:
+                    exact_match.is_active = False
+                    self.db.commit()
+                    return False, None
             return True, exact_match.reason or "IP is blacklisted"
         
         # Check IP ranges (CIDR)
@@ -117,7 +123,7 @@ class IPFencingService:
         if not reputation:
             reputation = IPReputation(
                 ip=ip,
-                first_seen=datetime.utcnow(),
+                first_seen=utc_now(),
                 country_code=country_code,
                 asn=asn,
                 isp=isp,
@@ -165,7 +171,7 @@ class IPFencingService:
             geo * weights['geo']
         )
         
-        reputation.last_seen = datetime.utcnow()
+        reputation.last_seen = utc_now()
         if country_code:
             reputation.country_code = country_code
         if asn:
@@ -184,7 +190,7 @@ class IPFencingService:
         if not reputation:
             reputation = IPReputation(
                 ip=ip,
-                first_seen=datetime.utcnow(),
+                first_seen=utc_now(),
                 total_requests=0,
                 blocked_requests=0,
                 anomaly_count=0,
@@ -218,7 +224,7 @@ class IPFencingService:
         if is_threat:
             reputation.threat_count = (reputation.threat_count or 0) + 1
         
-        reputation.last_seen = datetime.utcnow()
+        reputation.last_seen = utc_now()
         
         # Update recent activity score based on behavior
         if reputation.total_requests > 0:
@@ -248,7 +254,7 @@ class IPFencingService:
             return existing
         
         # Create auto-block
-        expires_at = datetime.utcnow() + timedelta(hours=duration_hours)
+        expires_at = utc_now() + timedelta(hours=duration_hours)
         block = IPBlacklist(
             ip=ip,
             list_type=IPListType.BLACKLIST,
@@ -277,7 +283,7 @@ class IPFencingService:
         """Add IP to blacklist"""
         expires_at = None
         if duration_hours:
-            expires_at = datetime.utcnow() + timedelta(hours=duration_hours)
+            expires_at = utc_now() + timedelta(hours=duration_hours)
         
         block = IPBlacklist(
             ip=ip,
@@ -346,7 +352,7 @@ class IPFencingService:
     def cleanup_expired_blocks(self):
         """Remove expired temporary blocks"""
         expired = self.db.query(IPBlacklist)\
-            .filter(IPBlacklist.expires_at < datetime.utcnow())\
+            .filter(IPBlacklist.expires_at < utc_now())\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.auto_unblock)\
             .all()

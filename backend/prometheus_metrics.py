@@ -2,7 +2,8 @@
 Prometheus metrics from security_events and traffic (Feature 10).
 Data source: DB aggregates; no mock values.
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from typing import List, Tuple
 
 from sqlalchemy.orm import Session
@@ -39,7 +40,7 @@ def gather_metrics(db: Session, window_minutes: int = 60) -> List[Tuple[str, dic
     Query security_events for the last window_minutes and return list of
     (metric_name, labels_dict, value) for counters/gauges.
     """
-    start_time = datetime.utcnow() - timedelta(minutes=window_minutes)
+    start_time = utc_now() - timedelta(minutes=window_minutes)
     results = []
 
     # Total events in window (requests)

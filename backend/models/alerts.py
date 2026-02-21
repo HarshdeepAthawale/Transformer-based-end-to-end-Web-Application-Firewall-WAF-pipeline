@@ -3,7 +3,7 @@ Alerts database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -24,7 +24,7 @@ class Alert(Base):
     __tablename__ = "alerts"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     type = Column(Enum(AlertType), nullable=False, index=True)
     severity = Column(Enum(AlertSeverity), nullable=False, index=True)

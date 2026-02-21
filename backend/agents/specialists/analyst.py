@@ -14,6 +14,12 @@ When analyzing:
 
 Format your responses in markdown. Include relevant numbers and percentages.
 When discussing trends, mention direction (increasing/decreasing), magnitude, and potential causes.
+
+For any list or tabular data, use a GitHub Flavored Markdown table: one header row, then a separator row with |---| for each column, then one row per item. Example:
+
+| Col A | Col B |
+|-------|-------|
+| a     | b     |
 """
 
 TOOL_NAMES = [

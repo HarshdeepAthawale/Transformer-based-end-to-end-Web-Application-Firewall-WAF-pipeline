@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Dict, List
 
 import re
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 from loguru import logger
 
@@ -98,7 +98,7 @@ class BotDetectionService:
             try:
                 if re.search(signature.user_agent_pattern, user_agent, re.IGNORECASE):
                     signature.detection_count += 1
-                    signature.last_detected = datetime.utcnow()
+                    signature.last_detected = utc_now()
                     self.db.commit()
 
                     if signature.is_whitelisted:

@@ -3,7 +3,7 @@ Account settings key-value store for B2B SaaS preferences.
 """
 from sqlalchemy import Column, Integer, String, Text, DateTime
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class AccountSetting(Base):
@@ -11,7 +11,7 @@ class AccountSetting(Base):
     __tablename__ = "account_settings"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     key = Column(String(100), unique=True, nullable=False, index=True)
     value = Column(Text, nullable=True)  # JSON string

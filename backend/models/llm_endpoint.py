@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class LLMEndpoint(Base):
@@ -15,8 +15,8 @@ class LLMEndpoint(Base):
     methods = Column(String(100), nullable=False)       # e.g. POST or POST,PUT
     label = Column(String(100), nullable=False)         # e.g. chat
     is_active = Column(Boolean, default=True, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     def to_dict(self):
         return {

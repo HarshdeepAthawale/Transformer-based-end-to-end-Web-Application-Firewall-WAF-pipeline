@@ -9,9 +9,11 @@ in the database but not enforced at the gateway.
 import json
 import os
 from datetime import datetime
-from typing import Optional
 
 from loguru import logger
+
+from backend.lib.datetime_utils import utc_now
+from typing import Optional
 
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
@@ -58,7 +60,7 @@ def sync_add(ip: str, reason: Optional[str] = None, expires_at: Optional[datetim
     val = json.dumps({"reason": reason or "IP is blacklisted"})
     try:
         if expires_at:
-            ttl = max(1, int((expires_at - datetime.utcnow()).total_seconds()))
+            ttl = max(1, int((expires_at - utc_now()).total_seconds()))
             r.setex(key, ttl, val)
         else:
             r.set(key, val)
@@ -132,7 +134,7 @@ def sync_full_blacklist(entries: list) -> int:
             if expires_at:
                 if isinstance(expires_at, str):
                     expires_at = datetime.fromisoformat(expires_at.replace("Z", "+00:00"))
-                ttl = max(1, int((expires_at - datetime.utcnow()).total_seconds()))
+                ttl = max(1, int((expires_at - utc_now()).total_seconds()))
                 r.setex(key, ttl, val)
             else:
                 r.set(key, val)

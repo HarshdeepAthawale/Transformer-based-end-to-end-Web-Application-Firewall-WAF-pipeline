@@ -2,7 +2,7 @@
 
 import json
 import shutil
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -45,7 +45,7 @@ class ModelVersionManager:
         if not src.exists():
             raise FileNotFoundError(f"Model not found: {model_path}")
 
-        version_id = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        version_id = utc_now().strftime("%Y%m%d_%H%M%S")
         dest = self.versions_dir / version_id
         dest.mkdir(parents=True, exist_ok=True)
 
@@ -55,7 +55,7 @@ class ModelVersionManager:
 
         entry = {
             "id": version_id,
-            "created_at": datetime.utcnow().isoformat(),
+            "created_at": utc_now().isoformat(),
             "source": str(src),
             "metadata": metadata or {},
         }

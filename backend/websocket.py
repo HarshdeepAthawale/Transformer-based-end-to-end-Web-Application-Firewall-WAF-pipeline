@@ -5,7 +5,7 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from typing import List, Dict, Set
 import json
 import asyncio
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from loguru import logger
 
 
@@ -24,8 +24,8 @@ class ConnectionManager:
         self.active_connections.append(websocket)
         self.subscriptions[websocket] = set()  # All message types by default
         self.connection_metadata[websocket] = {
-            "connected_at": datetime.utcnow().isoformat(),
-            "last_ping": datetime.utcnow().isoformat()
+            "connected_at": utc_now().isoformat(),
+            "last_ping": utc_now().isoformat()
         }
         logger.info(f"WebSocket connected. Total connections: {len(self.active_connections)}")
         
@@ -34,7 +34,7 @@ class ConnectionManager:
             json.dumps({
                 "type": "connection",
                 "status": "connected",
-                "timestamp": datetime.utcnow().isoformat()
+                "timestamp": utc_now().isoformat()
             }),
             websocket
         )
@@ -62,7 +62,7 @@ class ConnectionManager:
         message = {
             "type": message_type,
             "data": data,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": utc_now().isoformat()
         }
         message_json = json.dumps(message)
         
@@ -169,10 +169,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 if msg_type == "ping":
                     # Update last ping time
                     if websocket in manager.connection_metadata:
-                        manager.connection_metadata[websocket]["last_ping"] = datetime.utcnow().isoformat()
+                        manager.connection_metadata[websocket]["last_ping"] = utc_now().isoformat()
                     
                     await manager.send_personal_message(
-                        json.dumps({"type": "pong", "timestamp": datetime.utcnow().isoformat()}),
+                        json.dumps({"type": "pong", "timestamp": utc_now().isoformat()}),
                         websocket
                     )
                 
@@ -185,7 +185,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             json.dumps({
                                 "type": "subscribed",
                                 "message_types": message_types,
-                                "timestamp": datetime.utcnow().isoformat()
+                                "timestamp": utc_now().isoformat()
                             }),
                             websocket
                         )
@@ -199,7 +199,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             json.dumps({
                                 "type": "unsubscribed",
                                 "message_types": message_types,
-                                "timestamp": datetime.utcnow().isoformat()
+                                "timestamp": utc_now().isoformat()
                             }),
                             websocket
                         )
@@ -211,7 +211,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         json.dumps({
                             "type": "subscriptions",
                             "message_types": subscriptions,
-                            "timestamp": datetime.utcnow().isoformat()
+                            "timestamp": utc_now().isoformat()
                         }),
                         websocket
                     )

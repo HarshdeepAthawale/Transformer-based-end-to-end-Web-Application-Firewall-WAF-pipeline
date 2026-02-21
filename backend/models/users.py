@@ -3,7 +3,7 @@ User authentication and authorization models
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 import hashlib
 import secrets
@@ -20,7 +20,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # User information
     username = Column(String(100), unique=True, nullable=False, index=True)

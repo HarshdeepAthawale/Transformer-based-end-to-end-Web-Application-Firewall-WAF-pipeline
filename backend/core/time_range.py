@@ -2,6 +2,7 @@
 Time range parsing utility for range query params (e.g. 24h, 7d).
 """
 from datetime import datetime, timedelta
+from backend.lib.datetime_utils import utc_now
 from typing import Tuple
 
 
@@ -10,7 +11,7 @@ def parse_time_range(range_str: str) -> Tuple[datetime, datetime]:
     Parse a range string like '1h', '24h', '7d', '30d' into (start_time, end_time).
     end_time is utcnow(); start_time is end_time - range.
     """
-    now = datetime.utcnow()
+    now = utc_now()
     range_str = (range_str or "24h").strip().lower()
     hours = 24
     if range_str.endswith("h"):

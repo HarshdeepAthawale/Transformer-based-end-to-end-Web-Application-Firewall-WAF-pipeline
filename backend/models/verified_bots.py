@@ -3,9 +3,9 @@ Verified bots database model.
 Separate from bot_signatures for clear separation and bulk sync from URL.
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, Integer, String, DateTime
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class VerifiedBot(Base):
@@ -18,7 +18,7 @@ class VerifiedBot(Base):
     user_agent_pattern = Column(String(500), nullable=False, index=True)
     source = Column(String(50), nullable=False, default="manual")  # manual | remote
     synced_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
 
     def to_dict(self):
         return {

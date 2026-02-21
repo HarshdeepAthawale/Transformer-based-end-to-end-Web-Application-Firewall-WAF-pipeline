@@ -29,7 +29,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-screen text-foreground" style={{ backgroundColor: 'var(--positivus-gray)' }}>
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         <Header timeRange={timeRange} onTimeRangeChange={setTimeRange} />
         <main className="flex-1 overflow-auto">
           <ErrorBoundary>

@@ -14,6 +14,12 @@ When performing forensics:
 
 Format your responses in markdown. Use chronological ordering for timelines.
 Highlight key findings and anomalies. Include IP addresses, timestamps, and event details.
+
+For any list or tabular data, use a GitHub Flavored Markdown table: one header row, then a separator row with |---| for each column, then one row per item. Example:
+
+| Col A | Col B |
+|-------|-------|
+| a     | b     |
 """
 
 TOOL_NAMES = [

@@ -1,5 +1,5 @@
 """Activities controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.activity_service import ActivityService
@@ -12,7 +12,7 @@ def get_recent(db: Session, limit: int) -> dict:
     return {
         "success": True,
         "data": [a.to_dict() for a in activities],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -23,5 +23,5 @@ def get_by_range(db: Session, range_str: str) -> dict:
     return {
         "success": True,
         "data": [a.to_dict() for a in activities],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

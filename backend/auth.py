@@ -1,7 +1,8 @@
 """
 Authentication and Authorization
 """
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from typing import Optional, Union
 import jwt
 import secrets
@@ -28,8 +29,8 @@ def create_access_token(user_id: int, username: str, role: UserRole) -> str:
         "user_id": user_id,
         "username": username,
         "role": role.value,
-        "exp": datetime.utcnow() + timedelta(seconds=JWT_EXPIRY),
-        "iat": datetime.utcnow()
+        "exp": utc_now() + timedelta(seconds=JWT_EXPIRY),
+        "iat": utc_now()
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 

@@ -1,5 +1,5 @@
 """Traffic controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.traffic_service import TrafficService
@@ -12,7 +12,7 @@ def get_recent(db: Session, limit: int) -> dict:
     return {
         "success": True,
         "data": [log.to_dict() for log in logs],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -23,7 +23,7 @@ def get_by_range(db: Session, range_str: str) -> dict:
     return {
         "success": True,
         "data": [log.to_dict() for log in logs],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -34,5 +34,5 @@ def get_by_endpoint(db: Session, endpoint: str, range_str: str) -> dict:
     return {
         "success": True,
         "data": [log.to_dict() for log in logs],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

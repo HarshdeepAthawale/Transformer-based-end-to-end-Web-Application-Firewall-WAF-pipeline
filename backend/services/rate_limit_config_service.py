@@ -17,7 +17,7 @@ class RateLimitConfigService:
         if zone_id is not None:
             q = q.filter(RateLimitConfig.zone_id == zone_id)
         if active_only:
-            q = q.filter(RateLimitConfig.is_active == True)
+            q = q.filter(RateLimitConfig.is_active)
         return q.order_by(RateLimitConfig.id).all()
 
     def get_by_id(self, config_id: int) -> RateLimitConfig | None:

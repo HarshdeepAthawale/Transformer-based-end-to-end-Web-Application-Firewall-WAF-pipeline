@@ -10,7 +10,6 @@ from backend.database import get_db
 from backend.config import config
 from backend.services.llm_endpoint_service import (
     list_endpoints,
-    get_endpoint,
     create_endpoint,
     update_endpoint,
     delete_endpoint,

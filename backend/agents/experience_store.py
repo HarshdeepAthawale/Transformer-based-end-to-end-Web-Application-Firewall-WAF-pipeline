@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from typing import List, Optional
 
 from sqlalchemy import desc
@@ -72,7 +72,7 @@ class ExperienceStore:
             return None
         exp.feedback_score = score
         exp.feedback_text = text
-        exp.feedback_at = datetime.utcnow()
+        exp.feedback_at = utc_now()
         self.db.commit()
         self.db.refresh(exp)
         return exp

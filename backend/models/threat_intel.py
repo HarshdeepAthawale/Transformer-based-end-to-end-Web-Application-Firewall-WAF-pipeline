@@ -3,7 +3,7 @@ Threat intelligence database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Float, Text, Boolean
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class ThreatIntel(Base):
@@ -11,7 +11,7 @@ class ThreatIntel(Base):
     __tablename__ = "threat_intel"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Threat information
     threat_type = Column(String(50), nullable=False, index=True)  # ip, domain, signature, etc.

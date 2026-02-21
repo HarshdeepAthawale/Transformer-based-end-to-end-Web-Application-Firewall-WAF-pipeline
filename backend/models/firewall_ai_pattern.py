@@ -2,7 +2,7 @@
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class FirewallAIPattern(Base):
@@ -15,7 +15,7 @@ class FirewallAIPattern(Base):
     pattern_value = Column(String(1000), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
     source = Column(String(50), default="manual")       # manual | remote
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
 
     def to_dict(self):
         return {

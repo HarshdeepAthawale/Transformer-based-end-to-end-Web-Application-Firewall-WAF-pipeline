@@ -1,6 +1,6 @@
 """Charts controller."""
 
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
@@ -13,14 +13,14 @@ def get_requests(db: Session, range_str: str) -> dict:
     service = ChartsService(db)
     start_time, _ = parse_time_range(range_str)
     data = service.get_requests_chart_data(start_time)
-    return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": data, "timestamp": utc_now().isoformat()}
 
 
 def get_threats(db: Session, range_str: str) -> dict:
     service = ChartsService(db)
     start_time, _ = parse_time_range(range_str)
     data = service.get_threats_chart_data(start_time)
-    return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": data, "timestamp": utc_now().isoformat()}
 
 
 def _aggregate_security_events(db: Session, start_time, event_types: list[str]) -> list:
@@ -44,7 +44,7 @@ def _aggregate_security_events(db: Session, start_time, event_types: list[str]) 
 def get_rate_limit_chart(db: Session, range_str: str) -> dict:
     start_time, _ = parse_time_range(range_str)
     data = _aggregate_security_events(db, start_time, ["rate_limit"])
-    return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": data, "timestamp": utc_now().isoformat()}
 
 
 def get_ddos_chart(db: Session, range_str: str) -> dict:
@@ -52,4 +52,4 @@ def get_ddos_chart(db: Session, range_str: str) -> dict:
     data = _aggregate_security_events(
         db, start_time, ["ddos_burst", "ddos_blocked", "ddos_size"]
     )
-    return {"success": True, "data": data, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": data, "timestamp": utc_now().isoformat()}

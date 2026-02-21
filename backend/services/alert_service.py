@@ -1,12 +1,14 @@
 """
 Alert Service
 """
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
+import json
 from datetime import datetime
 from typing import List
-import json
 
+from sqlalchemy import desc
+from sqlalchemy.orm import Session
+
+from backend.lib.datetime_utils import utc_now
 from backend.models.alerts import Alert, AlertType, AlertSeverity
 
 
@@ -19,8 +21,8 @@ class AlertService:
     def get_active_alerts(self) -> List[Alert]:
         """Get active alerts (active and not dismissed)."""
         return self.db.query(Alert)\
-            .filter(Alert.is_active == True)\
-            .filter(Alert.is_dismissed == False)\
+            .filter(Alert.is_active)\
+            .filter(~Alert.is_dismissed)\
             .order_by(desc(Alert.timestamp))\
             .all()
     
@@ -71,7 +73,7 @@ class AlertService:
         if alert:
             alert.is_dismissed = True
             alert.is_active = False
-            alert.dismissed_at = datetime.utcnow()
+            alert.dismissed_at = utc_now()
             self.db.commit()
             return True
         return False
@@ -81,7 +83,7 @@ class AlertService:
         alert = self.db.query(Alert).filter(Alert.id == alert_id).first()
         if alert:
             alert.is_acknowledged = True
-            alert.acknowledged_at = datetime.utcnow()
+            alert.acknowledged_at = utc_now()
             self.db.commit()
             return True
         return False

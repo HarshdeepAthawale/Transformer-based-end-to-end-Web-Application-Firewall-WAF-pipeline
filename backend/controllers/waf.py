@@ -1,5 +1,5 @@
 """WAF controller. Uses app-state WAF service or core.waf_factory."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -54,7 +54,7 @@ async def check_batch(
             body=r.get("body"),
         )
         results.append(res)
-    return {"success": True, "data": results, "timestamp": datetime.utcnow().isoformat()}
+    return {"success": True, "data": results, "timestamp": utc_now().isoformat()}
 
 
 def get_stats(waf_service: Any = None) -> Dict:
@@ -69,7 +69,7 @@ def get_stats(waf_service: Any = None) -> Dict:
                 "average_processing_time_ms": 0.0,
                 "threshold": 0.5,
             },
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now().isoformat(),
         }
     metrics = svc.get_metrics() if hasattr(svc, "get_metrics") else {}
     return {
@@ -82,7 +82,7 @@ def get_stats(waf_service: Any = None) -> Dict:
             "threshold": getattr(svc, "threshold", 0.5),
             "model_loaded": True,
         },
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -95,7 +95,7 @@ def get_config(waf_service: Any = None) -> Dict:
             "model_available": svc is not None,
             "service_enabled": True,
         },
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -110,7 +110,7 @@ def update_config(threshold: float, waf_service: Any = None) -> Dict:
     return {
         "success": True,
         "data": {"threshold": threshold, "message": "Configuration updated successfully"},
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -153,5 +153,5 @@ def get_model_info(waf_service: Any = None) -> Dict:
             "project_root": str(root),
             "metrics": metrics,
         },
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

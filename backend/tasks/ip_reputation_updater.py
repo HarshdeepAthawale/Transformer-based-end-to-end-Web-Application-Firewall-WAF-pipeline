@@ -3,7 +3,8 @@ IP Reputation Updater Background Worker
 """
 import threading
 import time
-from datetime import datetime, timedelta
+from datetime import timedelta
+from backend.lib.datetime_utils import utc_now
 from loguru import logger
 
 from backend.database import SessionLocal
@@ -54,7 +55,7 @@ class IPReputationUpdater:
             ip_fencing = IPFencingService(db)
             
             # Get IPs with recent activity (last 24 hours)
-            start_time = datetime.utcnow() - timedelta(hours=24)
+            start_time = utc_now() - timedelta(hours=24)
             
             ips_with_activity = db.query(
                 TrafficLog.ip,

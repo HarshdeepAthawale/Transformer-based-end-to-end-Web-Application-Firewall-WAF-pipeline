@@ -3,7 +3,7 @@ Threats database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -19,7 +19,7 @@ class Threat(Base):
     __tablename__ = "threats"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Threat classification
     type = Column(String(50), nullable=False, index=True)  # SQL injection, XSS, DDoS, etc.

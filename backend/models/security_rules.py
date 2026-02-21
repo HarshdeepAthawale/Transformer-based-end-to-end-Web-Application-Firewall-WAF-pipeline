@@ -3,7 +3,7 @@ Security rules database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text, ForeignKey
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -26,7 +26,7 @@ class SecurityRule(Base):
     __tablename__ = "security_rules"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Rule information
     name = Column(String(200), nullable=False)

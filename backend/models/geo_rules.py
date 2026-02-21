@@ -3,7 +3,7 @@ Geo-fencing rules database model
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 import enum
 
 
@@ -17,7 +17,7 @@ class GeoRule(Base):
     __tablename__ = "geo_rules"
 
     id = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime, default=datetime.utcnow, index=True, nullable=False)
+    timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Rule type
     rule_type = Column(Enum(GeoRuleType), nullable=False, index=True)

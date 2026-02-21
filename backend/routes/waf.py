@@ -1,7 +1,7 @@
 """
 WAF Service API endpoints. Uses controllers + schemas.
 """
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from typing import List
 from fastapi import APIRouter, Request, HTTPException
 
@@ -72,8 +72,8 @@ async def get_waf_middleware_metrics():
         from backend.middleware.waf_middleware import WAFMiddleware
         if WAFMiddleware._instance is not None:
             metrics = WAFMiddleware._instance.get_metrics()
-            return {"success": True, "data": metrics, "timestamp": datetime.utcnow().isoformat()}
+            return {"success": True, "data": metrics, "timestamp": utc_now().isoformat()}
     except Exception as e:
         import logging
         logging.getLogger(__name__).error("Error getting WAF middleware metrics: %s", e)
-    return {"success": False, "message": "WAF middleware metrics not available", "timestamp": datetime.utcnow().isoformat()}
+    return {"success": False, "message": "WAF middleware metrics not available", "timestamp": utc_now().isoformat()}

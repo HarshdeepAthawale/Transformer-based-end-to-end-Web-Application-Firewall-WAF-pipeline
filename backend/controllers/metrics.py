@@ -1,5 +1,5 @@
 """Metrics controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.metrics_service import MetricsService
@@ -12,7 +12,7 @@ def get_realtime(db: Session) -> dict:
     return {
         "success": True,
         "data": metrics,
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -23,5 +23,5 @@ def get_historical(db: Session, range_str: str) -> dict:
     return {
         "success": True,
         "data": [m.to_dict() for m in metrics],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

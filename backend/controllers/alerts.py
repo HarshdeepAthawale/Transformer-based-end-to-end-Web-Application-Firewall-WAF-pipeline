@@ -1,5 +1,5 @@
 """Alerts controller."""
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 
 from backend.services.alert_service import AlertService
@@ -12,7 +12,7 @@ def get_active(db: Session) -> dict:
     return {
         "success": True,
         "data": [a.to_dict() for a in alerts],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -23,7 +23,7 @@ def get_history(db: Session, range_str: str) -> dict:
     return {
         "success": True,
         "data": [a.to_dict() for a in alerts],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -33,7 +33,7 @@ def dismiss(db: Session, alert_id: int) -> dict:
     return {
         "success": success,
         "message": "Alert dismissed" if success else "Alert not found",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }
 
 
@@ -43,5 +43,5 @@ def acknowledge(db: Session, alert_id: int) -> dict:
     return {
         "success": success,
         "message": "Alert acknowledged" if success else "Alert not found",
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": utc_now().isoformat(),
     }

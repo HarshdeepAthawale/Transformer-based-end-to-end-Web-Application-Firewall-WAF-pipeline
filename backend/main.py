@@ -24,7 +24,6 @@ from backend.routes import (
     threats,
     analytics,
     events,
-    scan,
     stats,
     firewall_ai,
     ddos,
@@ -271,7 +270,18 @@ app.include_router(threats.router, prefix="/api/threats", tags=["threats"])
 
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(events.router, prefix="/api/events", tags=["events"])
-app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
+try:
+    from backend.routes import scan
+    app.include_router(scan.router, prefix="/api/scan", tags=["scan"])
+    logger.info("✓ Registered routes: /api/scan")
+except (ImportError, RuntimeError) as e:
+    _scan_stub = APIRouter()
+    _scan_detail = "Upload scan not available. Install python-multipart: pip install python-multipart and restart the backend."
+    @_scan_stub.post("/upload")
+    def _scan_stub_upload():
+        raise HTTPException(status_code=503, detail=_scan_detail)
+    app.include_router(_scan_stub, prefix="/api/scan", tags=["scan"])
+    logger.warning(f"Scan route stub registered (install python-multipart for /api/scan/upload): {e}")
 app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 app.include_router(firewall_ai.router, prefix="/api/firewall-ai", tags=["firewall-ai"])
 app.include_router(ddos.router, prefix="/api/ddos", tags=["ddos"])

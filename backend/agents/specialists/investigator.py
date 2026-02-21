@@ -14,6 +14,12 @@ When investigating:
 
 Format your responses in markdown. Use tables for structured data. Highlight critical findings with **bold** text.
 Always include your assessment of severity and recommended next steps.
+
+For any list or tabular data, use a GitHub Flavored Markdown table: one header row, then a separator row with |---| for each column, then one row per item. Example:
+
+| Col A | Col B |
+|-------|-------|
+| a     | b     |
 """
 
 TOOL_NAMES = [

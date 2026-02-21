@@ -1,7 +1,6 @@
 """Scan API: upload scan endpoint for gateway to call."""
 
 from fastapi import APIRouter, File, UploadFile, HTTPException
-from loguru import logger
 
 from backend.config import config
 from backend.services.upload_scan_service import scan_bytes

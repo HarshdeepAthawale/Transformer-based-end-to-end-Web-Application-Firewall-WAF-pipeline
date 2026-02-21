@@ -3,7 +3,7 @@ Rule pack (managed ruleset) model for OWASP CRS and other feed-based rule packs.
 """
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 from backend.database import Base
-from datetime import datetime
+from backend.lib.datetime_utils import utc_now
 
 
 class RulePack(Base):
@@ -17,8 +17,8 @@ class RulePack(Base):
     version = Column(String(100), nullable=True)
     enabled = Column(Boolean, default=True, nullable=False, index=True)
     last_synced_at = Column(DateTime, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utc_now, nullable=False)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now, nullable=False)
 
     def to_dict(self):
         return {
