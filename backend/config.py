@@ -111,6 +111,13 @@ class Config:
     FIREWALL_AI_ABUSE_RATE_PER_MINUTE: int = int(os.getenv("FIREWALL_AI_ABUSE_RATE_PER_MINUTE", "60"))
     FIREWALL_AI_PATTERNS_REFRESH_SECONDS: int = int(os.getenv("FIREWALL_AI_PATTERNS_REFRESH_SECONDS", "300"))
 
+    # WAF API auth (Feature 9: API-first rules/bot/rate-limits)
+    API_AUTH_REQUIRED: bool = os.getenv("API_AUTH_REQUIRED", "true").lower() == "true"
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "")
+    JWT_EXPIRY: int = int(os.getenv("JWT_EXPIRY", "3600"))
+    API_KEY_HEADER: str = os.getenv("API_KEY_HEADER", "X-API-Key")
+    API_KEYS: str = os.getenv("API_KEYS", "")  # Comma-separated valid API keys
+
     # Credential leak protection (HIBP k-anonymity)
     CREDENTIAL_LEAK_ENABLED: bool = os.getenv("CREDENTIAL_LEAK_ENABLED", "false").lower() == "true"
     CREDENTIAL_LEAK_API_URL: str = os.getenv("CREDENTIAL_LEAK_API_URL", "https://api.pwnedpasswords.com/range/")
@@ -121,6 +128,18 @@ class Config:
     CREDENTIAL_LEAK_ACTION: str = os.getenv("CREDENTIAL_LEAK_ACTION", "block")  # block | flag
     CREDENTIAL_LEAK_TIMEOUT_SECONDS: float = float(os.getenv("CREDENTIAL_LEAK_TIMEOUT_SECONDS", "5"))
     CREDENTIAL_LEAK_INCLUDE_HASH_PREFIX_IN_EVENTS: bool = os.getenv("CREDENTIAL_LEAK_INCLUDE_HASH_PREFIX_IN_EVENTS", "false").lower() == "true"
+
+    # Prometheus metrics (Feature 10)
+    PROMETHEUS_METRICS_ENABLED: bool = os.getenv("PROMETHEUS_METRICS_ENABLED", "true").lower() == "true"
+    PROMETHEUS_METRICS_NAMESPACE: str = os.getenv("PROMETHEUS_METRICS_NAMESPACE", "waf")
+
+    # Alerting and webhooks (Feature 10) – no hardcoded URLs
+    ALERT_WEBHOOK_URL: str = os.getenv("ALERT_WEBHOOK_URL", "")
+    ALERT_WEBHOOK_HEADERS: str = os.getenv("ALERT_WEBHOOK_HEADERS", "")  # JSON or key:value,key:value
+    ALERT_RULE_BLOCK_RATE_THRESHOLD: float = float(os.getenv("ALERT_RULE_BLOCK_RATE_THRESHOLD", "0.1"))
+    ALERT_RULE_BLOCK_RATE_WINDOW_MINUTES: int = int(os.getenv("ALERT_RULE_BLOCK_RATE_WINDOW_MINUTES", "5"))
+    ALERT_RULE_DDOS_COUNT_THRESHOLD: int = int(os.getenv("ALERT_RULE_DDOS_COUNT_THRESHOLD", "100"))
+    ALERT_EVALUATION_INTERVAL_SECONDS: int = int(os.getenv("ALERT_EVALUATION_INTERVAL_SECONDS", "60"))
 
     # Alert notifications (email)
     SMTP_HOST: Optional[str] = os.getenv("SMTP_HOST", None)

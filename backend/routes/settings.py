@@ -1,9 +1,10 @@
-"""Settings API: account preferences and retention."""
+"""Settings API: account preferences, retention, alerting (Feature 10)."""
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import Any, Dict
 
 from backend.database import get_db
+from backend.auth import require_waf_api_auth
 from backend.controllers import settings as ctrl
 
 router = APIRouter()
@@ -42,5 +43,32 @@ async def get_retention():
     return {
         "success": True,
         "data": data,
+        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+    }
+
+
+@router.get("/alerting")
+async def get_alerting_settings(db: Session = Depends(get_db)):
+    """Get alerting settings (webhook URL, rule thresholds). URL may be masked."""
+    data = ctrl.get_alerting_settings(db)
+    return {
+        "success": True,
+        "data": data,
+        "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
+    }
+
+
+@router.put("/alerting")
+async def update_alerting_settings(
+    payload: Dict[str, Any],
+    db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Update alerting settings (webhook URL, thresholds). Auth required."""
+    data = ctrl.update_alerting_settings(db, payload)
+    return {
+        "success": True,
+        "data": data,
+        "message": "Alerting settings updated",
         "timestamp": __import__("datetime").datetime.utcnow().isoformat(),
     }

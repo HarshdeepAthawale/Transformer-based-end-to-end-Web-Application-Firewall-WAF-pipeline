@@ -22,13 +22,7 @@ class RulesService:
     
     def _load_rules(self):
         """Load active rules into cache"""
-        self._rules_cache = self.db.query(SecurityRule)\
-            .filter(SecurityRule.is_active)\
-            .order_by(
-                SecurityRule.priority.desc(),
-                SecurityRule.timestamp.desc()
-            )\
-            .all()
+        self._rules_cache, _ = self.get_rules(active_only=True, limit=None, offset=0)
         logger.info(f"Loaded {len(self._rules_cache)} active security rules")
     
     def check_rules(
@@ -148,19 +142,24 @@ class RulesService:
         priority: RulePriority = RulePriority.MEDIUM,
         description: str = None,
         owasp_category: str = None,
-        created_by: str = None
+        created_by: str = None,
+        match_conditions: dict = None,
+        is_active: bool = True,
     ) -> SecurityRule:
         """Create security rule"""
+        match_json = json.dumps(match_conditions) if match_conditions else None
         rule = SecurityRule(
             name=name,
             description=description,
             rule_type=rule_type,
             pattern=pattern,
+            match_conditions=match_json,
             applies_to=applies_to,
             action=action,
             priority=priority,
             owasp_category=owasp_category,
-            created_by=created_by
+            created_by=created_by,
+            is_active=is_active,
         )
         
         self.db.add(rule)
@@ -172,12 +171,70 @@ class RulesService:
         
         return rule
     
-    def get_rules(self, active_only: bool = True) -> List[SecurityRule]:
-        """Get security rules"""
+    def get_rule_by_id(self, rule_id: int) -> SecurityRule | None:
+        """Get a single rule by id."""
+        return self.db.query(SecurityRule).filter(SecurityRule.id == rule_id).first()
+    
+    def update_rule(
+        self,
+        rule_id: int,
+        **kwargs
+    ) -> SecurityRule | None:
+        """Update rule by id. Returns None if not found or system rule."""
+        rule = self.get_rule_by_id(rule_id)
+        if not rule or rule.is_system_rule:
+            return None
+        for k, v in list(kwargs.items()):
+            if v is None:
+                continue
+            if k == "action":
+                rule.action = RuleAction[v.upper()] if hasattr(RuleAction, v.upper()) else rule.action
+            elif k == "priority":
+                rule.priority = RulePriority[v.upper()] if hasattr(RulePriority, v.upper()) else rule.priority
+            elif k == "match_conditions":
+                rule.match_conditions = json.dumps(v) if isinstance(v, dict) else v
+            elif hasattr(rule, k):
+                setattr(rule, k, v)
+        self.db.commit()
+        self.db.refresh(rule)
+        self._load_rules()
+        return rule
+    
+    def delete_rule(self, rule_id: int) -> bool:
+        """Soft-deactivate rule. Returns False if not found or system rule."""
+        rule = self.get_rule_by_id(rule_id)
+        if not rule or rule.is_system_rule:
+            return False
+        rule.is_active = False
+        self.db.commit()
+        self._load_rules()
+        return True
+    
+    def get_rules(
+        self,
+        active_only: bool = True,
+        pack_id: int | None = None,
+        limit: int | None = None,
+        offset: int = 0,
+    ) -> tuple[List[SecurityRule], int]:
+        """Get security rules with optional filters. Returns (list, total_count)."""
         query = self.db.query(SecurityRule)
         if active_only:
             query = query.filter(SecurityRule.is_active)
-        return query.order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc()).all()
+        if pack_id is not None:
+            query = query.filter(SecurityRule.rule_pack_id == pack_id)
+        total = query.count()
+        query = query.order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc())
+        if offset:
+            query = query.offset(offset)
+        if limit is not None:
+            query = query.limit(limit)
+        return query.all(), total
+    
+    def get_rules_legacy(self, active_only: bool = True) -> List[SecurityRule]:
+        """Legacy: get all rules without pagination (for backward compatibility)."""
+        rules, _ = self.get_rules(active_only=active_only, limit=None, offset=0)
+        return rules
     
     def get_owasp_rules(self) -> List[SecurityRule]:
         """Get OWASP Top 10 rules"""
@@ -186,6 +243,11 @@ class RulesService:
             .filter(SecurityRule.is_active)\
             .order_by(SecurityRule.owasp_category)\
             .all()
+
+    def get_rules_list_only(self, active_only: bool = True) -> List[SecurityRule]:
+        """Get rules list only (no total) for backward compatibility."""
+        rules, _ = self.get_rules(active_only=active_only)
+        return rules
 
     def evaluate_managed_rules(
         self,

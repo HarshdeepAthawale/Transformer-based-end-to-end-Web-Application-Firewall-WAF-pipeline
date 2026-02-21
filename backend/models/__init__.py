@@ -21,6 +21,7 @@ from backend.models.verified_bots import VerifiedBot
 from backend.models.bot_score_bands import BotScoreBand
 from backend.models.llm_endpoint import LLMEndpoint
 from backend.models.firewall_ai_pattern import FirewallAIPattern
+from backend.models.rate_limit_config import RateLimitConfig
 
 __all__ = [
     "Metrics",
@@ -51,4 +52,5 @@ __all__ = [
     "BotScoreBand",
     "LLMEndpoint",
     "FirewallAIPattern",
+    "RateLimitConfig",
 ]

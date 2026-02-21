@@ -235,3 +235,49 @@ class BotDetectionService:
         if active_only:
             query = query.filter(BotSignature.is_active)
         return query.order_by(BotSignature.timestamp.desc()).all()
+
+    def get_signature_by_id(self, signature_id: int) -> BotSignature | None:
+        """Get a single signature by id."""
+        return self.db.query(BotSignature).filter(BotSignature.id == signature_id).first()
+
+    def update_signature(
+        self,
+        signature_id: int,
+        *,
+        user_agent_pattern: str | None = None,
+        name: str | None = None,
+        category: BotCategory | None = None,
+        action: str | None = None,
+        is_whitelisted: bool | None = None,
+        is_active: bool | None = None,
+    ) -> BotSignature | None:
+        """Update a signature by id. Returns None if not found."""
+        sig = self.get_signature_by_id(signature_id)
+        if not sig:
+            return None
+        if user_agent_pattern is not None:
+            sig.user_agent_pattern = user_agent_pattern
+        if name is not None:
+            sig.name = name
+        if category is not None:
+            sig.category = category
+        if action is not None:
+            sig.action = action
+        if is_whitelisted is not None:
+            sig.is_whitelisted = is_whitelisted
+        if is_active is not None:
+            sig.is_active = is_active
+        self.db.commit()
+        self.db.refresh(sig)
+        self._load_signatures()
+        return sig
+
+    def delete_signature(self, signature_id: int) -> bool:
+        """Delete a signature by id. Returns False if not found."""
+        sig = self.get_signature_by_id(signature_id)
+        if not sig:
+            return False
+        self.db.delete(sig)
+        self.db.commit()
+        self._load_signatures()
+        return True

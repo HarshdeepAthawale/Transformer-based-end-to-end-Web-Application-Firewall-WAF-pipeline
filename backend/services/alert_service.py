@@ -17,10 +17,10 @@ class AlertService:
         self.db = db
     
     def get_active_alerts(self) -> List[Alert]:
-        """Get active alerts"""
+        """Get active alerts (active and not dismissed)."""
         return self.db.query(Alert)\
-            .filter(Alert.is_active)\
-            .filter(not Alert.is_dismissed)\
+            .filter(Alert.is_active == True)\
+            .filter(Alert.is_dismissed == False)\
             .order_by(desc(Alert.timestamp))\
             .all()
     

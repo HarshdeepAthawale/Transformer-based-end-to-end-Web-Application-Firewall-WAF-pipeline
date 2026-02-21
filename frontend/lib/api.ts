@@ -198,13 +198,19 @@ export const metricsApi = {
     apiRequest(`/api/metrics/historical?range=${timeRange}`),
 }
 
-// Alerts API
+// Alerts API (Feature 10)
 export const alertsApi = {
   getActive: (): Promise<ApiResponse<AlertData[]>> =>
     apiRequest('/api/alerts/active'),
 
+  getAlerts: (): Promise<ApiResponse<AlertData[]>> =>
+    apiRequest('/api/alerts/active'),
+
   getHistorical: (timeRange: string): Promise<ApiResponse<AlertData[]>> =>
     apiRequest(`/api/alerts/history?range=${timeRange}`),
+
+  getAlertHistory: (range: string): Promise<ApiResponse<AlertData[]>> =>
+    apiRequest(`/api/alerts/history?range=${range}`),
 
   dismiss: (alertId: number): Promise<ApiResponse<void>> =>
     apiRequest(`/api/alerts/${alertId}/dismiss`, { method: 'POST' }),
@@ -284,6 +290,58 @@ export const eventsApi = {
 
   getWafEvents: (range: string = '24h', limit?: number): Promise<ApiResponse<SecurityEventData[]>> =>
     apiRequest(`/api/events/waf?range=${range}${limit != null ? `&limit=${limit}` : ''}`),
+}
+
+// Unified security dashboard (Feature 8)
+export interface DashboardOverview {
+  waf_block_count: number
+  rate_limit_count: number
+  ddos_count: number
+  bot_block_count: number
+  upload_scan_infected_count: number
+  credential_leak_block_count: number
+  firewall_ai_block_count: number
+  avg_attack_score: number | null
+  avg_bot_score: number | null
+}
+
+export interface DashboardChartSeries {
+  name: string
+  data: { time: string; count: number }[]
+}
+
+export interface DashboardUnifiedData {
+  overview: DashboardOverview
+  charts: { series: DashboardChartSeries[] }
+  recent_events: SecurityEventData[]
+}
+
+export const dashboardApi = {
+  getDashboardOverview: (range: string = '24h'): Promise<ApiResponse<DashboardOverview>> =>
+    apiRequest(`/api/dashboard/overview?range=${range}`),
+
+  getDashboardCharts: (range: string = '24h'): Promise<ApiResponse<{ series: DashboardChartSeries[] }>> =>
+    apiRequest(`/api/dashboard/charts?range=${range}`),
+
+  getDashboardEvents: (
+    range: string = '24h',
+    limit: number = 50,
+    eventType?: string
+  ): Promise<ApiResponse<SecurityEventData[]>> => {
+    const params = new URLSearchParams({ range, limit: String(limit) })
+    if (eventType) params.set('event_type', eventType)
+    return apiRequest(`/api/dashboard/events?${params}`)
+  },
+
+  getDashboardUnified: (
+    range: string = '24h',
+    limit: number = 50,
+    eventType?: string
+  ): Promise<ApiResponse<DashboardUnifiedData>> => {
+    const params = new URLSearchParams({ range, limit: String(limit) })
+    if (eventType) params.set('event_type', eventType)
+    return apiRequest(`/api/dashboard/unified?${params}`)
+  },
 }
 
 // Adaptive DDoS (auto-tuned burst threshold)
@@ -885,6 +943,16 @@ export interface RetentionSettings {
   threats_days: number
 }
 
+// Alerting settings (Feature 10: webhooks and rule thresholds)
+export interface AlertingSettings {
+  webhook_url?: string
+  webhook_url_masked?: string
+  webhook_headers?: string
+  alert_rule_block_rate_threshold?: number
+  alert_rule_block_rate_window_minutes?: number
+  alert_rule_ddos_count_threshold?: number
+}
+
 export const settingsApi = {
   get: (): Promise<ApiResponse<AccountSettings>> =>
     apiRequest('/api/settings'),
@@ -897,6 +965,15 @@ export const settingsApi = {
 
   getRetention: (): Promise<ApiResponse<RetentionSettings>> =>
     apiRequest('/api/settings/retention'),
+
+  getAlerting: (): Promise<ApiResponse<AlertingSettings>> =>
+    apiRequest('/api/settings/alerting'),
+
+  updateAlerting: (payload: Partial<AlertingSettings>): Promise<ApiResponse<AlertingSettings>> =>
+    apiRequest('/api/settings/alerting', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
 }
 
 // API Keys (current user)

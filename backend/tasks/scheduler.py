@@ -8,6 +8,7 @@ from backend.tasks.metrics_aggregator import MetricsAggregator
 from backend.tasks.ip_reputation_updater import IPReputationUpdater
 from backend.tasks.managed_rules_sync_task import ManagedRulesSyncTask
 from backend.tasks.adaptive_ddos_job import AdaptiveDDoSJob
+from backend.tasks.alert_evaluator_task import AlertEvaluatorTask
 
 
 # Global instances
@@ -16,11 +17,12 @@ metrics_aggregator = None
 ip_reputation_updater = None
 managed_rules_sync_task = None
 adaptive_ddos_job = None
+alert_evaluator_task = None
 
 
 def start_background_workers():
     """Start all background workers"""
-    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job
+    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job, alert_evaluator_task
 
     logger.info("Starting background workers...")
     
@@ -66,10 +68,18 @@ def start_background_workers():
     except Exception as e:
         logger.error(f"Failed to start adaptive DDoS job: {e}")
 
+    # Alert rule evaluator (Feature 10)
+    try:
+        alert_evaluator_task = AlertEvaluatorTask()
+        alert_evaluator_task.start()
+        logger.info("Alert evaluator task started")
+    except Exception as e:
+        logger.error(f"Failed to start alert evaluator task: {e}")
+
 
 def stop_background_workers():
     """Stop all background workers"""
-    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job
+    global log_processor, metrics_aggregator, ip_reputation_updater, managed_rules_sync_task, adaptive_ddos_job, alert_evaluator_task
 
     logger.info("Stopping background workers...")
 
@@ -87,5 +97,8 @@ def stop_background_workers():
 
     if adaptive_ddos_job:
         adaptive_ddos_job.stop()
+
+    if alert_evaluator_task:
+        alert_evaluator_task.stop()
 
     logger.info("Background workers stopped")

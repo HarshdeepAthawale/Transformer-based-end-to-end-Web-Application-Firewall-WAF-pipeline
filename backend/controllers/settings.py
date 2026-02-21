@@ -6,6 +6,15 @@ from sqlalchemy.orm import Session
 from backend.models.settings import AccountSetting
 from backend.config import config
 
+# Alerting-related keys (Feature 10); used by GET/PUT /settings/alerting
+ALERTING_KEYS = {
+    "webhook_url": str,
+    "webhook_headers": str,  # JSON object string
+    "alert_rule_block_rate_threshold": float,
+    "alert_rule_block_rate_window_minutes": int,
+    "alert_rule_ddos_count_threshold": int,
+}
+
 # Keys we allow in settings (and their types for validation)
 ALLOWED_KEYS = {
     "theme": str,
@@ -17,7 +26,11 @@ ALLOWED_KEYS = {
     "alert_severity_high": bool,
     "alert_severity_medium": bool,
     "webhook_url": str,
+    "webhook_headers": str,
     "alert_emails": str,
+    "alert_rule_block_rate_threshold": float,
+    "alert_rule_block_rate_window_minutes": int,
+    "alert_rule_ddos_count_threshold": int,
 }
 
 DEFAULTS = {
@@ -30,7 +43,11 @@ DEFAULTS = {
     "alert_severity_high": True,
     "alert_severity_medium": False,
     "webhook_url": "",
+    "webhook_headers": "",
     "alert_emails": "",
+    "alert_rule_block_rate_threshold": getattr(config, "ALERT_RULE_BLOCK_RATE_THRESHOLD", 0.1),
+    "alert_rule_block_rate_window_minutes": getattr(config, "ALERT_RULE_BLOCK_RATE_WINDOW_MINUTES", 5),
+    "alert_rule_ddos_count_threshold": getattr(config, "ALERT_RULE_DDOS_COUNT_THRESHOLD", 100),
 }
 
 
@@ -67,6 +84,30 @@ def update_settings(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
             db.add(AccountSetting(key=key, value=serialized))
     db.commit()
     return get_settings(db)
+
+
+def get_alerting_settings(db: Session) -> Dict[str, Any]:
+    """Return only alerting-related settings (for GET /api/settings/alerting). Fallback to config."""
+    full = get_settings(db)
+    out = {}
+    for k in ALERTING_KEYS:
+        if k in full:
+            out[k] = full[k]
+        else:
+            out[k] = DEFAULTS.get(k)
+    # Mask webhook URL for display if desired (e.g. show last 4 chars only)
+    if out.get("webhook_url") and len(out["webhook_url"]) > 8:
+        out["webhook_url_masked"] = out["webhook_url"][:4] + "…" + out["webhook_url"][-4:]
+    return out
+
+
+def update_alerting_settings(db: Session, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Update only alerting keys. Returns updated alerting settings."""
+    filtered = {k: v for k, v in payload.items() if k in ALERTING_KEYS}
+    if not filtered:
+        return get_alerting_settings(db)
+    update_settings(db, filtered)
+    return get_alerting_settings(db)
 
 
 def get_retention() -> Dict[str, int]:

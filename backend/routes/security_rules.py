@@ -1,14 +1,15 @@
-"""Security Rules API endpoints."""
+"""Security Rules API endpoints (Feature 9: API-first WAF rules)."""
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Query, Body
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, Depends, Query, Body, HTTPException
+from fastapi.responses import FileResponse, Response
 from sqlalchemy.orm import Session
 
 from backend.config import config
 from backend.database import get_db
-from backend.schemas.security_rules import SecurityRuleRequest
+from backend.auth import require_waf_api_auth
+from backend.schemas.security_rules import SecurityRuleRequest, SecurityRuleUpdate
 from backend.controllers import security_rules as ctrl
 from backend.controllers import managed_rules as managed_ctrl
 
@@ -16,12 +17,24 @@ router = APIRouter()
 
 
 @router.get("/")
-async def get_security_rules(active_only: bool = Query(True), db: Session = Depends(get_db)):
-    return ctrl.get_rules(db, active_only)
+async def list_security_rules(
+    active_only: bool = Query(True, description="Filter to active rules only"),
+    pack_id: int | None = Query(None, description="Filter by rule pack id"),
+    limit: int | None = Query(None, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    """List rules. Response: { data: rule_dict[], total: number }."""
+    return ctrl.get_rules(db, active_only=active_only, pack_id=pack_id, limit=limit, offset=offset)
 
 
 @router.post("/")
-async def create_security_rule(request: SecurityRuleRequest, db: Session = Depends(get_db)):
+async def create_security_rule(
+    request: SecurityRuleRequest,
+    db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Create a rule. Requires auth (JWT or API key)."""
     return ctrl.create_rule(
         db,
         name=request.name,
@@ -32,6 +45,8 @@ async def create_security_rule(request: SecurityRuleRequest, db: Session = Depen
         priority=request.priority,
         description=request.description,
         owasp_category=request.owasp_category,
+        match_conditions=request.match_conditions,
+        is_active=request.is_active if request.is_active is not None else True,
     )
 
 
@@ -120,3 +135,41 @@ async def evaluate_rules(
     service = RulesService(db)
     result = service.evaluate_managed_rules(method, path, headers, query_params, req_body)
     return result
+
+
+# By-id routes last so /owasp, /managed/* are not matched as rule_id
+@router.get("/{rule_id}")
+async def get_security_rule(rule_id: int, db: Session = Depends(get_db)):
+    """Get one rule by id."""
+    out = ctrl.get_rule_by_id(db, rule_id)
+    if out is None:
+        raise HTTPException(status_code=404, detail="Rule not found")
+    return out
+
+
+@router.put("/{rule_id}")
+async def update_security_rule(
+    rule_id: int,
+    request: SecurityRuleUpdate,
+    db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Update a rule (partial). System rules cannot be updated. Requires auth."""
+    body = request.model_dump(exclude_unset=True)
+    out = ctrl.update_rule(db, rule_id, **body)
+    if out is None:
+        raise HTTPException(status_code=404, detail="Rule not found or system rule cannot be updated")
+    return out
+
+
+@router.delete("/{rule_id}", status_code=204)
+async def delete_security_rule(
+    rule_id: int,
+    db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Soft-deactivate a rule. Returns 204. System rules cannot be deleted. Requires auth."""
+    ok = ctrl.delete_rule(db, rule_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Rule not found or system rule cannot be deleted")
+    return Response(status_code=204)

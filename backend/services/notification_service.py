@@ -42,13 +42,21 @@ def _get_email_recipients(settings: Dict[str, Any], db) -> List[str]:
         return []
 
 
-def _send_webhook(webhook_url: str, payload: Dict[str, Any], timeout: int = 5) -> bool:
-    """POST payload to webhook URL. Returns True if 2xx, else False. One retry on failure."""
+def _send_webhook(
+    webhook_url: str,
+    payload: Dict[str, Any],
+    timeout: int = 5,
+    extra_headers: Dict[str, str] | None = None,
+) -> bool:
+    """POST payload to webhook URL. Returns True if 2xx, else False. One retry on failure. No hardcoded URL."""
     data = json.dumps(payload).encode("utf-8")
+    headers = {"Content-Type": "application/json"}
+    if extra_headers:
+        headers.update(extra_headers)
     req = urllib.request.Request(
         webhook_url,
         data=data,
-        headers={"Content-Type": "application/json"},
+        headers=headers,
         method="POST",
     )
     ctx = ssl.create_default_context()
@@ -56,15 +64,37 @@ def _send_webhook(webhook_url: str, payload: Dict[str, Any], timeout: int = 5) -
         try:
             with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
                 if 200 <= resp.getcode() < 300:
-                    logger.info(f"Webhook delivered to {webhook_url}")
+                    logger.info(f"Webhook delivered to {webhook_url[:50]}…")
                     return True
-                logger.warning(f"Webhook returned {resp.getcode()} from {webhook_url}")
+                logger.warning(f"Webhook returned {resp.getcode()} from {webhook_url[:50]}…")
                 return False
         except urllib.error.URLError as e:
-            logger.warning(f"Webhook attempt {attempt + 1} failed for {webhook_url}: {e}")
+            logger.warning(f"Webhook attempt {attempt + 1} failed for {webhook_url[:50]}…: {e}")
         except Exception as e:
             logger.warning(f"Webhook error: {e}")
     return False
+
+
+def send_alert_webhook(
+    webhook_url: str,
+    alert_dict: Dict[str, Any],
+    extra_headers: Dict[str, str] | None = None,
+) -> bool:
+    """
+    Send a single alert to a webhook (Feature 10). URL and headers from config/settings; no hardcoded URL.
+    Payload shape: { "event": "alert", "severity", "title", "description", "timestamp", "source" }.
+    """
+    if not (webhook_url or "").strip():
+        return False
+    payload = {
+        "event": "alert",
+        "severity": alert_dict.get("severity", "high"),
+        "title": alert_dict.get("title", "Alert"),
+        "description": alert_dict.get("description", ""),
+        "timestamp": alert_dict.get("timestamp"),
+        "source": alert_dict.get("source", "waf"),
+    }
+    return _send_webhook(webhook_url.strip(), payload, extra_headers=extra_headers)
 
 
 def maybe_send_notifications(db, alert, settings: Dict[str, Any]) -> None:

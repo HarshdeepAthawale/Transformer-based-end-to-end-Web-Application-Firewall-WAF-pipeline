@@ -1,15 +1,18 @@
-"""Bot Management API - score endpoint, verified bots, score bands."""
+"""Bot Management API - score, signatures, verified bots, score bands (Feature 9)."""
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy import inspect
 from sqlalchemy.orm import Session
 from loguru import logger
 
 from backend.database import get_db, engine, Base
+from backend.auth import require_waf_api_auth
 from backend.services.bot_detection import BotDetectionService
 from backend.services.verified_bots_service import VerifiedBotsService
 from backend.services.bot_score_bands_service import BotScoreBandsService
+from backend.models.bot_signatures import BotCategory
+from backend.schemas.bot_detection import BotSignatureRequest
 
 router = APIRouter()
 
@@ -96,16 +99,24 @@ async def get_verified_bots(db: Session = Depends(get_db_with_bot_tables)):
 
 
 @router.post("/verified")
-async def add_verified_bot(body: VerifiedBotCreate, db: Session = Depends(get_db_with_bot_tables)):
-    """Add a verified bot."""
+async def add_verified_bot(
+    body: VerifiedBotCreate,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Add a verified bot. Requires auth."""
     svc = VerifiedBotsService(db)
     bot = svc.add(body.name, body.user_agent_pattern, source="manual")
     return {"success": True, "data": bot.to_dict()}
 
 
 @router.delete("/verified/{bot_id}")
-async def delete_verified_bot(bot_id: int, db: Session = Depends(get_db_with_bot_tables)):
-    """Delete a verified bot."""
+async def delete_verified_bot(
+    bot_id: int,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Delete a verified bot. Requires auth."""
     svc = VerifiedBotsService(db)
     ok = svc.delete(bot_id)
     if not ok:
@@ -145,8 +156,96 @@ async def get_score_bands(db: Session = Depends(get_db_with_bot_tables)):
 
 
 @router.put("/score-bands")
-async def update_score_bands(body: ScoreBandsUpdate, db: Session = Depends(get_db_with_bot_tables)):
-    """Replace score bands with the given array."""
+async def update_score_bands(
+    body: ScoreBandsUpdate,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Replace score bands with the given array. Requires auth."""
     svc = BotScoreBandsService(db)
     bands = svc.update_bands([b.model_dump() for b in body.bands])
     return {"success": True, "data": [b.to_dict() for b in bands]}
+
+
+# --- Signatures CRUD (Feature 9) ---
+
+class BotSignatureUpdate(BaseModel):
+    user_agent_pattern: str | None = None
+    name: str | None = None
+    category: str | None = None
+    action: str | None = None
+    is_whitelisted: bool | None = None
+    is_active: bool | None = None
+
+
+@router.get("/signatures")
+async def list_bot_signatures(
+    active_only: bool = Query(True, description="Filter to active only"),
+    db: Session = Depends(get_db_with_bot_tables),
+):
+    """List bot signatures."""
+    svc = BotDetectionService(db)
+    sigs = svc.get_signatures(active_only=active_only)
+    return {"success": True, "data": [s.to_dict() for s in sigs]}
+
+
+@router.post("/signatures")
+async def create_bot_signature(
+    request: BotSignatureRequest,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Create a bot signature. Requires auth."""
+    svc = BotDetectionService(db)
+    cat = BotCategory[request.category.upper()] if hasattr(BotCategory, request.category.upper()) else BotCategory.UNKNOWN
+    sig = svc.add_signature(
+        user_agent_pattern=request.user_agent_pattern,
+        name=request.name,
+        category=cat,
+        action=request.action,
+        is_whitelisted=request.is_whitelisted,
+    )
+    return {"success": True, "data": sig.to_dict()}
+
+
+@router.get("/signatures/{sig_id}")
+async def get_bot_signature(sig_id: int, db: Session = Depends(get_db_with_bot_tables)):
+    """Get one bot signature by id."""
+    svc = BotDetectionService(db)
+    sig = svc.get_signature_by_id(sig_id)
+    if not sig:
+        raise HTTPException(status_code=404, detail="Signature not found")
+    return {"success": True, "data": sig.to_dict()}
+
+
+@router.put("/signatures/{sig_id}")
+async def update_bot_signature(
+    sig_id: int,
+    body: BotSignatureUpdate,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Update a bot signature. Requires auth."""
+    svc = BotDetectionService(db)
+    kwargs = body.model_dump(exclude_unset=True)
+    if "category" in kwargs and kwargs["category"] is not None:
+        c = kwargs["category"].upper()
+        kwargs["category"] = BotCategory[c] if hasattr(BotCategory, c) else None
+    sig = svc.update_signature(sig_id, **kwargs)
+    if not sig:
+        raise HTTPException(status_code=404, detail="Signature not found")
+    return {"success": True, "data": sig.to_dict()}
+
+
+@router.delete("/signatures/{sig_id}")
+async def delete_bot_signature(
+    sig_id: int,
+    db: Session = Depends(get_db_with_bot_tables),
+    _auth=Depends(require_waf_api_auth),
+):
+    """Delete a bot signature. Requires auth."""
+    svc = BotDetectionService(db)
+    ok = svc.delete_signature(sig_id)
+    if not ok:
+        raise HTTPException(status_code=404, detail="Signature not found")
+    return {"success": True}

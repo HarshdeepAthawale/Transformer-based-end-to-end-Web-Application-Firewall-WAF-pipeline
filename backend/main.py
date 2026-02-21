@@ -6,15 +6,15 @@ import os
 import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, APIRouter
+from fastapi import FastAPI, Request, APIRouter, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, PlainTextResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 from loguru import logger
 
 from backend.config import config
-from backend.database import init_db, close_db
+from backend.database import init_db, close_db, get_db
 from backend.routes import (
     metrics,
     alerts,
@@ -29,6 +29,7 @@ from backend.routes import (
     firewall_ai,
     ddos,
     credential_leak,
+    dashboard,
 )
 from backend.routes import health, test, debug
 from backend.websocket import router as websocket_router
@@ -241,6 +242,16 @@ app.include_router(health.router)
 app.include_router(test.router)
 app.include_router(debug.router)
 
+
+# Prometheus metrics (Feature 10)
+@app.get("/metrics", response_class=PlainTextResponse, include_in_schema=False)
+async def prometheus_metrics(db=Depends(get_db)):
+    """Prometheus exposition format. Data from security_events (last 60 min). Set PROMETHEUS_METRICS_ENABLED=false to disable."""
+    if not getattr(config, "PROMETHEUS_METRICS_ENABLED", True):
+        raise HTTPException(status_code=404, detail="Metrics disabled")
+    from backend.prometheus_metrics import get_prometheus_text
+    return get_prometheus_text(db, window_minutes=60)
+
 # Test target router - goes through WAF middleware (not in /api/ path)
 try:
     from backend.routes import test_target
@@ -265,6 +276,16 @@ app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 app.include_router(firewall_ai.router, prefix="/api/firewall-ai", tags=["firewall-ai"])
 app.include_router(ddos.router, prefix="/api/ddos", tags=["ddos"])
 app.include_router(credential_leak.router, prefix="/api/credential-leak", tags=["credential-leak"])
+app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
+
+# Feature 9: WAF API (security rules, rate limit config)
+try:
+    from backend.routes import security_rules, rate_limits
+    app.include_router(security_rules.router, prefix="/api/security-rules", tags=["security-rules"])
+    app.include_router(rate_limits.router, prefix="/api/rate-limits", tags=["rate-limits"])
+    logger.info("✓ Registered routes: /api/security-rules, /api/rate-limits")
+except ImportError as e:
+    logger.warning(f"WAF API routes not available: {e}")
 
 # WAF service routes (includes /middleware-metrics)
 try:

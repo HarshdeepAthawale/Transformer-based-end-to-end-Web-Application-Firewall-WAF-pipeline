@@ -6,6 +6,7 @@ import { MetricsOverview } from '@/components/metrics-overview'
 import { ChartsSection } from '@/components/charts-section'
 import { AlertsSection } from '@/components/alerts-section'
 import { ActivityFeed } from '@/components/activity-feed'
+import { UnifiedSecuritySection } from '@/components/unified-security-section'
 import { ErrorBoundary } from '@/components/error-boundary'
 import { useState, useEffect } from 'react'
 import { wsManager } from '@/lib/api'
@@ -56,6 +57,10 @@ export default function DashboardPage() {
                   </ErrorBoundary>
                 </div>
               </div>
+
+              <ErrorBoundary>
+                <UnifiedSecuritySection timeRange={timeRange} onTimeRangeChange={setTimeRange} />
+              </ErrorBoundary>
             </div>
           </ErrorBoundary>
         </main>

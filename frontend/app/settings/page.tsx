@@ -36,12 +36,14 @@ import {
 } from '@/components/ui/dialog'
 import {
   settingsApi,
+  alertsApi,
   wafApi,
   apiKeysApi,
   type AccountSettings,
   type ApiKeyMeta,
   type ApiKeyCreated,
   type RetentionSettings,
+  type AlertingSettings,
 } from '@/lib/api'
 import { ErrorBoundary } from '@/components/error-boundary'
 
@@ -68,6 +70,10 @@ export default function SettingsPage() {
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const [saveMessage, setSaveMessage] = useState('')
   const [apiKeysError, setApiKeysError] = useState<string | null>(null)
+  const [alertingSettings, setAlertingSettings] = useState<AlertingSettings | null>(null)
+  const [alertingDraft, setAlertingDraft] = useState<Partial<AlertingSettings>>({})
+  const [activeAlerts, setActiveAlerts] = useState<{ id: number; title: string; description: string; severity?: string; timestamp?: string }[]>([])
+  const [alertingSaveStatus, setAlertingSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const { theme, setTheme } = useTheme()
 
   // Create API key dialog
@@ -119,6 +125,40 @@ export default function SettingsPage() {
       setApiKeys([])
     })
   }, [section])
+
+  // Load alerting settings and active alerts when on notifications tab
+  useEffect(() => {
+    if (section !== 'notifications') return
+    settingsApi.getAlerting().then((res) => {
+      if (res?.success && res.data) {
+        setAlertingSettings(res.data)
+        setAlertingDraft({
+          webhook_url: res.data.webhook_url ?? '',
+          webhook_headers: res.data.webhook_headers ?? '',
+          alert_rule_block_rate_threshold: res.data.alert_rule_block_rate_threshold ?? 0.1,
+          alert_rule_block_rate_window_minutes: res.data.alert_rule_block_rate_window_minutes ?? 5,
+          alert_rule_ddos_count_threshold: res.data.alert_rule_ddos_count_threshold ?? 100,
+        })
+      }
+    }).catch(() => setAlertingSettings(null))
+    alertsApi.getActive().then((res) => {
+      if (res?.success && Array.isArray(res.data)) setActiveAlerts(res.data)
+      else setActiveAlerts([])
+    }).catch(() => setActiveAlerts([]))
+  }, [section])
+
+  async function saveAlertingSettings() {
+    setAlertingSaveStatus('saving')
+    try {
+      const res = await settingsApi.updateAlerting(alertingDraft)
+      if (res?.success && res.data) {
+        setAlertingSettings(res.data)
+        setAlertingSaveStatus('success')
+      } else setAlertingSaveStatus('error')
+    } catch {
+      setAlertingSaveStatus('error')
+    }
+  }
 
   const updateSetting = (key: keyof AccountSettings, value: unknown) => {
     setSettings((prev) => (prev ? { ...prev, [key]: value } : { [key]: value } as AccountSettings))
@@ -384,6 +424,79 @@ export default function SettingsPage() {
                     />
                     <p className="text-xs text-muted-foreground mt-2">Comma-separated; used for email alerts when Email alerts is on. Leave empty to use admin users.</p>
                   </Card>
+
+                  <Card className="p-6">
+                    <h3 className="font-semibold mb-2">Alerting (webhook & rules)</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Webhook URL and rule thresholds. When rules trigger, an alert is created and the webhook is called.</p>
+                    <div className="space-y-4">
+                      <div>
+                        <Label className="mb-1 block">Webhook URL</Label>
+                        <Input
+                          placeholder="https://..."
+                          value={alertingDraft.webhook_url ?? ''}
+                          onChange={(e) => setAlertingDraft((d) => ({ ...d, webhook_url: e.target.value }))}
+                        />
+                      </div>
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <Label className="mb-1 block">Block rate threshold (0–1)</Label>
+                          <Input
+                            type="number"
+                            min={0}
+                            max={1}
+                            step={0.05}
+                            value={alertingDraft.alert_rule_block_rate_threshold ?? 0.1}
+                            onChange={(e) => setAlertingDraft((d) => ({ ...d, alert_rule_block_rate_threshold: parseFloat(e.target.value) || 0.1 }))}
+                          />
+                        </div>
+                        <div>
+                          <Label className="mb-1 block">Block rate window (minutes)</Label>
+                          <Input
+                            type="number"
+                            min={1}
+                            max={60}
+                            value={alertingDraft.alert_rule_block_rate_window_minutes ?? 5}
+                            onChange={(e) => setAlertingDraft((d) => ({ ...d, alert_rule_block_rate_window_minutes: parseInt(e.target.value, 10) || 5 }))}
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label className="mb-1 block">DDoS count threshold</Label>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={alertingDraft.alert_rule_ddos_count_threshold ?? 100}
+                          onChange={(e) => setAlertingDraft((d) => ({ ...d, alert_rule_ddos_count_threshold: parseInt(e.target.value, 10) || 100 }))}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">Alert when DDoS events in the window exceed this count.</p>
+                      </div>
+                    </div>
+                    {alertingSaveStatus !== 'idle' && (
+                      <p className={alertingSaveStatus === 'error' ? 'text-destructive text-sm mt-2' : 'text-muted-foreground text-sm mt-2'}>
+                        {alertingSaveStatus === 'saving' ? 'Saving…' : alertingSaveStatus === 'success' ? 'Saved.' : 'Failed to save.'}
+                      </p>
+                    )}
+                    <Button className="mt-4" onClick={saveAlertingSettings} disabled={alertingSaveStatus === 'saving'}>Save alerting settings</Button>
+                  </Card>
+
+                  <Card className="p-6">
+                    <h3 className="font-semibold mb-2">Active alerts</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Recent alerts from alert rules (block rate, DDoS spike). No mock data.</p>
+                    {activeAlerts.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">No active alerts.</p>
+                    ) : (
+                      <ul className="space-y-3">
+                        {activeAlerts.map((a) => (
+                          <li key={a.id} className="border rounded-lg p-3">
+                            <p className="font-medium">{a.title}</p>
+                            <p className="text-sm text-muted-foreground">{a.description}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{a.severity} · {a.timestamp ?? ''}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </Card>
+
                   <Button onClick={saveSettings} disabled={saveStatus === 'saving'}>Save</Button>
                 </TabsContent>
 
