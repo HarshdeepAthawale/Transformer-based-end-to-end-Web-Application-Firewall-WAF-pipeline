@@ -10,10 +10,11 @@ const nextConfig = {
     NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001/ws/',
   },
   async rewrites() {
-    // Always proxy /api/* to backend so Copilot and API work even when backend is only reachable via same host.
-    // Server-side: BACKEND_URL (e.g. http://backend:3001 in Docker) or default localhost:3001.
+    // NextAuth handles /api/auth/* (session, signin, error, etc.) — do not proxy to backend.
+    // Proxy all other /api/* to backend so Copilot and API work when backend is only reachable via same host.
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:3001'
     return [
+      { source: '/api/auth/:path*', destination: '/api/auth/:path*' },
       { source: '/api/:path*', destination: `${backendUrl.replace(/\/$/, '')}/api/:path*` },
     ]
   },

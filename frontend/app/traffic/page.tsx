@@ -38,34 +38,42 @@ export default function TrafficPage() {
   const [sortField, setSortField] = useState<keyof TrafficData | null>(null)
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
 
+  // How many recent logs to fetch (or load by time range for 24h/7d)
+  const [fetchLimit, setFetchLimit] = useState(1000)
+  const displayCap = Math.max(500, Math.min(2000, fetchLimit))
+
   const [selectedTraffic, setSelectedTraffic] = useState<TrafficData | null>(null)
   const [showDetails, setShowDetails] = useState(false)
 
-  // Fetch traffic data
+  // Fetch traffic data (by time range for 24h/7d, else recent N)
   const fetchTraffic = useCallback(async (showLoading = true) => {
     try {
       if (showLoading) setIsLoading(true)
       setIsRefreshing(true)
       setError(null)
-      const response = await trafficApi.getRecent(200) // Get more recent logs
+      const useTimeRange = timeRange === '24h' || timeRange === '7d'
+      const response = useTimeRange
+        ? await trafficApi.getByTimeRange(timeRange)
+        : await trafficApi.getRecent(fetchLimit)
       if (response.success) {
-        // Merge with existing data, avoiding duplicates
-        setTrafficData(prev => {
-          const existingIds = new Set(prev.map(t => t.timestamp))
-          const newData = response.data.filter(t => !existingIds.has(t.timestamp))
-          const merged = [...newData, ...prev]
-          // Sort by timestamp descending and keep latest 500
-          return merged
-            .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-            .slice(0, 500)
-        })
+        if (useTimeRange) {
+          setTrafficData(response.data)
+        } else {
+          setTrafficData(prev => {
+            const existingIds = new Set(prev.map(t => t.timestamp))
+            const newData = response.data.filter(t => !existingIds.has(t.timestamp))
+            const merged = [...newData, ...prev]
+            return merged
+              .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+              .slice(0, displayCap)
+          })
+        }
         setLastUpdateTime(new Date())
       }
     } catch (err: any) {
-      // Only show error if it's not a network error (backend not running)
       if (err?.isNetworkError) {
         console.debug('[TrafficPage] Backend not available')
-        setError(null) // Don't show error for network issues
+        setError(null)
       } else {
         console.error('[TrafficPage] Failed to fetch traffic data:', err)
         setError('Failed to load traffic data')
@@ -74,7 +82,7 @@ export default function TrafficPage() {
       if (showLoading) setIsLoading(false)
       setIsRefreshing(false)
     }
-  }, [])
+  }, [timeRange, fetchLimit, displayCap])
 
   // Handle scroll position to determine if we should auto-scroll
   useEffect(() => {
@@ -112,12 +120,10 @@ export default function TrafficPage() {
     // Subscribe to real-time traffic updates via WebSocket
     const handleTrafficUpdate = (newTraffic: TrafficData) => {
       setTrafficData(prev => {
-        // Check if this log already exists (avoid duplicates)
         const exists = prev.some(t => t.timestamp === newTraffic.timestamp)
         if (exists) return prev
-
-        // Add new log at the top, keep latest 500 entries
-        const updated = [newTraffic, ...prev.slice(0, 499)]
+        const keep = Math.min(2000, displayCap) - 1
+        const updated = [newTraffic, ...prev.slice(0, keep)]
         setLastUpdateTime(new Date())
         return updated
       })
@@ -385,6 +391,20 @@ export default function TrafficPage() {
                       <SelectItem value="2xx">2xx Success</SelectItem>
                       <SelectItem value="4xx">4xx Client Error</SelectItem>
                       <SelectItem value="5xx">5xx Server Error</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={String(fetchLimit)}
+                    onValueChange={(v) => setFetchLimit(Number(v))}
+                  >
+                    <SelectTrigger className="w-full md:w-[140px]" title="Number of recent logs to load">
+                      <SelectValue placeholder="Show" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="200">Show 200</SelectItem>
+                      <SelectItem value="500">Show 500</SelectItem>
+                      <SelectItem value="1000">Show 1000</SelectItem>
+                      <SelectItem value="2000">Show 2000</SelectItem>
                     </SelectContent>
                   </Select>
                   <Button onClick={handleExport} variant="outline">

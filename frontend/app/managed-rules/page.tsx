@@ -15,6 +15,7 @@ import { Shield, RefreshCw, AlertCircle, Package } from 'lucide-react'
 export default function ManagedRulesPage() {
   const pathname = usePathname()
   const [packs, setPacks] = useState<ManagedRulePack[]>([])
+  const [feedUrlConfigured, setFeedUrlConfigured] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const [syncing, setSyncing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +23,18 @@ export default function ManagedRulesPage() {
   useEffect(() => {
     setPacks([])
     setError(null)
-    fetchPacks()
+    const load = async () => {
+      try {
+        const configRes = await managedRulesApi.getConfig()
+        if (configRes.success && configRes.data) {
+          setFeedUrlConfigured(configRes.data.feed_url_configured)
+        }
+      } catch {
+        setFeedUrlConfigured(false)
+      }
+      fetchPacks()
+    }
+    load()
   }, [pathname])
 
   const fetchPacks = async () => {
@@ -106,11 +118,13 @@ export default function ManagedRulesPage() {
                 </Button>
               </div>
 
-              {error && (
+              {(error || feedUrlConfigured === false) && (
                 <Card className="p-4 bg-destructive/10 border-destructive">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-destructive" />
-                    <p className="text-sm text-destructive">{error}</p>
+                    <p className="text-sm text-destructive">
+                      {error ?? 'MANAGED_RULES_FEED_URL is not set'}
+                    </p>
                   </div>
                 </Card>
               )}
@@ -128,7 +142,11 @@ export default function ManagedRulesPage() {
                     <div className="p-8 text-center text-muted-foreground flex flex-col items-center gap-2">
                       <Package className="h-10 w-10 opacity-50" />
                       <p>No rule packs yet.</p>
-                      <p className="text-sm">Set MANAGED_RULES_FEED_URL and click &quot;Sync now&quot; to create a pack.</p>
+                      <p className="text-sm">
+                        {feedUrlConfigured === true
+                          ? 'Click Sync now to create a pack from the configured feed.'
+                          : 'Set MANAGED_RULES_FEED_URL and click "Sync now" to create a pack.'}
+                      </p>
                       <Button onClick={() => handleSync()} disabled={!!syncing} variant="outline" className="mt-2">
                         <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
                         Sync now

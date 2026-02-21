@@ -31,6 +31,8 @@ COPY config/ ./config/
 
 # Create data directory for SQLite (if used)
 RUN mkdir -p /app/data
+# Built-in managed rules feed (not under volume so it persists in image)
+COPY data/managed-rules-feed.json /app/backend/data/managed-rules-feed.json
 
 # Create non-root user for security
 RUN adduser --disabled-password --gecos '' appuser && \

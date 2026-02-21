@@ -439,7 +439,7 @@ export default function DosProtectionPage() {
                           fill="url(#fillRateLimitDos)"
                           stroke="var(--color-rateLimit)"
                           stackId="a"
-                          radius={[0, 0, 4, 4]}
+                          radius={4}
                           dot={false}
                           isAnimationActive={true}
                         />
@@ -459,7 +459,7 @@ export default function DosProtectionPage() {
                           fill="url(#fillBlacklistDos)"
                           stroke="var(--color-blacklist)"
                           stackId="a"
-                          radius={[4, 4, 0, 0]}
+                          radius={4}
                           dot={false}
                           isAnimationActive={true}
                         />

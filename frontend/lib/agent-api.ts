@@ -58,8 +58,16 @@ export const agentApi = {
     })
 
     if (!res.ok) {
-      const err = await res.json().catch(() => ({ detail: res.statusText }))
-      callbacks.onError?.(err.detail || 'Stream request failed')
+      const text = await res.text()
+      let detail: string | undefined
+      try {
+        const err = JSON.parse(text)
+        detail = typeof err.detail === 'string' ? err.detail : Array.isArray(err.detail) ? err.detail.map((e: any) => e?.msg ?? e).join(', ') : err.message ?? err.detail
+      } catch {
+        detail = text?.slice(0, 200) || res.statusText
+      }
+      const message = detail && detail.trim() ? `${detail} (${res.status})` : `Stream request failed (${res.status})`
+      callbacks.onError?.(message)
       return
     }
 

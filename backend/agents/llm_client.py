@@ -16,6 +16,11 @@ def _get_api_key() -> str:
     )
 
 
+def has_api_key() -> bool:
+    """Return True if an API key is configured for the LLM."""
+    return bool(_get_api_key())
+
+
 def get_llm_client() -> AsyncOpenAI:
     """Create an AsyncOpenAI client from env vars.
 

@@ -1,7 +1,12 @@
 """Security Rules API endpoints."""
+from datetime import datetime
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, Query, Body
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+from backend.config import config
 from backend.database import get_db
 from backend.schemas.security_rules import SecurityRuleRequest
 from backend.controllers import security_rules as ctrl
@@ -36,6 +41,30 @@ async def get_owasp_rules(db: Session = Depends(get_db)):
 
 
 # --- Managed rules (rule packs) ---
+
+# Fixed paths first so they are not matched as pack_id
+# Project root data/ (local); backend/data/ (Docker image copy)
+_resolve_dir = Path(__file__).resolve().parent.parent
+FEED_FILE = _resolve_dir.parent / "data" / "managed-rules-feed.json"
+FEED_FILE_FALLBACK = _resolve_dir / "data" / "managed-rules-feed.json"
+
+
+@router.get("/managed/config")
+async def get_managed_rules_config():
+    """Return whether feed URL is configured (no URL exposed)."""
+    feed_configured = bool((config.MANAGED_RULES_FEED_URL or "").strip())
+    return {"success": True, "data": {"feed_url_configured": feed_configured}, "timestamp": datetime.utcnow().isoformat() + "Z"}
+
+
+@router.get("/managed/feed")
+async def get_managed_rules_feed():
+    """Serve built-in sample rule feed for sync (JSON format)."""
+    from fastapi import HTTPException
+    path = FEED_FILE if FEED_FILE.exists() else (FEED_FILE_FALLBACK if FEED_FILE_FALLBACK.exists() else None)
+    if not path:
+        raise HTTPException(status_code=404, detail="Managed rules feed file not found")
+    return FileResponse(path=str(path), media_type="application/json")
+
 
 @router.get("/managed")
 async def get_managed_rules(

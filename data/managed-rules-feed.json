@@ -1,0 +1,46 @@
+{
+  "rules": [
+    {
+      "id": "sql-001",
+      "name": "SQL injection - union select",
+      "pattern": "(?i)(?:union\\s+select|union\\s+all\\s+select)",
+      "action": "block",
+      "applies_to": "all"
+    },
+    {
+      "id": "sql-002",
+      "name": "SQL injection - comment bypass",
+      "pattern": "(?i)(?:--\\s*$|/\\*.*\\*/)",
+      "action": "block",
+      "applies_to": "all"
+    },
+    {
+      "id": "xss-001",
+      "name": "XSS - script tag",
+      "pattern": "(?i)<script[^>]*>",
+      "action": "block",
+      "applies_to": "all"
+    },
+    {
+      "id": "xss-002",
+      "name": "XSS - javascript: protocol",
+      "pattern": "(?i)javascript\\s*:",
+      "action": "block",
+      "applies_to": "all"
+    },
+    {
+      "id": "path-001",
+      "name": "Path traversal",
+      "pattern": "(?i)(?:\\.\\./|\\.\\.\\\\|%2e%2e%2f|%2e%2e/)",
+      "action": "block",
+      "applies_to": "all"
+    },
+    {
+      "id": "cmd-001",
+      "name": "Command injection - basic",
+      "pattern": "(?i)(?:;\\s*\\||\\|\\s*\\||`[^`]+`|\\$\\s*\\()",
+      "action": "block",
+      "applies_to": "all"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ export function useChartData(timeRange: string): UseChartDataResult {
 
   const fetchTrafficByMinute = useCallback(async (): Promise<ChartDataPoint[]> => {
     try {
-      const response = await trafficApi.getRecent(1000)
+      const response = await trafficApi.getRecent(600)
       if (!response.success || !Array.isArray(response.data)) return []
       const minuteMap = new Map<string, { requests: number; blocked: number; allowed: number }>()
       response.data.forEach((traffic: { timestamp?: string; time?: string; was_blocked?: boolean; wasBlocked?: boolean }) => {

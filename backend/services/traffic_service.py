@@ -22,19 +22,21 @@ class TrafficService:
             .limit(limit)\
             .all()
     
-    def get_traffic_by_range(self, start_time: datetime) -> List[TrafficLog]:
-        """Get traffic logs by time range"""
+    def get_traffic_by_range(self, start_time: datetime, limit: int = 3000) -> List[TrafficLog]:
+        """Get traffic logs by time range (capped to avoid overload under load)."""
         return self.db.query(TrafficLog)\
             .filter(TrafficLog.timestamp >= start_time)\
             .order_by(desc(TrafficLog.timestamp))\
+            .limit(limit)\
             .all()
     
-    def get_traffic_by_endpoint(self, endpoint: str, start_time: datetime) -> List[TrafficLog]:
-        """Get traffic logs for specific endpoint"""
+    def get_traffic_by_endpoint(self, endpoint: str, start_time: datetime, limit: int = 2000) -> List[TrafficLog]:
+        """Get traffic logs for specific endpoint (capped)."""
         return self.db.query(TrafficLog)\
             .filter(TrafficLog.endpoint == endpoint)\
             .filter(TrafficLog.timestamp >= start_time)\
             .order_by(desc(TrafficLog.timestamp))\
+            .limit(limit)\
             .all()
     
     def create_traffic_log(

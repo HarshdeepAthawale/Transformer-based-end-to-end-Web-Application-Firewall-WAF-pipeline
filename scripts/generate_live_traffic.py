@@ -179,25 +179,52 @@ def generate_traffic(duration_seconds=60, requests_per_second=2):
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
 
-    # Parse command line arguments
-    duration = 60  # default 60 seconds
-    rate = 2  # default 2 requests per second
+    parser = argparse.ArgumentParser(
+        description="Generate live traffic through WAF (backend /test/*). Use a moderate rate so the backend and dashboard stay responsive."
+    )
+    parser.add_argument(
+        "duration",
+        nargs="?",
+        type=int,
+        default=None,
+        help="Duration in seconds (ignored if --requests is set)",
+    )
+    parser.add_argument(
+        "rate",
+        nargs="?",
+        type=int,
+        default=None,
+        help="Requests per second (default 2, or use with --requests for load test)",
+    )
+    parser.add_argument(
+        "--requests",
+        "-n",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Total number of requests to send (e.g. 5000). Duration is then N/rate.",
+    )
+    parser.add_argument(
+        "--rate",
+        "-r",
+        type=int,
+        default=None,
+        metavar="R",
+        help="Req/s when using --requests (default 25). Use moderate rate so WAF/dashboard stay responsive.",
+    )
+    args = parser.parse_args()
 
-    if len(sys.argv) > 1:
-        try:
-            duration = int(sys.argv[1])
-        except ValueError:
-            print(f"Invalid duration: {sys.argv[1]}, using default 60 seconds")
-
-    if len(sys.argv) > 2:
-        try:
-            rate = int(sys.argv[2])
-        except ValueError:
-            print(f"Invalid rate: {sys.argv[2]}, using default 2 req/s")
-
-    print(f"\n💡 Usage: python3 {sys.argv[0]} [duration_seconds] [requests_per_second]")
-    print(f"   Example: python3 {sys.argv[0]} 120 5  # 120 seconds at 5 req/s\n")
-
-    generate_traffic(duration_seconds=duration, requests_per_second=rate)
+    if args.requests is not None:
+        total_requests = args.requests
+        rate = args.rate if args.rate is not None else 25
+        duration = max(1, (total_requests + rate - 1) // rate)
+        print(f"\n💡 Sending {total_requests} requests at {rate} req/s (~{duration}s)\n")
+        generate_traffic(duration_seconds=duration, requests_per_second=rate)
+    else:
+        duration = 60 if args.duration is None else args.duration
+        rate = 2 if args.rate is None else args.rate
+        print(f"\n💡 Usage: python3 {sys.argv[0]} [duration_seconds] [requests_per_second]")
+        print(f"   Or:    python3 {sys.argv[0]} --requests 5000 --rate 25\n")
+        generate_traffic(duration_seconds=duration, requests_per_second=rate)

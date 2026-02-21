@@ -103,70 +103,88 @@ export class ApiError extends Error {
   }
 }
 
-// Generic fetch wrapper with error handling
+// Dashboard requests can be slow under load (e.g. 5000 traffic logs); use a generous timeout and retry once
+const API_TIMEOUT_MS = 25000
+
 async function apiRequest<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  retries = 1
 ): Promise<T> {
+  const doRequest = async (): Promise<T> => {
+    const controller = typeof AbortController !== 'undefined' ? new AbortController() : null
+    const timeoutId = controller
+      ? setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+      : null
+    try {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        ...(options.headers as Record<string, string>),
+      }
+      // Attach backend JWT when on client so /api/users and other auth routes work
+      if (typeof window !== 'undefined') {
+        try {
+          const { getSession } = await import('next-auth/react')
+          const session = await getSession()
+          const backendToken = (session?.user as { backendToken?: string } | undefined)?.backendToken
+          if (backendToken) {
+            headers['Authorization'] = `Bearer ${backendToken}`
+          }
+        } catch {
+          // next-auth not available or not in provider (e.g. tests)
+        }
+      }
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers,
+        signal: controller?.signal,
+      })
+
+      if (!response.ok) {
+        let message = `API request failed: ${response.statusText}`
+        try {
+          const errBody = await response.json()
+          if (typeof errBody?.detail === 'string') {
+            message = errBody.detail
+          }
+        } catch {
+          // Ignore JSON parse errors
+        }
+        throw new ApiError(response.status, message)
+      }
+
+      const data = await response.json()
+      return data
+    } finally {
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }
+
   try {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(options.headers as Record<string, string>),
-    }
-    // Attach backend JWT when on client so /api/users and other auth routes work
-    if (typeof window !== 'undefined') {
-      try {
-        const { getSession } = await import('next-auth/react')
-        const session = await getSession()
-        const backendToken = (session?.user as { backendToken?: string } | undefined)?.backendToken
-        if (backendToken) {
-          headers['Authorization'] = `Bearer ${backendToken}`
-        }
-      } catch {
-        // next-auth not available or not in provider (e.g. tests)
-      }
-    }
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-      ...options,
-      headers,
-    })
-
-    if (!response.ok) {
-      let message = `API request failed: ${response.statusText}`
-      try {
-        const errBody = await response.json()
-        if (typeof errBody?.detail === 'string') {
-          message = errBody.detail
-        }
-      } catch {
-        // Ignore JSON parse errors
-      }
-      throw new ApiError(response.status, message)
-    }
-
-    const data = await response.json()
-    return data
+    return await doRequest()
   } catch (error) {
-    if (error instanceof ApiError) {
-      throw error
+    const isRetryable =
+      (error instanceof ApiError && error.status >= 500) ||
+      (error instanceof Error && error.name === 'AbortError') ||
+      (error instanceof TypeError &&
+        (String((error as Error).message).includes('fetch') ||
+          String((error as Error).message).includes('Failed to fetch') ||
+          String((error as Error).message).includes('NetworkError')))
+    if (retries > 0 && isRetryable) {
+      await new Promise((r) => setTimeout(r, 1500))
+      return apiRequest<T>(endpoint, options, 0)
     }
-    
-    // Handle network errors gracefully (backend not running)
-    // These are expected when backend is offline, so mark them specially
-    const isNetworkError = error instanceof TypeError && 
-      (error.message.includes('fetch') || 
-       error.message.includes('Failed to fetch') ||
-       error.message.includes('NetworkError'))
-    
+    if (error instanceof ApiError) throw error
+    const isNetworkError =
+      error instanceof TypeError &&
+      (String((error as Error).message).includes('fetch') ||
+        String((error as Error).message).includes('Failed to fetch') ||
+        String((error as Error).message).includes('NetworkError'))
     if (isNetworkError) {
-      // Network error - backend likely not running
-      // Create a special error that can be handled gracefully
       const networkError = new ApiError(0, 'Backend server not available')
-      // Add a flag to identify network errors
       ;(networkError as any).isNetworkError = true
       throw networkError
     }
-    
     throw new ApiError(0, `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`)
   }
 }
@@ -625,6 +643,9 @@ export interface ManagedRulesResponse {
 }
 
 export const managedRulesApi = {
+  getConfig: (): Promise<ApiResponse<{ feed_url_configured: boolean }>> =>
+    apiRequest('/api/rules/managed/config'),
+
   getPacks: (enabledOnly: boolean = false): Promise<ApiResponse<ManagedRulePack[]>> =>
     apiRequest(`/api/rules/managed/packs?enabled_only=${enabledOnly}`),
 

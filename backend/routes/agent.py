@@ -52,6 +52,12 @@ def _get_orchestrator(request: Request, db: Session):
 @router.post("/chat")
 async def chat(body: ChatRequest, request: Request, db: Session = Depends(get_db)):
     """Non-streaming chat endpoint."""
+    from backend.agents.llm_client import has_api_key
+    if not has_api_key():
+        raise HTTPException(
+            status_code=503,
+            detail="AI Copilot is not configured. Set GROQ_API_KEY, AGENT_API_KEY, or OPENAI_API_KEY and restart the backend.",
+        )
     orchestrator = _get_orchestrator(request, db)
     result = await orchestrator.run(body.message, session_id=body.session_id)
     return {
@@ -64,6 +70,12 @@ async def chat(body: ChatRequest, request: Request, db: Session = Depends(get_db
 @router.post("/chat/stream")
 async def chat_stream(body: ChatRequest, request: Request, db: Session = Depends(get_db)):
     """SSE streaming chat endpoint."""
+    from backend.agents.llm_client import has_api_key
+    if not has_api_key():
+        raise HTTPException(
+            status_code=503,
+            detail="AI Copilot is not configured. Set GROQ_API_KEY, AGENT_API_KEY, or OPENAI_API_KEY and restart the backend.",
+        )
     orchestrator = _get_orchestrator(request, db)
 
     async def event_generator():
