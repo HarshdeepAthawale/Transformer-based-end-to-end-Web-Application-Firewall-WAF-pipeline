@@ -50,8 +50,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === 'google') {
-        // Only harshdeepathawale27@gmail.com gets admin role
-        user.role = user.email === 'harshdeepathawale27@gmail.com' ? 'admin' : 'user'
+        const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .filter(Boolean)
+        const isAdmin = user?.email && adminEmails.includes(user.email.toLowerCase())
+        ;(user as { role?: string }).role = isAdmin ? 'admin' : 'viewer'
       }
       return true
     },

@@ -2,6 +2,10 @@
 
 This directory contains comprehensive documentation for building a Transformer-based end-to-end Web Application Firewall (WAF) pipeline.
 
+## Setup and configuration
+
+**[SETUP.md](SETUP.md)** – Required and optional configuration (Redis, JWT, NextAuth, gateway→backend URLs), first-run checklist, and references to GeoIP and ML model setup.
+
 ## Documentation Structure
 
 ### Phase 1: Environment Setup & Web Application Deployment

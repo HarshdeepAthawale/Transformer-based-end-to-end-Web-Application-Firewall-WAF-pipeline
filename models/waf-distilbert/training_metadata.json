@@ -1,0 +1,30 @@
+{
+  "base_model": "distilbert-base-uncased",
+  "epochs": 5,
+  "augmentation": {
+    "extra_benign": 62,
+    "malicious_pool": 931,
+    "missed_malicious": 857,
+    "missed_malicious_weight": 3
+  },
+  "train_size": 13961,
+  "eval_size": 1552,
+  "final_metrics": {
+    "eval_loss": 0.0167,
+    "eval_accuracy": 0.9961,
+    "eval_f1": 0.9956,
+    "eval_precision": 0.9956,
+    "eval_recall": 0.9956,
+    "eval_runtime": 4.3683,
+    "eval_samples_per_second": 355.29,
+    "eval_steps_per_second": 5.723,
+    "epoch": 5.0
+  },
+  "changes": [
+    "Added CRLF/header injection payloads to training data",
+    "Added SSTI payloads from PayloadsAllTheThings",
+    "Added LDAP/XPATH payloads",
+    "Fixed _req_to_text() to serialize headers (training-inference parity)",
+    "Expanded benign samples for FP control"
+  ]
+}

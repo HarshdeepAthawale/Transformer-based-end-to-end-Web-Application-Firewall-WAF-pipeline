@@ -45,7 +45,7 @@ docker-compose up -d
 
 To run only the WAF gateway with Redis (rate limiting and DDoS): `docker compose -f docker-compose.gateway.yml up -d`.
 
-See [docs/README.md](docs/README.md) for full setup, environment variables, and deployment.
+See [docs/SETUP.md](docs/SETUP.md) for required configuration (Redis, JWT, NextAuth, gateway URLs) and first-run steps. See [docs/README.md](docs/README.md) for full documentation and deployment.
 
 ---
 

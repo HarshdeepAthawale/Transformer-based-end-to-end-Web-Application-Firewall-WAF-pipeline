@@ -44,13 +44,13 @@ export function Header({ variant = 'default' }: { variant?: 'default' | 'light' 
 	return (
 		<header
 			className={cn(
-				'sticky top-4 z-50 w-full mt-4 border-b outline-none rounded-b-lg',
+				'sticky top-0 z-50 w-full border-b outline-none',
 				isLight
-					? 'bg-white border-[#F2F2F2]'
+					? 'bg-white border-[#F2F2F2] rounded-lg'
 					: cn('border-transparent', {
 							'bg-background/95 supports-[backdrop-filter]:bg-background/50 border-border backdrop-blur-lg':
 								scrolled,
-						}),
+						}, 'rounded-b-lg'),
 			)}
 		>
 			{isLight && (
@@ -67,19 +67,23 @@ export function Header({ variant = 'default' }: { variant?: 'default' | 'light' 
 					/>
 				</>
 			)}
-			<nav className="relative mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4">
-				<Link
-					href="/"
-					className={cn(
-						'hover:bg-accent rounded-md p-2 flex items-center gap-2 outline-none',
-						isLight && 'text-[#191A23] hover:bg-[#E8F5B8]',
-					)}
-					aria-label="Home"
-				>
-					<Shield className={cn('h-5 w-5', isLight && 'text-[#191A23]')} />
-					<span className="font-bold text-lg">WAF</span>
-				</Link>
-				<div className="hidden items-center gap-2 md:flex">
+			<nav className="relative mx-auto flex h-14 w-full max-w-5xl items-center px-4">
+				{/* Left: WAF — same width as right for equal side gaps */}
+				<div className="flex flex-1 items-center min-w-0">
+					<Link
+						href="/"
+						className={cn(
+							'hover:bg-accent rounded-md p-2 flex items-center gap-2 outline-none',
+							isLight && 'text-[#191A23] hover:bg-[#E8F5B8]',
+						)}
+						aria-label="Home"
+					>
+						<Shield className={cn('h-5 w-5', isLight && 'text-[#191A23]')} />
+						<span className="font-bold text-lg">WAF</span>
+					</Link>
+				</div>
+				{/* Center: nav links — truly centered for equal space to WAF and to Sign In */}
+				<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2">
 					{links.map((link) => (
 						<a
 							key={link.label}
@@ -92,12 +96,15 @@ export function Header({ variant = 'default' }: { variant?: 'default' | 'light' 
 							{link.label}
 						</a>
 					))}
-					<Button variant="outline" asChild className={isLight ? 'bg-white border-[#191A23] text-[#191A23] hover:bg-[#E8F5B8] hover:text-[#191A23]' : undefined}>
+				</div>
+				{/* Right: Sign In + Get Started — same width as left for equal side gaps */}
+				<div className="flex flex-1 justify-end items-center gap-2 min-w-0">
+					<Button variant="outline" asChild className={cn('hidden md:inline-flex', isLight && 'bg-white border-[#191A23] text-[#191A23] hover:bg-[#E8F5B8] hover:text-[#191A23]')}>
 						<Link href="/login">Sign In</Link>
 					</Button>
 					<Button
 						asChild
-						className={isLight ? 'bg-[#C5E246] text-[#191A23] hover:opacity-90' : undefined}
+						className={cn('hidden md:inline-flex', isLight && 'bg-[#C5E246] text-[#191A23] hover:opacity-90')}
 					>
 						<Link href="/dashboard">Get Started</Link>
 					</Button>
@@ -156,7 +163,7 @@ function MobileMenu({ open, variant = 'default', children, className, ...props }
 			id="mobile-menu"
 			className={cn(
 				'fixed right-0 bottom-0 left-0 z-40 flex flex-col overflow-hidden border-y md:hidden',
-				isLight ? 'top-[4.5rem]' : 'top-14',
+				'top-14',
 				isLight
 					? 'bg-white border-[#F2F2F2]'
 					: 'bg-background/95 supports-[backdrop-filter]:bg-background/50 backdrop-blur-lg',

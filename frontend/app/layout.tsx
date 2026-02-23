@@ -1,11 +1,24 @@
 import React from "react"
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import { Inter, JetBrains_Mono, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { AuthSessionProvider } from '@/components/providers/session-provider'
 import { TimezoneProvider } from '@/contexts/timezone-context'
 import './globals.css'
+
+// Run before first paint so light/dark matches stored preference (avoids flash on settings open)
+const themeInitScript = `
+(function(){
+  var k='waf-theme';
+  var s=null;
+  try{s=localStorage.getItem(k);}catch(e){}
+  var p=s||'system';
+  var r=p==='system'?(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):p;
+  document.documentElement.classList.add(r);
+})();
+`
 
 // Configure Inter font for clean, readable typography
 const inter = Inter({
@@ -49,6 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <body className={`font-sans antialiased bg-background text-foreground`}>
+        <Script id="theme-init" strategy="beforeInteractive" dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="waf-theme">
           <TimezoneProvider>
             <AuthSessionProvider>

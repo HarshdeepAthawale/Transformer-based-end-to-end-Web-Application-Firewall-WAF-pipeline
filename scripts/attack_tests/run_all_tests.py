@@ -23,6 +23,7 @@ TEST_SCRIPTS = [
     ("08_ldap_xpath_injection.py", "LDAP / XPATH / Template Injection"),
     ("09_dos_patterns.py", "DoS/DDoS Patterns"),
     ("10_mixed_blended.py", "Mixed & Blended Attacks"),
+    ("11_fp_regression.py", "False Positive Regression (Benign)"),
 ]
 
 
@@ -113,6 +114,7 @@ def run_test(script_path: Path, name: str) -> dict:
         missed = 0
         errors = 0
         total = 0
+        fp_rate = None
 
         for line in lines:
             # Strip ANSI codes for parsing
@@ -132,9 +134,26 @@ def run_test(script_path: Path, name: str) -> dict:
                     errors = int(clean_line.split(':')[1].strip().split()[0])
                 except (ValueError, IndexError):
                     pass
-            elif 'Total Tests:' in clean_line:
+            elif 'Total Tests:' in clean_line or 'Total Benign Tests:' in clean_line:
                 try:
                     total = int(clean_line.split(':')[1].strip())
+                except (ValueError, IndexError):
+                    pass
+            elif 'Correctly Allowed:' in clean_line:
+                # FP regression test: "Correctly Allowed" maps to allowed (not blocked)
+                try:
+                    allowed = int(clean_line.split(':')[1].strip().split()[0])
+                    missed = allowed  # In FP test, "missed" = correctly not blocked
+                except (ValueError, IndexError):
+                    pass
+            elif 'False Positives:' in clean_line:
+                try:
+                    blocked = int(clean_line.split(':')[1].strip().split()[0])
+                except (ValueError, IndexError):
+                    pass
+            elif 'False Positive Rate:' in clean_line:
+                try:
+                    fp_rate = float(clean_line.split(':')[1].strip().rstrip('%'))
                 except (ValueError, IndexError):
                     pass
 
@@ -179,24 +198,38 @@ def generate_report(results: list):
 
     for r in results:
         if r.get("success"):
-            rate = r["blocked"] / (r["total"] - r["errors"]) * 100 if (r["total"] - r["errors"]) > 0 else 0
+            is_fp_test = "False Positive" in r["name"] or "Benign" in r["name"]
 
-            # Color code based on rate
-            if rate >= 80:
-                color = "\033[92m"  # Green
-            elif rate >= 50:
-                color = "\033[93m"  # Yellow
+            if is_fp_test:
+                # For FP tests: lower blocked = better (blocked = false positives)
+                fp_count = r["blocked"]
+                tested = r["total"] - r["errors"]
+                fp_rate_pct = fp_count / tested * 100 if tested > 0 else 0
+                rate = 100.0 - fp_rate_pct  # Invert: show "pass rate"
+                color = "\033[92m" if fp_rate_pct < 1.0 else ("\033[93m" if fp_rate_pct < 5.0 else "\033[91m")
+                print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
+                    r["name"][:35], r["total"], fp_count, tested - fp_count, color, rate))
+                # Don't add FP test numbers to the attack detection totals
+                total_time += r["elapsed"]
             else:
-                color = "\033[91m"  # Red
+                rate = r["blocked"] / (r["total"] - r["errors"]) * 100 if (r["total"] - r["errors"]) > 0 else 0
 
-            print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
-                r["name"][:35], r["total"], r["blocked"], r["missed"], color, rate))
+                # Color code based on rate
+                if rate >= 80:
+                    color = "\033[92m"  # Green
+                elif rate >= 50:
+                    color = "\033[93m"  # Yellow
+                else:
+                    color = "\033[91m"  # Red
 
-            total_tests += r["total"]
-            total_blocked += r["blocked"]
-            total_missed += r["missed"]
-            total_errors += r["errors"]
-            total_time += r["elapsed"]
+                print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
+                    r["name"][:35], r["total"], r["blocked"], r["missed"], color, rate))
+
+                total_tests += r["total"]
+                total_blocked += r["blocked"]
+                total_missed += r["missed"]
+                total_errors += r["errors"]
+                total_time += r["elapsed"]
         else:
             print("║ {:<35} \033[91m{:>44}\033[0m ║".format(
                 r["name"][:35], f"FAILED: {r.get('error', 'Unknown')}"[:44]))

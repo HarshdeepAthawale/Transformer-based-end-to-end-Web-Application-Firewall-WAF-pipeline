@@ -68,10 +68,17 @@ def compute_metrics(eval_pred):
 # ---------------------------------------------------------------------------
 
 def _req_to_text(req: Dict) -> str:
-    """Convert a stress-test request dict into a raw HTTP-like string for training."""
+    """Convert a stress-test request dict into a raw HTTP-like string for training.
+
+    Now also serializes headers (when present) to match the inference-time
+    format produced by backend.parsing.serializer.serialize_request().
+    This closes the training-inference gap that caused the model to never
+    learn header-based attack patterns (CRLF, smuggling, header overwrite).
+    """
     method = req.get("method", "GET")
     path = req.get("url", "/")
     params = req.get("params")
+    headers = req.get("headers")
     body = req.get("json")
 
     full_path = path
@@ -81,6 +88,14 @@ def _req_to_text(req: Dict) -> str:
             full_path = f"{path}?{qs}"
 
     lines = [f"{method} {full_path} HTTP/1.1"]
+
+    # Serialize headers (matching inference-time serializer skip list)
+    if headers:
+        skip = {"host", "content-length", "connection", "accept-encoding", "transfer-encoding"}
+        for key, value in headers.items():
+            if key.lower() not in skip:
+                lines.append(f"{key}: {value}")
+
     if body is not None:
         lines.append("")
         lines.append(json.dumps(body) if isinstance(body, dict) else str(body))
@@ -124,7 +139,7 @@ def _build_augmentation_samples() -> List[Dict[str, str]]:
     else:
         print("  WARNING: stress_test_1000_evasive.py not found, skipping malicious pool.")
 
-    # 3. Missed malicious samples file (produced by stress test)
+    # 3. Missed malicious samples file (produced by stress test / harvest)
     missed_path = SCRIPT_DIR / "missed_malicious_samples.json"
     if missed_path.exists():
         with open(missed_path) as f:
@@ -135,6 +150,21 @@ def _build_augmentation_samples() -> List[Dict[str, str]]:
             for _ in range(3):
                 rows.append({"text": text, "label": "malicious"})
         print(f"  Loaded {len(missed)} missed-malicious samples (x3 = {len(missed)*3} rows)")
+
+    # 4. Categorized payloads from data/malicious/ (1x weight)
+    data_malicious_dir = PROJECT_ROOT / "data" / "malicious"
+    if data_malicious_dir.exists():
+        cat_count = 0
+        for json_file in sorted(data_malicious_dir.glob("*.json")):
+            try:
+                entries = json.loads(json_file.read_text())
+                for req in entries:
+                    rows.append({"text": _req_to_text(req), "label": "malicious"})
+                cat_count += len(entries)
+            except (json.JSONDecodeError, IOError):
+                pass
+        if cat_count:
+            print(f"  Loaded {cat_count} categorized malicious samples from data/malicious/")
 
     print(f"  Augmentation: {sum(1 for r in rows if r['label']=='benign')} benign, "
           f"{sum(1 for r in rows if r['label']=='malicious')} malicious")

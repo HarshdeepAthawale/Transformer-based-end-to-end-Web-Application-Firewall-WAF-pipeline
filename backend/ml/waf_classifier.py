@@ -121,6 +121,9 @@ class WAFClassifier:
                 return_tensors="pt",
             ).to(self.device)
 
+            # DistilBERT does not use token_type_ids
+            inputs.pop("token_type_ids", None)
+
             # Inference
             with torch.no_grad():
                 outputs = self.model(**inputs)
@@ -179,6 +182,9 @@ class WAFClassifier:
                     padding=True,
                     return_tensors="pt",
                 ).to(self.device)
+
+                # DistilBERT does not use token_type_ids
+                inputs.pop("token_type_ids", None)
 
                 with torch.no_grad():
                     outputs = self.model(**inputs)
@@ -241,14 +247,16 @@ class WAFClassifier:
         Returns:
             Classification result with request reconstruction
         """
-        process_dict = self._to_process_dict(
+        # Use _build_request_text (raw HTTP format) to match training data
+        # format.  The model was trained on un-normalised text so we must
+        # NOT pass through the normaliser here.
+        request_text = self._build_request_text(
             method=request_data.get("method", "GET"),
             path=request_data.get("path", "/"),
             query_params=request_data.get("query_params"),
             headers=request_data.get("headers"),
             body=request_data.get("body"),
         )
-        request_text = self._pipeline.process_dict(process_dict)
         result = self.classify(request_text)
         result["request_text_length"] = len(request_text)
         return result
@@ -328,15 +336,16 @@ class WAFClassifier:
         """
         start_time = time.perf_counter()
 
-        # Normalize and serialize via parsing pipeline
-        process_dict = self._to_process_dict(
+        # Use _build_request_text (raw HTTP format) to match training data
+        # format.  The model was trained on un-normalised text so we must
+        # NOT pass through the normaliser here.
+        request_text = self._build_request_text(
             method=method,
             path=path,
             query_params=query_params,
             headers=headers,
             body=body,
         )
-        request_text = self._pipeline.process_dict(process_dict)
 
         # Run sync classify in thread pool to avoid blocking event loop
         try:

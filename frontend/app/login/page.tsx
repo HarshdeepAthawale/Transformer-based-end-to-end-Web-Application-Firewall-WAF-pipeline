@@ -263,10 +263,11 @@ function LoginForm() {
               variant="outline"
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full rounded-none font-medium py-3 border-2"
+              className="w-full rounded-none font-medium py-3 border-2 bg-white hover:bg-[#E8F5B8]"
               style={{
                 borderColor: '#191A23',
                 color: '#191A23',
+                backgroundColor: '#ffffff',
               }}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

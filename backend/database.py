@@ -15,6 +15,13 @@ DATABASE_URL = os.getenv(
     f"sqlite:///{Path(__file__).parent.parent}/data/waf_dashboard.db"
 )
 
+# Ensure SQLite DB directory exists (SQLAlchemy does not create parent dirs)
+if DATABASE_URL.startswith("sqlite:///"):
+    db_path = Path(DATABASE_URL.replace("sqlite:///", ""))
+    if not db_path.is_absolute():
+        db_path = Path(__file__).parent.parent / db_path
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
 # Create engine
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
@@ -60,6 +67,9 @@ def init_db():
 
     # Seed default Firewall-for-AI prompt-injection pattern if empty (no hardcoded patterns in app code)
     _seed_firewall_ai_patterns()
+
+    # Seed first admin user if users table is empty (optional: set SEED_ADMIN=false to disable)
+    _seed_admin_user()
 
     logger.info("Database initialized successfully - all tables created")
 
@@ -157,6 +167,39 @@ def _seed_firewall_ai_patterns():
             db.close()
     except Exception as e:
         logger.debug(f"Firewall AI patterns seed skipped: {e}")
+
+
+def _seed_admin_user():
+    """Seed one admin user if users table is empty. Guard with SEED_ADMIN=false to disable in production."""
+    if os.getenv("SEED_ADMIN", "true").lower() == "false":
+        return
+    try:
+        from backend.models.users import User, UserRole
+
+        db = SessionLocal()
+        try:
+            if db.query(User).count() > 0:
+                return
+            email = os.getenv("ADMIN_EMAIL", "admin@waf.example")
+            password = os.getenv("ADMIN_PASSWORD", "admin123")
+            username = email.split("@")[0] if "@" in email else email
+            if db.query(User).filter(User.username == username).first() or db.query(User).filter(User.email == email).first():
+                return
+            user = User(
+                username=username,
+                email=email,
+                role=UserRole.ADMIN,
+                full_name="Admin",
+                created_by="seed",
+            )
+            user.set_password(password)
+            db.add(user)
+            db.commit()
+            logger.info("Seeded first admin user (set SEED_ADMIN=false to disable)")
+        finally:
+            db.close()
+    except Exception as e:
+        logger.debug(f"Admin user seed skipped: {e}")
 
 
 def _seed_bot_score_bands():

@@ -75,6 +75,14 @@ export default function SettingsPage() {
   const [activeAlerts, setActiveAlerts] = useState<{ id: number; title: string; description: string; severity?: string; timestamp?: string }[]>([])
   const [alertingSaveStatus, setAlertingSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle')
   const { theme, setTheme } = useTheme()
+  const [themeMounted, setThemeMounted] = useState(false)
+
+  useEffect(() => {
+    setThemeMounted(true)
+  }, [])
+
+  // Resolved preference for UI: avoid wrong state before next-themes has hydrated
+  const displayTheme = themeMounted ? (theme ?? settings?.theme ?? 'system') : (settings?.theme ?? 'system')
 
   // Create API key dialog
   const [createKeyOpen, setCreateKeyOpen] = useState(false)
@@ -92,7 +100,8 @@ export default function SettingsPage() {
         ])
         if (!cancelled && settingsRes?.success && settingsRes.data) {
           setSettings(settingsRes.data)
-          setTheme(settingsRes.data.theme || 'system')
+          const preferred = settingsRes.data.theme || 'system'
+          setTheme((current) => (current === preferred ? current : preferred))
         }
         if (!cancelled && retentionRes?.success && retentionRes.data) {
           setRetention(retentionRes.data)
@@ -262,7 +271,7 @@ export default function SettingsPage() {
                         <button
                           type="button"
                           onClick={() => { setTheme('light'); updateSetting('theme', 'light') }}
-                          className={`p-2 rounded-md transition-colors ${theme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                          className={`p-2 rounded-md transition-colors ${displayTheme === 'light' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
                           title="Light"
                         >
                           <Sun size={18} />
@@ -270,7 +279,7 @@ export default function SettingsPage() {
                         <button
                           type="button"
                           onClick={() => { setTheme('dark'); updateSetting('theme', 'dark') }}
-                          className={`p-2 rounded-md transition-colors ${theme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                          className={`p-2 rounded-md transition-colors ${displayTheme === 'dark' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
                           title="Dark"
                         >
                           <Moon size={18} />
@@ -278,7 +287,7 @@ export default function SettingsPage() {
                         <button
                           type="button"
                           onClick={() => { setTheme('system'); updateSetting('theme', 'system') }}
-                          className={`p-2 rounded-md transition-colors ${theme === 'system' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
+                          className={`p-2 rounded-md transition-colors ${displayTheme === 'system' ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'}`}
                           title="System"
                         >
                           <Monitor size={18} />

@@ -42,6 +42,17 @@ async def lifespan(app: FastAPI):
     """Application lifespan manager"""
     # Startup
     logger.info("Starting WAF API Server...")
+
+    # Require JWT_SECRET in production (prevents token invalidation on restart)
+    if os.getenv("ENV", "").lower() == "production":
+        secret = getattr(config, "JWT_SECRET", "") or ""
+        if not (secret and secret.strip()):
+            logger.critical(
+                "JWT_SECRET is required in production. Set JWT_SECRET to a long random string in .env. "
+                "See .env.example for details."
+            )
+            raise SystemExit(1)
+
     logger.info(f"Database URL: {config.DATABASE_URL}")
 
     # Initialize database

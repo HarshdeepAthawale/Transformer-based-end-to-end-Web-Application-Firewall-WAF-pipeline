@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from typing import Any, Dict
 
 from backend.database import get_db
-from backend.auth import require_waf_api_auth
+from backend.auth import get_current_user, require_waf_api_auth
+from backend.models.users import User
 from backend.controllers import settings as ctrl
 from backend.lib.datetime_utils import utc_now
 
@@ -12,8 +13,11 @@ router = APIRouter()
 
 
 @router.get("")
-async def get_settings(db: Session = Depends(get_db)):
-    """Get all account settings (with defaults for missing keys)."""
+async def get_settings(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Get all account settings (with defaults for missing keys). Auth required."""
     data = ctrl.get_settings(db)
     return {
         "success": True,
@@ -26,8 +30,9 @@ async def get_settings(db: Session = Depends(get_db)):
 async def update_settings(
     payload: Dict[str, Any],
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Update one or more settings. Only allowed keys are persisted."""
+    """Update one or more settings. Only allowed keys are persisted. Auth required."""
     data = ctrl.update_settings(db, payload)
     return {
         "success": True,

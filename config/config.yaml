@@ -50,7 +50,7 @@ waf_service:
   port: 8000
   workers: 4
   timeout: 5.0
-  model_path: "models/waf-anomaly"
+  model_path: "models/waf-distilbert"
   threshold: 0.5
 
 # Log Ingestion Configuration
@@ -108,7 +108,7 @@ integration:
     port: 8000
     workers: 4
     timeout: 5.0
-    model_path: "models/waf-anomaly"
+    model_path: "models/waf-distilbert"
     threshold: 0.5
 
   web_server:
