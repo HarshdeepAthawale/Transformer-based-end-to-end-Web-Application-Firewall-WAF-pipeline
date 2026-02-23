@@ -1,0 +1,42 @@
+# Test applications for WAF testing (vulnerable web apps behind gateway)
+# Usage: docker compose -f docker-compose.yml -f docker-compose.apps.yml up -d
+# Access via gateway at http://localhost:8080 (set UPSTREAM_URL to target app)
+
+services:
+  juice-shop:
+    image: bkimminich/juice-shop:latest
+    ports:
+      - "3002:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  webgoat:
+    image: webgoat/webgoat:latest
+    ports:
+      - "3003:8080"
+    restart: unless-stopped
+    environment:
+      WEBGOAT_PORT: 8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/WebGoat"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  dvwa:
+    image: vulnerables/web-dvwa:latest
+    ports:
+      - "3004:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
