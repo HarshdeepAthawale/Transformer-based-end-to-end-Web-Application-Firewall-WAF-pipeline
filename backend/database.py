@@ -74,6 +74,24 @@ def init_db():
     logger.info("Database initialized successfully - all tables created")
 
 
+# Whitelisted identifiers for dynamic SQL migrations (prevent injection if extended)
+_SAFE_COL_NAMES = frozenset({
+    "attack_score", "block_duration_seconds", "bot_score",
+    "rule_pack_id", "rule_pack_version", "external_id",
+})
+_SAFE_COL_TYPES = frozenset({
+    "INTEGER", "VARCHAR(100)", "VARCHAR(200)",
+})
+
+
+def _validate_migration_column(col_name: str, col_type: str):
+    """Ensure column name and type are in the safe whitelist."""
+    if col_name not in _SAFE_COL_NAMES:
+        raise ValueError(f"Unsafe migration column name: {col_name}")
+    if col_type not in _SAFE_COL_TYPES:
+        raise ValueError(f"Unsafe migration column type: {col_type}")
+
+
 def _migrate_security_events_columns():
     """Add missing columns to security_events (attack_score, block_duration_seconds, bot_score)."""
     from sqlalchemy import text
@@ -88,6 +106,7 @@ def _migrate_security_events_columns():
             result = conn.execute(text("PRAGMA table_info(security_events)"))
             columns = [row[1] for row in result]
             for col_name, col_type in required_columns:
+                _validate_migration_column(col_name, col_type)
                 if col_name not in columns:
                     conn.execute(text(f"ALTER TABLE security_events ADD COLUMN {col_name} {col_type}"))
                     conn.commit()
@@ -95,6 +114,7 @@ def _migrate_security_events_columns():
         else:
             # PostgreSQL
             for col_name, col_type in required_columns:
+                _validate_migration_column(col_name, col_type)
                 result = conn.execute(
                     text(
                         "SELECT column_name FROM information_schema.columns "
@@ -121,6 +141,7 @@ def _migrate_managed_rules_tables():
                 ("rule_pack_version", "VARCHAR(100)"),
                 ("external_id", "VARCHAR(200)"),
             ]:
+                _validate_migration_column(col_name, col_type)
                 if col_name not in columns:
                     conn.execute(text(f"ALTER TABLE security_rules ADD COLUMN {col_name} {col_type}"))
                     conn.commit()
@@ -131,6 +152,7 @@ def _migrate_managed_rules_tables():
                 ("rule_pack_version", "VARCHAR(100)"),
                 ("external_id", "VARCHAR(200)"),
             ]:
+                _validate_migration_column(col_name, col_type)
                 result = conn.execute(
                     text(
                         "SELECT column_name FROM information_schema.columns "
@@ -171,6 +193,8 @@ def _seed_firewall_ai_patterns():
 
 def _seed_admin_user():
     """Seed one admin user if users table is empty. Guard with SEED_ADMIN=false to disable in production."""
+    import secrets as _secrets
+
     if os.getenv("SEED_ADMIN", "true").lower() == "false":
         return
     try:
@@ -181,7 +205,16 @@ def _seed_admin_user():
             if db.query(User).count() > 0:
                 return
             email = os.getenv("ADMIN_EMAIL", "admin@waf.example")
-            password = os.getenv("ADMIN_PASSWORD", "admin123")
+            password = os.getenv("ADMIN_PASSWORD", "")
+            if not password or password == "admin123":
+                # Generate a strong random password instead of using a weak default
+                password = _secrets.token_urlsafe(20)
+                logger.warning(
+                    f"ADMIN_PASSWORD not set or is default. Generated random admin password: {password}  "
+                    "Copy this now — it will not be shown again. Set ADMIN_PASSWORD in .env to use your own."
+                )
+            if len(password) < 10:
+                logger.warning("ADMIN_PASSWORD is shorter than 10 characters. Consider using a stronger password.")
             username = email.split("@")[0] if "@" in email else email
             if db.query(User).filter(User.username == username).first() or db.query(User).filter(User.email == email).first():
                 return

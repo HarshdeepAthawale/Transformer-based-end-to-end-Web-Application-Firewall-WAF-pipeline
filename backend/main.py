@@ -43,7 +43,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting WAF API Server...")
 
-    # Require JWT_SECRET in production (prevents token invalidation on restart)
+    # Require secrets and secure defaults in production
     if os.getenv("ENV", "").lower() == "production":
         secret = getattr(config, "JWT_SECRET", "") or ""
         if not (secret and secret.strip()):
@@ -52,6 +52,17 @@ async def lifespan(app: FastAPI):
                 "See .env.example for details."
             )
             raise SystemExit(1)
+        admin_pw = os.getenv("ADMIN_PASSWORD", "admin123")
+        if admin_pw == "admin123":
+            logger.critical(
+                "ADMIN_PASSWORD must be changed from default in production. "
+                "Set ADMIN_PASSWORD in .env or set SEED_ADMIN=false."
+            )
+            raise SystemExit(1)
+        if os.getenv("SEED_ADMIN", "true").lower() != "false":
+            logger.warning(
+                "SEED_ADMIN is enabled in production. Set SEED_ADMIN=false in .env for production."
+            )
 
     logger.info(f"Database URL: {config.DATABASE_URL}")
 
@@ -165,8 +176,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=config.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-Requested-With"],
 )
 
 # Rate limiting - after CORS, before WAF
@@ -242,8 +253,7 @@ async def global_exception_handler(request: Request, exc: Exception):
         "message": "Internal server error",
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
     }
-    if os.getenv("DEBUG", "false").lower() == "true":
-        content["detail"] = str(exc)
+    # Never leak exception details in responses — they are already logged above
     return JSONResponse(status_code=500, content=content)
 
 
@@ -388,6 +398,26 @@ for module_name, prefix, tag in advanced_routes:
 # WebSocket router
 if config.WEBSOCKET_ENABLED:
     app.include_router(websocket_router, prefix="/ws", tags=["websocket"])
+
+# Phase 1 — Edge Network & Performance (cache, DNS, SSL)
+try:
+    from backend.routes import cache
+    app.include_router(cache.router, prefix="/api/v1/cache", tags=["cache"])
+    logger.info("✓ Registered routes: /api/v1/cache")
+except ImportError as e:
+    logger.warning(f"Cache routes not available: {e}")
+try:
+    from backend.routes import dns
+    app.include_router(dns.router, prefix="/api/v1/dns", tags=["dns"])
+    logger.info("✓ Registered routes: /api/v1/dns")
+except ImportError as e:
+    logger.warning(f"DNS routes not available: {e}")
+try:
+    from backend.routes import ssl
+    app.include_router(ssl.router, prefix="/api/v1/ssl", tags=["ssl"])
+    logger.info("✓ Registered routes: /api/v1/ssl")
+except ImportError as e:
+    logger.warning(f"SSL routes not available: {e}")
 
 
 if __name__ == "__main__":

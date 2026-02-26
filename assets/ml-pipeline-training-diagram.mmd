@@ -1,0 +1,12 @@
+flowchart TB
+    Raw[CIC-IDS2017 CSV] --> Load[Load & Merge]
+    Load --> Label[Multiclass + Binary Labels]
+    Label --> Clean[Clean & Clip Outliers]
+    Clean --> Feat[Feature Selection - 25 features]
+    Feat --> Scale[StandardScaler]
+    Scale --> Split[70/20/10 Stratified Split]
+    Split --> Train[Train 4 Models]
+    Train --> Compare[Compare]
+    Compare --> Best[Select Best - XGBoost]
+    Best --> Eval[Binary Eval on Simulation Set]
+    Eval --> Deploy[Deploy in WAF]

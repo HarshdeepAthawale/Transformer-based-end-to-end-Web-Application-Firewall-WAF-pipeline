@@ -1,0 +1,4536 @@
+{
+  "timestamp": "2026-02-24T02:01:41.766504",
+  "api_base": "http://localhost:3001",
+  "total_requests": 150,
+  "malicious_count": 100,
+  "normal_count": 50,
+  "results": [
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "admin"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.766779",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 15.040397644042969,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "product"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.767934",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 18.1729793548584,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "product"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:41.770379",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 16.69168472290039,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "; cat /etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.771214",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.12656211853027,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.769630",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 42.885780334472656,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.768752",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 48.96259307861328,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "page"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.781974",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 42.5105094909668,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "page"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.772058",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 65.17267227172852,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.772904",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 65.21391868591309,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:41.773884",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 64.3153190612793,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.775002",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 64.06426429748535,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "test"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.787165",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.19111251831055,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "test"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "; cat /etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "; cat /etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.786273",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.694414138793945,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "; cat /etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "/etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.817817",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 24.81698989868164,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:41.824585",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 18.422842025756836,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.811686",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 44.205427169799805,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "orange",
+          "text": "orange"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.812600",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 43.93768310546875,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "../../../etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "../../../etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.839170",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 19.64426040649414,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "../../../etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "admin'--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:41.838310",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 22.222042083740234,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:41.843686",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 17.844438552856445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "<svg onload=alert(1)>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.843176",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 19.52528953552246,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "page": "123"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.841423",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.896974563598633,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "page": "123"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:41.855977",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 16.457080841064453,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:41.837321",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.448001861572266,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.839741",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.717166900634766,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:41.841544",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.57316207885742,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "1"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.858875",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.326677322387695,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "123",
+          "text": "123"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.856620",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 41.121482849121094,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "123",
+          "text": "123"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "/etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.871427",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 30.17401695251465,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "<svg onload=alert(1)>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.872538",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.686689376831055,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:41.860811",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 59.51189994812012,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "1"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.886600",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 33.830881118774414,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:41.888336",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 33.48255157470703,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:41.861797",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 61.502933502197266,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<img src=x onerror=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.862866",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 60.29915809631348,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:41.873925",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 53.59816551208496,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "../../../etc/passwd",
+          "text": "../../../etc/passwd",
+          "query": "../../../etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "../../../etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.888464",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 47.1346378326416,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "../../../etc/passwd",
+          "text": "../../../etc/passwd",
+          "query": "../../../etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "file:///etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.901684",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.3287410736084,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "' OR 1=1--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "' OR 1=1--"
+      },
+      "timestamp": "2026-02-24T02:01:41.902298",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.66729545593262,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "' OR 1=1--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "is_malicious": true,
+        "payload": "<script>alert('XSS')</script>"
+      },
+      "timestamp": "2026-02-24T02:01:41.897860",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.16403579711914,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "1' OR '1'='1"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:41.921068",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 24.136781692504883,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "& whoami"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:41.923369",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 23.325681686401367,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "<script>alert('XSS')</script>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<script>alert('XSS')</script>"
+      },
+      "timestamp": "2026-02-24T02:01:41.927610",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 18.914222717285156,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "<script>alert('XSS')</script>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "/etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.920930",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 25.674104690551758,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "is_malicious": true,
+        "payload": "<script>alert('XSS')</script>"
+      },
+      "timestamp": "2026-02-24T02:01:41.921926",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 37.09554672241211,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:41.923852",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.39101982116699,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.935688",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 32.26494789123535,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:41.943070",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 25.99644660949707,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "1"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.944413",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 26.00407600402832,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "1"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "..\\..\\..\\etc\\passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "..\\..\\..\\etc\\passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.947371",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.002904891967773,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "..\\..\\..\\etc\\passwd"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "& whoami"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:41.946844",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 30.448198318481445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:41.942137",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 37.11414337158203,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "10",
+          "text": "10"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.946927",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.41294479370117,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "10",
+          "text": "10"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<img src=x onerror=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.945649",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 47.95479774475098,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:41.959111",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 47.41692543029785,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.960367",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.494245529174805,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "10"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.969165",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 38.88106346130371,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "10"
+        },
+        "timestamp": "2026-02-24T02:01:41"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.968046",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.69679832458496,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<img src=x onerror=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:41.970520",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 59.541940689086914,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "' OR 1=1--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "' OR 1=1--"
+      },
+      "timestamp": "2026-02-24T02:01:41.993427",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 48.45285415649414,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "' OR 1=1--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "'; DROP TABLE users--",
+          "text": "'; DROP TABLE users--",
+          "query": "'; DROP TABLE users--"
+        },
+        "is_malicious": true,
+        "payload": "'; DROP TABLE users--"
+      },
+      "timestamp": "2026-02-24T02:01:41.979356",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 63.94028663635254,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "'; DROP TABLE users--",
+          "text": "'; DROP TABLE users--",
+          "query": "'; DROP TABLE users--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.976499",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 66.88070297241211,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "page": "test"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:41.994063",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 48.95424842834473,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "page": "test"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "; cat /etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:41.977397",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 67.87490844726562,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "user"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.008164",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 38.78021240234375,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "user"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "php://filter/read=string.rot13/resource=index.php",
+          "text": "php://filter/read=string.rot13/resource=index.php",
+          "query": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "is_malicious": true,
+        "payload": "php://filter/read=string.rot13/resource=index.php"
+      },
+      "timestamp": "2026-02-24T02:01:42.006669",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 50.945281982421875,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "php://filter/read=string.rot13/resource=index.php",
+          "text": "php://filter/read=string.rot13/resource=index.php",
+          "query": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "apple",
+          "text": "apple"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.007594",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 50.84824562072754,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "apple",
+          "text": "apple"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "admin",
+          "text": "admin"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.022834",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 50.11248588562012,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "admin",
+          "text": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:42.030159",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 43.52998733520508,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "admin"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.043516",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 34.11698341369629,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "page": "1"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.045982",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 32.50765800476074,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "page": "1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.047056",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 32.43136405944824,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.042000",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 56.35809898376465,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "is_malicious": true,
+        "payload": "<script>alert('XSS')</script>"
+      },
+      "timestamp": "2026-02-24T02:01:42.044340",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 56.0147762298584,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<script>alert('XSS')</script>",
+          "text": "<script>alert('XSS')</script>",
+          "query": "<script>alert('XSS')</script>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:42.043644",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 70.84536552429199,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.057730",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 58.219194412231445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "file:///etc/passwd",
+          "text": "file:///etc/passwd",
+          "query": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "/etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.058535",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 58.29620361328125,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "/etc/passwd",
+          "text": "/etc/passwd",
+          "query": "/etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "10",
+          "text": "10"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.073037",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 58.44759941101074,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "10",
+          "text": "10"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "php://filter/read=string.rot13/resource=index.php",
+          "text": "php://filter/read=string.rot13/resource=index.php",
+          "query": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "is_malicious": true,
+        "payload": "php://filter/read=string.rot13/resource=index.php"
+      },
+      "timestamp": "2026-02-24T02:01:42.073840",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 58.495521545410156,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "php://filter/read=string.rot13/resource=index.php",
+          "text": "php://filter/read=string.rot13/resource=index.php",
+          "query": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "<svg onload=alert(1)>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.098837",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 35.34293174743652,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.077749",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 76.0953426361084,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "page",
+          "text": "page"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.078760",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 75.37460327148438,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "page",
+          "text": "page"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.114606",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 39.612531661987305,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.079558",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 76.70283317565918,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "1' OR '1'='1"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:42.116924",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 43.81871223449707,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.100473",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 61.121225357055664,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "page": "10"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.131605",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 37.333011627197266,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "page": "10"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "admin'--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:42.134289",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 35.503387451171875,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "123",
+          "text": "123"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.116044",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.788827896118164,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "123",
+          "text": "123"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "javascript:alert('XSS')"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "javascript:alert('XSS')"
+      },
+      "timestamp": "2026-02-24T02:01:42.154886",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 22.04728126525879,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "javascript:alert('XSS')"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "admin'--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:42.153964",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 23.856401443481445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "home"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.155540",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 22.779226303100586,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "home"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "user",
+          "text": "user"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.132440",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 47.36065864562988,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "user",
+          "text": "user"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "<svg onload=alert(1)>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.156339",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 23.35047721862793,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "file:///etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.160853",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 19.520282745361328,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "file:///etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.171244",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 15.508174896240234,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.161696",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 25.953292846679688,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.169050",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 34.665584564208984,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.169894",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 34.812211990356445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' UNION SELECT NULL--",
+          "text": "1' UNION SELECT NULL--",
+          "query": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.177254",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 28.49268913269043,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "'; DROP TABLE users--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "'; DROP TABLE users--"
+      },
+      "timestamp": "2026-02-24T02:01:42.179899",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 26.211261749267578,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "'; DROP TABLE users--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "1"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.181137",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 25.36773681640625,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "admin"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.180013",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 27.906179428100586,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "orange"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.187752",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 24.660587310791016,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "orange"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "apple",
+          "text": "apple"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.178398",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.117502212524414,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "apple",
+          "text": "apple"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "..\\..\\..\\etc\\passwd",
+          "text": "..\\..\\..\\etc\\passwd",
+          "query": "..\\..\\..\\etc\\passwd"
+        },
+        "is_malicious": true,
+        "payload": "..\\..\\..\\etc\\passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.179039",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 46.64754867553711,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "..\\..\\..\\etc\\passwd",
+          "text": "..\\..\\..\\etc\\passwd",
+          "query": "..\\..\\..\\etc\\passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "admin",
+          "text": "admin"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.187111",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.42816162109375,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "admin",
+          "text": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "php://filter/read=string.rot13/resource=index.php"
+      },
+      "timestamp": "2026-02-24T02:01:42.203812",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 27.07362174987793,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "../../../etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "../../../etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.206198",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 25.985240936279297,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "../../../etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "1' OR '1'='1"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:42.212482",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 20.320892333984375,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "123"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.209972",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 22.51434326171875,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "123"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "apple"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.218671",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 13.757467269897461,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "apple"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "product",
+          "text": "product"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.206902",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 45.29404640197754,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "product",
+          "text": "product"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:42.204812",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 48.71726036071777,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<svg onload=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.206766",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 47.077178955078125,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<svg onload=alert(1)>",
+          "text": "<svg onload=alert(1)>",
+          "query": "<svg onload=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "admin'--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:42.227629",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 28.02443504333496,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "'; DROP TABLE users--",
+          "text": "'; DROP TABLE users--",
+          "query": "'; DROP TABLE users--"
+        },
+        "is_malicious": true,
+        "payload": "'; DROP TABLE users--"
+      },
+      "timestamp": "2026-02-24T02:01:42.225811",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.32497787475586,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "'; DROP TABLE users--",
+          "text": "'; DROP TABLE users--",
+          "query": "'; DROP TABLE users--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "orange"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.233612",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 30.824899673461914,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "orange"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.252316",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.26108169555664,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:42.231170",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 63.73476982116699,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "admin'--",
+          "text": "admin'--",
+          "query": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "path": "..\\..\\..\\etc\\passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "..\\..\\..\\etc\\passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.253643",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 41.373491287231445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "path": "..\\..\\..\\etc\\passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "php://filter/read=string.rot13/resource=index.php"
+      },
+      "timestamp": "2026-02-24T02:01:42.253936",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 41.179656982421875,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "php://filter/read=string.rot13/resource=index.php"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.232930",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 63.963890075683594,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "10"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.262270",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 38.46597671508789,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "10"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:42.234866",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 65.7191276550293,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "is_malicious": true,
+        "payload": "1' OR '1'='1"
+      },
+      "timestamp": "2026-02-24T02:01:42.233052",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 69.1373348236084,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1' OR '1'='1",
+          "text": "1' OR '1'='1",
+          "query": "1' OR '1'='1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.255807",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 50.56619644165039,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "; cat /etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.264518",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 58.808088302612305,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "is_malicious": true,
+        "payload": "<img src=x onerror=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.288918",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 35.9959602355957,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "<img src=x onerror=alert(1)>",
+          "text": "<img src=x onerror=alert(1)>",
+          "query": "<img src=x onerror=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "<script>alert('XSS')</script>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<script>alert('XSS')</script>"
+      },
+      "timestamp": "2026-02-24T02:01:42.296998",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 28.110265731811523,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "<script>alert('XSS')</script>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "<img src=x onerror=alert(1)>"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "<img src=x onerror=alert(1)>"
+      },
+      "timestamp": "2026-02-24T02:01:42.295978",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.765844345092773,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "<img src=x onerror=alert(1)>"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "search": "file:///etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.300854",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 24.576425552368164,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "search": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "file:///etc/passwd"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "file:///etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.301511",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 23.83899688720703,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "file:///etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.297464",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 29.83546257019043,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "user": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "; cat /etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.295837",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.566734313964844,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "; cat /etc/passwd",
+          "text": "; cat /etc/passwd",
+          "query": "; cat /etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1",
+          "text": "1"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.302363",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 43.92600059509277,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1",
+          "text": "1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "test",
+          "text": "test"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.306461",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 40.465593338012695,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "test",
+          "text": "test"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "1' UNION SELECT NULL--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "1' UNION SELECT NULL--"
+      },
+      "timestamp": "2026-02-24T02:01:42.328014",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 21.92091941833496,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "1' UNION SELECT NULL--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "cmd": "admin'--"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "admin'--"
+      },
+      "timestamp": "2026-02-24T02:01:42.327146",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 23.476362228393555,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "cmd": "admin'--"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "page"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.328836",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 21.85797691345215,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "page"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "is_malicious": true,
+        "payload": "& whoami"
+      },
+      "timestamp": "2026-02-24T02:01:42.323424",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.03447151184082,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "& whoami",
+          "text": "& whoami",
+          "query": "& whoami"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "../../../etc/passwd",
+          "text": "../../../etc/passwd",
+          "query": "../../../etc/passwd"
+        },
+        "is_malicious": true,
+        "payload": "../../../etc/passwd"
+      },
+      "timestamp": "2026-02-24T02:01:42.325841",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 51.87416076660156,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "../../../etc/passwd",
+          "text": "../../../etc/passwd",
+          "query": "../../../etc/passwd"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.325206",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 52.80637741088867,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "| ls -la",
+          "text": "| ls -la",
+          "query": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "10",
+          "text": "10"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.327384",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 57.46197700500488,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "10",
+          "text": "10"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "file": "| ls -la"
+        },
+        "json": null,
+        "is_malicious": true,
+        "payload": "| ls -la"
+      },
+      "timestamp": "2026-02-24T02:01:42.346372",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 39.977073669433594,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "file": "| ls -la"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "q": "admin"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.347030",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 39.40153121948242,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "q": "admin"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "1",
+          "text": "1"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.332481",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 54.11577224731445,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "1",
+          "text": "1"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "home"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.350757",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 37.19019889831543,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "home"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "GET",
+        "url": "http://localhost:3001/api/test",
+        "params": {
+          "id": "search"
+        },
+        "json": null,
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.351128",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 36.9718074798584,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "GET",
+        "path": "/api/test",
+        "query_params": {
+          "id": "search"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    },
+    {
+      "request_config": {
+        "method": "POST",
+        "url": "http://localhost:3001/api/test",
+        "params": {},
+        "json": {
+          "input": "search",
+          "text": "search"
+        },
+        "is_malicious": false,
+        "payload": null
+      },
+      "timestamp": "2026-02-24T02:01:42.350161",
+      "status_code": 200,
+      "blocked_by_waf": false,
+      "allowed": true,
+      "error": null,
+      "response_time_ms": 43.97869110107422,
+      "response_body": {
+        "success": true,
+        "message": "Request allowed",
+        "method": "POST",
+        "path": "/api/test",
+        "query_params": {},
+        "body": {
+          "input": "search",
+          "text": "search"
+        },
+        "timestamp": "2026-02-24T02:01:42"
+      }
+    }
+  ]
+}

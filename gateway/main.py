@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager
 
 import httpx
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from loguru import logger
 
 from gateway.config import gateway_config
@@ -29,6 +29,8 @@ from gateway import managed_rules as managed_rules_module
 from gateway.upload_scan import is_upload_request, process_upload_scan
 from gateway.firewall_ai import evaluate_request as firewall_ai_evaluate
 from gateway.credential_leak import process_credential_leak
+from gateway.edge_cache import create_edge_cache, create_purge_subscriber
+from gateway.https_rewrite import should_redirect_to_https, build_hsts_header
 
 # Configure logger
 logger.add(
@@ -99,6 +101,17 @@ async def lifespan(app: FastAPI):
     # Event batching: batch events before POST to backend
     start_event_batcher()
 
+    # Edge cache (Phase 1 — CDN layer)
+    app.state.edge_cache = create_edge_cache()
+    if app.state.edge_cache:
+        await app.state.edge_cache.store.connect()
+        purge_sub = create_purge_subscriber(app.state.edge_cache)
+        await purge_sub.start()
+        app.state.cache_purge_subscriber = purge_sub
+        logger.info("Edge cache and cache purge subscriber enabled")
+    else:
+        app.state.cache_purge_subscriber = None
+
     # Initialize WAF classifier (reuse backend factory)
     app.state.waf_service = None
     if gateway_config.WAF_ENABLED:
@@ -137,6 +150,10 @@ async def lifespan(app: FastAPI):
         await app.state.ddos_protection.close()
     if getattr(app.state, "blacklist_checker", None):
         await app.state.blacklist_checker.close()
+    if getattr(app.state, "cache_purge_subscriber", None):
+        await app.state.cache_purge_subscriber.stop()
+    if getattr(app.state, "edge_cache", None):
+        await app.state.edge_cache.close()
     logger.info("Gateway shutdown complete")
 
 
@@ -228,6 +245,9 @@ def _log_gateway_event(
     """Helper to log an event to both MongoDB and the legacy event reporter."""
     event_store: MongoEventStore = request.app.state.event_store
     headers = dict(request.headers)
+    # Redact sensitive headers to prevent credential leakage in logs
+    _SENSITIVE_HEADERS = {"authorization", "cookie", "x-api-key", "proxy-authorization", "set-cookie"}
+    headers = {k: ("[REDACTED]" if k.lower() in _SENSITIVE_HEADERS else v) for k, v in headers.items()}
     header_content_length = headers.get("content-length")
 
     event_store.log_event(
@@ -316,6 +336,32 @@ async def gateway_proxy(request: Request, path: str):
             )
             resp.headers["X-Request-ID"] = request_id
             return resp
+
+    # --- Edge cache lookup (GET/HEAD only; skip body and heavy checks for cache hits) ---
+    edge_cache = getattr(request.app.state, "edge_cache", None)
+    cache_ctx = None  # (cache_key, full_url) to store after forward on miss
+    if edge_cache and request.method in ("GET", "HEAD"):
+        full_url = request.url.path + ("?" + request.url.query if request.url.query else "")
+        if edge_cache.is_cacheable_request(request.method, dict(request.headers)):
+            entry, cache_key, hit_status = await edge_cache.lookup(
+                request.method, full_url, dict(request.headers)
+            )
+            if hit_status in ("HIT", "STALE") and entry:
+                resp = Response(
+                    content=entry.body,
+                    status_code=entry.status_code,
+                    headers=dict(entry.headers),
+                )
+                resp.headers["X-Cache"] = hit_status
+                resp.headers["X-Request-ID"] = request_id
+                return resp
+            if hit_status == "REVALIDATED" and entry:
+                resp = Response(status_code=304)
+                resp.headers["X-Cache"] = "REVALIDATED"
+                resp.headers["X-Request-ID"] = request_id
+                return resp
+            if hit_status == "MISS":
+                cache_ctx = (cache_key, full_url)
 
     # --- Rate limit check (before body read) ---
     rate_limiter = getattr(request.app.state, "rate_limiter", None)
@@ -730,6 +776,26 @@ async def gateway_proxy(request: Request, path: str):
             waf_result.get("attack_score", "")
         )
         response.headers["X-WAF-Mode"] = gateway_config.WAF_MODE
+
+    # Store in edge cache on miss (GET/HEAD, cacheable response)
+    if cache_ctx and edge_cache and request.method in ("GET", "HEAD"):
+        try:
+            body_bytes = getattr(response, "body", None) or getattr(response, "_content", None) or b""
+            if isinstance(body_bytes, bytes) and edge_cache.is_cacheable_response(
+                response.status_code, dict(response.headers)
+            ):
+                await edge_cache.store_response(
+                    cache_ctx[0],
+                    response.status_code,
+                    body_bytes,
+                    dict(response.headers),
+                    request.url.path,
+                    request.method,
+                    cache_ctx[1],
+                )
+                response.headers["X-Cache"] = "MISS"
+        except Exception as e:
+            logger.debug(f"Edge cache store failed: {e}")
 
     return response
 

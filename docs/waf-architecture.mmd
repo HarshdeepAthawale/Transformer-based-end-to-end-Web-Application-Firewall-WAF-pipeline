@@ -1,0 +1,49 @@
+flowchart TB
+    subgraph Client
+        User[Client / Browser]
+    end
+
+    subgraph Gateway["WAF Gateway (gateway/)"]
+        In[Incoming Request]
+        Cache[Edge Cache Lookup]
+        RL[Rate Limit - Redis]
+        DDoS[DDoS Check - Redis]
+        Blacklist[IP Blacklist - Redis]
+        Bot[Bot Score]
+        WAF[WAF Inspect - DistilBERT]
+        Proxy[Reverse Proxy - forward_request]
+        In --> Cache
+        Cache --> RL
+        RL --> DDoS
+        DDoS --> Blacklist
+        Blacklist --> Bot
+        Bot --> WAF
+        WAF --> Proxy
+    end
+
+    subgraph Backend["Backend API (backend/)"]
+        API[FastAPI Routes]
+        DB[(PostgreSQL/SQLite)]
+        API --> DB
+    end
+
+    subgraph Frontend["Dashboard (frontend/)"]
+        UI[Next.js App]
+    end
+
+    subgraph External["External"]
+        Redis[(Redis)]
+        JuiceShop[OWASP Juice Shop]
+        WebGoat[WebGoat]
+        DVWA[DVWA]
+    end
+
+    User --> In
+    Proxy --> JuiceShop
+    Proxy --> WebGoat
+    Proxy --> DVWA
+    Gateway -.->|Events/Metrics| API
+    UI --> API
+    RL --> Redis
+    DDoS --> Redis
+    Blacklist --> Redis

@@ -20,7 +20,13 @@ fi
 mkdir -p logs data
 
 PY="$ROOT/.venv/bin/python"
+[[ -x "$PY" ]] || PY=python3
 echo "Using Python: $PY"
+
+# Start 3 web apps (ports 8080, 8081, 8082) for WAF testing
+if bash "$ROOT/scripts/start_apps.sh"; then
+  sleep 2
+fi
 
 # Start backend (port 3001)
 echo "Starting backend on http://localhost:3001 ..."
@@ -38,11 +44,16 @@ echo "Starting frontend on http://localhost:3000 ..."
 FRONTEND_PID=$!
 
 echo ""
-echo "All three services started."
-echo "  Frontend:  http://localhost:3000"
-echo "  Backend:   http://localhost:3001"
-echo "  WAF (ML):  http://localhost:8000"
+echo "Backend services and 3 web apps started."
+echo "  Frontend:   http://localhost:3000"
+echo "  Backend:    http://localhost:3001"
+echo "  WAF (ML):   http://localhost:8000"
+echo "  Web App 1:  http://localhost:8080"
+echo "  Web App 2:  http://localhost:8081"
+echo "  Web App 3:  http://localhost:8082"
 echo ""
 echo "PIDs: backend=$BACKEND_PID waf=$WAF_PID frontend=$FRONTEND_PID"
 echo "To stop: kill $BACKEND_PID $WAF_PID $FRONTEND_PID"
+echo "To stop everything (including web apps): ./scripts/stop_all.sh"
+echo ""
 wait

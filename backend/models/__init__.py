@@ -22,6 +22,9 @@ from backend.models.bot_score_bands import BotScoreBand
 from backend.models.llm_endpoint import LLMEndpoint
 from backend.models.firewall_ai_pattern import FirewallAIPattern
 from backend.models.rate_limit_config import RateLimitConfig
+from backend.models.cache_purge import CachePurgeLog
+from backend.models.ssl_certificate import SSLCertificate, SSLSettings
+from backend.models.dns_zone import DNSZone, DNSRecord
 
 __all__ = [
     "Metrics",
@@ -53,4 +56,9 @@ __all__ = [
     "LLMEndpoint",
     "FirewallAIPattern",
     "RateLimitConfig",
+    "CachePurgeLog",
+    "SSLCertificate",
+    "SSLSettings",
+    "DNSZone",
+    "DNSRecord",
 ]

@@ -1,0 +1,8 @@
+flowchart LR
+    T[Traffic] --> F[Features]
+    F --> M[4 ML Models]
+    M --> B[Best Model]
+    B --> S[Benign / Malicious]
+    S --> D{Malicious?}
+    D -->|Yes| Block[403 Block]
+    D -->|No| Allow[Allow]

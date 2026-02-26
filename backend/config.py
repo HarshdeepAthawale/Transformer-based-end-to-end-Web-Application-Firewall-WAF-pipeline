@@ -150,6 +150,29 @@ class Config:
     ALERT_FROM_EMAIL: str = os.getenv("ALERT_FROM_EMAIL", "waf-alerts@localhost")
     DASHBOARD_BASE_URL: str = os.getenv("DASHBOARD_BASE_URL", "http://localhost:3000")
     
+    # ACME / SSL certificate management
+    ACME_ENABLED: bool = os.getenv("ACME_ENABLED", "false").lower() == "true"
+    ACME_DIRECTORY_URL: str = os.getenv("ACME_DIRECTORY_URL", "https://acme-v02.api.letsencrypt.org/directory")
+    ACME_EMAIL: str = os.getenv("ACME_EMAIL", "")
+    ACME_STAGING: bool = os.getenv("ACME_STAGING", "true").lower() == "true"
+    CERT_STORAGE_DIR: str = os.getenv("CERT_STORAGE_DIR", "/etc/ssl/waf")
+    CERT_ENCRYPTION_KEY: str = os.getenv("CERT_ENCRYPTION_KEY", "")
+    CERT_RENEWAL_CHECK_HOURS: int = int(os.getenv("CERT_RENEWAL_CHECK_HOURS", "12"))
+    CERT_RENEWAL_DAYS_BEFORE: int = int(os.getenv("CERT_RENEWAL_DAYS_BEFORE", "30"))
+    NGINX_CONFIG_DIR: str = os.getenv("NGINX_CONFIG_DIR", "/etc/nginx/conf.d")
+    NGINX_RELOAD_CMD: str = os.getenv("NGINX_RELOAD_CMD", "nginx -s reload")
+
+    # DNS management
+    DNS_ENABLED: bool = os.getenv("DNS_ENABLED", "false").lower() == "true"
+    DNS_DEFAULT_PROVIDER: str = os.getenv("DNS_DEFAULT_PROVIDER", "manual")
+    DNS_CLOUDFLARE_API_TOKEN: str = os.getenv("DNS_CLOUDFLARE_API_TOKEN", "")
+    DNS_POWERDNS_API_URL: str = os.getenv("DNS_POWERDNS_API_URL", "")
+    DNS_POWERDNS_API_KEY: str = os.getenv("DNS_POWERDNS_API_KEY", "")
+    DNS_GATEWAY_IP: str = os.getenv("DNS_GATEWAY_IP", "")
+
+    # Redis (for cache purge pub/sub, blacklist sync, etc.)
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
+
     @classmethod
     def load_from_yaml(cls, config_path: Optional[str] = None):
         """Load configuration from YAML file"""

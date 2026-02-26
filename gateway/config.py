@@ -111,6 +111,21 @@ class GatewayConfig:
     FIREWALL_AI_FAIL_OPEN: bool = os.getenv("FIREWALL_AI_FAIL_OPEN", "true").lower() == "true"
     FIREWALL_AI_CACHE_TTL_SECONDS: int = int(os.getenv("FIREWALL_AI_CACHE_TTL_SECONDS", "60"))
 
+    # Edge caching (CDN layer)
+    EDGE_CACHE_ENABLED: bool = os.getenv("EDGE_CACHE_ENABLED", "false").lower() == "true"
+    EDGE_CACHE_LOCAL_MAX_ENTRIES: int = int(os.getenv("EDGE_CACHE_LOCAL_MAX_ENTRIES", "10000"))
+    EDGE_CACHE_LOCAL_MAX_BYTES: int = int(os.getenv("EDGE_CACHE_LOCAL_MAX_BYTES", str(256 * 1024 * 1024)))  # 256MB
+    EDGE_CACHE_REDIS_PREFIX: str = os.getenv("EDGE_CACHE_REDIS_PREFIX", "waf:cache:")
+    EDGE_CACHE_DEFAULT_TTL: int = int(os.getenv("EDGE_CACHE_DEFAULT_TTL", "3600"))  # 1 hour
+    EDGE_CACHE_RESPECT_ORIGIN_CC: bool = os.getenv("EDGE_CACHE_RESPECT_ORIGIN_CC", "true").lower() == "true"
+    EDGE_CACHE_BYPASS_COOKIE: str = os.getenv("EDGE_CACHE_BYPASS_COOKIE", "")
+    EDGE_CACHE_COALESCE_ENABLED: bool = os.getenv("EDGE_CACHE_COALESCE_ENABLED", "true").lower() == "true"
+    EDGE_CACHE_COALESCE_TIMEOUT: float = float(os.getenv("EDGE_CACHE_COALESCE_TIMEOUT", "30.0"))
+
+    # HTTPS rewrite
+    HTTPS_REWRITE_ENABLED: bool = os.getenv("HTTPS_REWRITE_ENABLED", "false").lower() == "true"
+    SSL_SETTINGS_CACHE_TTL: int = int(os.getenv("SSL_SETTINGS_CACHE_TTL", "300"))
+
     # Credential leak protection (HIBP; gateway calls backend check)
     CREDENTIAL_LEAK_ENABLED: bool = os.getenv("CREDENTIAL_LEAK_ENABLED", "false").lower() == "true"
     CREDENTIAL_LEAK_BACKEND_URL: str = os.getenv("CREDENTIAL_LEAK_BACKEND_URL", "")

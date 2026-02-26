@@ -1,8 +1,19 @@
 # Full-stack WAF: Backend API, Frontend Dashboard, Gateway, Redis, MongoDB
 # Run: docker compose up -d
 # Dashboard: http://localhost:3000 | Gateway: http://localhost:8080 | Backend API: http://localhost:3001
+# With nginx (optional): http://localhost:80 → frontend + /api → backend
 
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - backend
+
   redis:
     image: redis:7-alpine
     ports:

@@ -1,19 +1,47 @@
 """User Management API endpoints."""
-from typing import Optional
-from fastapi import APIRouter, Depends, HTTPException
+import time
+from collections import defaultdict
+from threading import Lock
+
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.models.users import User
-from backend.auth import get_current_user, optional_admin
+from backend.models.users import User, UserRole
+from backend.auth import get_current_user, require_role
 from backend.schemas.users import UserCreateRequest, LoginRequest, ApiKeyCreateRequest
 from backend.controllers import users as ctrl
 
 router = APIRouter()
 
+# --- Login rate limiter: 5 attempts per IP per 60 seconds ---
+_login_attempts: dict[str, list[float]] = defaultdict(list)
+_login_lock = Lock()
+LOGIN_MAX_ATTEMPTS = 5
+LOGIN_WINDOW_SECONDS = 60
+
+
+def _check_login_rate_limit(request: Request):
+    """Block login if IP exceeds 5 attempts in 60 seconds."""
+    ip = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (
+        request.client.host if request.client else "unknown"
+    )
+    now = time.monotonic()
+    with _login_lock:
+        attempts = _login_attempts[ip]
+        # Prune old entries
+        _login_attempts[ip] = [t for t in attempts if now - t < LOGIN_WINDOW_SECONDS]
+        if len(_login_attempts[ip]) >= LOGIN_MAX_ATTEMPTS:
+            raise HTTPException(
+                status_code=429,
+                detail="Too many login attempts. Try again later.",
+            )
+        _login_attempts[ip].append(now)
+
 
 @router.post("/login")
-async def login(payload: LoginRequest, db: Session = Depends(get_db)):
+async def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)):
+    _check_login_rate_limit(request)
     try:
         return ctrl.login(db, payload.username, payload.password)
     except ValueError as e:
@@ -24,7 +52,7 @@ async def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("")
 async def get_users(
-    current_user: Optional[User] = Depends(optional_admin()),
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
     db: Session = Depends(get_db),
 ):
     return ctrl.get_users(db)
@@ -33,10 +61,9 @@ async def get_users(
 @router.post("")
 async def create_user(
     request: UserCreateRequest,
-    current_user: Optional[User] = Depends(optional_admin()),
+    current_user: User = Depends(require_role(UserRole.ADMIN)),
     db: Session = Depends(get_db),
 ):
-    created_by = current_user.username if current_user else "anonymous"
     try:
         return ctrl.create_user(
             db,
@@ -45,7 +72,7 @@ async def create_user(
             password=request.password,
             role=request.role,
             full_name=request.full_name,
-            created_by=created_by,
+            created_by=current_user.username,
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
