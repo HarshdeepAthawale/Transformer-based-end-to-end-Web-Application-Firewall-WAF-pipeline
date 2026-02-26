@@ -30,7 +30,6 @@ from gateway.upload_scan import is_upload_request, process_upload_scan
 from gateway.firewall_ai import evaluate_request as firewall_ai_evaluate
 from gateway.credential_leak import process_credential_leak
 from gateway.edge_cache import create_edge_cache, create_purge_subscriber
-from gateway.https_rewrite import should_redirect_to_https, build_hsts_header
 
 # Configure logger
 logger.add(

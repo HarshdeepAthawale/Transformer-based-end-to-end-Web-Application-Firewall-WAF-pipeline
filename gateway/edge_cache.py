@@ -545,13 +545,10 @@ class EdgeCache:
 
         # Check conditional request headers from client
         if_none_match = None
-        if_modified_since = None
         for h_name, h_val in request_headers.items():
             h_lower = h_name.lower()
             if h_lower == "if-none-match":
                 if_none_match = h_val
-            elif h_lower == "if-modified-since":
-                if_modified_since = h_val
 
         if if_none_match and entry.etag and if_none_match.strip('"') == entry.etag.strip('"'):
             return entry, cache_key, "REVALIDATED"
