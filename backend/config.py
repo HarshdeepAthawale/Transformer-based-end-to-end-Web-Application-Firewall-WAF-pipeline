@@ -4,11 +4,35 @@ API Server Configuration
 import os
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse, urlunparse
 import yaml
 
 # Load .env file if it exists
 from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent.parent / ".env")
+
+
+def redact_database_url(url: str) -> str:
+    """Return a safe-to-log version of DATABASE_URL with credentials redacted."""
+    try:
+        parsed = urlparse(url)
+        if not parsed.password:
+            return url  # e.g. sqlite has no password
+        # Replace password in netloc with [REDACTED]
+        netloc = parsed.netloc
+        if "@" in netloc:
+            userinfo, host = netloc.rsplit("@", 1)
+            if ":" in userinfo:
+                user = userinfo.split(":", 1)[0]
+                netloc = f"{user}:****@{host}"
+            else:
+                netloc = f"****@{host}"
+        else:
+            netloc = "****"
+        safe = urlunparse(parsed._replace(netloc=netloc))
+        return safe
+    except Exception:
+        return "[REDACTED]"
 
 
 class Config:

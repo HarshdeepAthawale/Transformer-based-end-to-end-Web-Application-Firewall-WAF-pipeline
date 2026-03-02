@@ -10,13 +10,13 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from backend.config import config
+from backend.config import config, redact_database_url
 from backend.main import app
 
 
 if __name__ == "__main__":
     print(f"Starting WAF API Server on {config.API_HOST}:{config.API_PORT}")
-    print(f"Database: {config.DATABASE_URL}")
+    print(f"Database: {redact_database_url(config.DATABASE_URL)}")
     print(f"WebSocket: {'Enabled' if config.WEBSOCKET_ENABLED else 'Disabled'}")
     
     # Use import string for reload to work properly

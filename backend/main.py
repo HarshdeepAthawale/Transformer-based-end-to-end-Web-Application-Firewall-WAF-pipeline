@@ -13,7 +13,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi import HTTPException
 from loguru import logger
 
-from backend.config import config
+from backend.config import config, redact_database_url
 from backend.database import init_db, close_db, get_db
 from backend.routes import (
     metrics,
@@ -64,7 +64,7 @@ async def lifespan(app: FastAPI):
                 "SEED_ADMIN is enabled in production. Set SEED_ADMIN=false in .env for production."
             )
 
-    logger.info(f"Database URL: {config.DATABASE_URL}")
+    logger.info(f"Database URL: {redact_database_url(config.DATABASE_URL)}")
 
     # Initialize database
     try:
