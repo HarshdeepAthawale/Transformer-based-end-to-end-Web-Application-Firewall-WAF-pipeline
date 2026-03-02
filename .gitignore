@@ -25,6 +25,10 @@ build/
 *.swo
 *~
 
+# AI / Editor plans
+.claude/plans
+.cursor/plans
+
 # Environment variables
 .env
 .env.local
