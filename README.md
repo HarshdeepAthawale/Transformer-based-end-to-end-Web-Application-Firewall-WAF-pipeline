@@ -176,3 +176,7 @@ The system operates as a reverse proxy at Layer 7 (Application Layer), intercept
 ## Documentation
 
 Full documentation lives in [docs/](docs/), including phase-by-phase implementation guides, architecture notes, and deployment procedures.
+
+## License
+This project is proprietary. All rights reserved.
+See the LICENSE file for details.
