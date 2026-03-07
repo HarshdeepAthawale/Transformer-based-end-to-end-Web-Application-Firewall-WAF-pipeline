@@ -26,8 +26,8 @@ build/
 *~
 
 # AI / Editor plans
-.claude/plans
-.cursor/plans
+# .claude/plans
+# .cursor/plans
 
 # Environment variables
 .env
