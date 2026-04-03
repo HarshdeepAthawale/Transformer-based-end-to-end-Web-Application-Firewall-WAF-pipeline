@@ -41,7 +41,7 @@ class ActivityService:
         anomaly_score: float = None
     ) -> Activity:
         """Create a new activity"""
-        activity = Activity(org_id=org_id,
+        activity = Activity(
             type=type,
             title=title,
             details=details,

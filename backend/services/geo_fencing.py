@@ -51,7 +51,7 @@ class GeoFencingService:
         
         # Get active geo rules
         rules = self.db.query(GeoRule)\
-            .filter(GeoRule.org_id == org_id).filter(GeoRule.is_active)\
+            .filter(GeoRule.is_active)\
             .order_by(GeoRule.priority.desc())\
             .all()
         
@@ -145,7 +145,7 @@ class GeoFencingService:
         """Get geo rules"""
         query = self.db.query(GeoRule)
         if active_only:
-            query = query.filter(GeoRule.org_id == org_id).filter(GeoRule.is_active)
+            query = query.filter(GeoRule.is_active)
         return query.order_by(GeoRule.priority.desc(), GeoRule.timestamp.desc()).all()
     
     def get_geographic_stats(self, start_time: datetime) -> List[Dict]:
@@ -199,7 +199,7 @@ class GeoFencingService:
                 country_threat_map[cc] = country_threat_map.get(cc, 0) + int(threat_count)
         
         def _resolve_country_name(country_code: str) -> str:
-            rule = self.db.query(GeoRule).filter(GeoRule.org_id == org_id).filter(GeoRule.country_code == country_code).first()
+            rule = self.db.query(GeoRule).filter(GeoRule.country_code == country_code).first()
             if rule and rule.country_name:
                 return rule.country_name
             return get_country_name(country_code)

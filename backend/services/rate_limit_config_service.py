@@ -21,7 +21,7 @@ class RateLimitConfigService:
         return q.order_by(RateLimitConfig.id).all()
 
     def get_by_id(self, config_id: int) -> RateLimitConfig | None:
-        return self.db.query(RateLimitConfig).filter(RateLimitConfig.id == config_id, RateLimitConfig.org_id == org_id).first()
+        return self.db.query(RateLimitConfig).filter(RateLimitConfig.id == config_id).first()
 
     def create(
         self,
