@@ -36,7 +36,7 @@ class AlertEvaluatorTask:
                 db = SessionLocal()
                 try:
                     from backend.models.organization import Organization
-                    orgs = db.query(Organization).filter(Organization.is_active == True).all()
+                    orgs = db.query(Organization).filter(Organization.is_active).all()
                     for org in orgs:
                         run_evaluator_once(db, org.id)
                 finally:
