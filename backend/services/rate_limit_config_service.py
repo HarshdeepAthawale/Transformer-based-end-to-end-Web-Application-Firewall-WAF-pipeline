@@ -30,7 +30,7 @@ class RateLimitConfigService:
         return self.db.query(RateLimitConfig).filter(
             RateLimitConfig.org_id == org_id,
             RateLimitConfig.path_prefix == path,
-            RateLimitConfig.is_active == True,
+            RateLimitConfig.is_active,
         ).first()
 
     def create(

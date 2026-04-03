@@ -56,7 +56,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             config = db.query(RateLimitConfig).filter(
                 RateLimitConfig.org_id == org_id,
                 RateLimitConfig.path_prefix == path,
-                RateLimitConfig.is_active == True
+                RateLimitConfig.is_active
             ).first()
 
             limit = config.requests_per_minute if config else self.default_limit
