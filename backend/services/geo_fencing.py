@@ -115,6 +115,7 @@ class GeoFencingService:
     
     def create_rule(
         self,
+        org_id: int,
         rule_type: GeoRuleType,
         country_code: str,
         country_name: str,
