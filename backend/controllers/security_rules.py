@@ -75,9 +75,9 @@ def delete_rule(db: Session, org_id: int, rule_id: int) -> bool:
     return service.delete_rule(org_id, rule_id)
 
 
-def get_owasp_rules(db: Session) -> dict:
+def get_owasp_rules(db: Session, org_id: int) -> dict:
     service = RulesService(db)
-    rules = service.get_owasp_rules()
+    rules = service.get_owasp_rules(org_id)
     return {
         "success": True,
         "data": [r.to_dict() for r in rules],

@@ -54,8 +54,8 @@ async def create_security_rule(
 
 
 @router.get("/owasp")
-async def get_owasp_rules(db: Session = Depends(get_db)):
-    return ctrl.get_owasp_rules(db)
+async def get_owasp_rules(org_id: int = Depends(get_current_tenant), db: Session = Depends(get_db)):
+    return ctrl.get_owasp_rules(db, org_id)
 
 
 # --- Managed rules (rule packs) ---
