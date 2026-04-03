@@ -15,17 +15,17 @@ class ActivityService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_recent_activities(self, limit: int = 10) -> List[Activity]:
+    def get_recent_activities(self, org_id: int, limit: int = 10) -> List[Activity]:
         """Get recent activities"""
         return self.db.query(Activity)\
             .order_by(desc(Activity.timestamp))\
             .limit(limit)\
             .all()
     
-    def get_activities_by_range(self, start_time: datetime) -> List[Activity]:
+    def get_activities_by_range(self, org_id: int, start_time: datetime) -> List[Activity]:
         """Get activities by time range"""
         return self.db.query(Activity)\
-            .filter(Activity.timestamp >= start_time)\
+            .filter(Activity.org_id == org_id).filter(Activity.timestamp >= start_time)\
             .order_by(desc(Activity.timestamp))\
             .all()
     
@@ -41,7 +41,7 @@ class ActivityService:
         anomaly_score: float = None
     ) -> Activity:
         """Create a new activity"""
-        activity = Activity(
+        activity = Activity(org_id=org_id,
             type=type,
             title=title,
             details=details,

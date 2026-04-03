@@ -18,8 +18,8 @@ class ChartsService:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_requests_chart_data(self, start_time: datetime) -> List[Dict]:
-        """Get requests chart data"""
+    def get_requests_chart_data(self, org_id: int, start_time: datetime) -> List[Dict]:
+        """Get requests chart data for organization"""
         # Aggregate by hour
         results = (
             self.db.query(
@@ -28,6 +28,7 @@ class ChartsService:
                 func.sum(Metrics.blocked_requests).label("blocked"),
                 func.sum(Metrics.allowed_requests).label("allowed"),
             )
+            .filter(Metrics.org_id == org_id)
             .filter(Metrics.timestamp >= start_time)
             .group_by("time")
             .order_by("time")
@@ -61,8 +62,8 @@ class ChartsService:
             for row in results
         ]
 
-    def get_threats_chart_data(self, start_time: datetime) -> List[Dict]:
-        """Get threats chart data"""
+    def get_threats_chart_data(self, org_id: int, start_time: datetime) -> List[Dict]:
+        """Get threats chart data for organization"""
         # Aggregate by hour and threat type
         results = (
             self.db.query(
@@ -70,6 +71,7 @@ class ChartsService:
                 Threat.type,
                 func.count(Threat.id).label("count"),
             )
+            .filter(Threat.org_id == org_id)
             .filter(Threat.timestamp >= start_time)
             .group_by("time", Threat.type)
             .order_by("time")

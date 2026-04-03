@@ -19,19 +19,20 @@ class AnalyticsService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_overview(self, start_time: datetime) -> List[Dict]:
-        """Get analytics overview as time-series (requests, blocked, allowed per time bucket)"""
+    def get_overview(self, org_id: int, start_time: datetime) -> List[Dict]:
+        """Get analytics overview for organization as time-series (requests, blocked, allowed per time bucket)"""
         charts_service = ChartsService(self.db)
-        return charts_service.get_requests_chart_data(start_time)
+        return charts_service.get_requests_chart_data(org_id, start_time)
     
-    def get_trends(self, metric: str, start_time: datetime) -> List[Dict]:
-        """Get trends for a specific metric"""
+    def get_trends(self, org_id: int, metric: str, start_time: datetime) -> List[Dict]:
+        """Get trends for a specific metric for organization"""
         # Aggregate by hour
         if metric == "requests":
             results = self.db.query(
                 func.strftime('%Y-%m-%d %H:00:00', Metrics.timestamp).label('time'),
                 func.sum(Metrics.total_requests).label('value')
             )\
+            .filter(Metrics.org_id == org_id)\
             .filter(Metrics.timestamp >= start_time)\
             .group_by('time')\
             .order_by('time')\
@@ -41,6 +42,7 @@ class AnalyticsService:
                 func.strftime('%Y-%m-%d %H:00:00', Threat.timestamp).label('time'),
                 func.count(Threat.id).label('value')
             )\
+            .filter(Threat.org_id == org_id)\
             .filter(Threat.timestamp >= start_time)\
             .group_by('time')\
             .order_by('time')\
@@ -56,21 +58,24 @@ class AnalyticsService:
             for row in results
         ]
     
-    def get_summary(self, start_time: datetime) -> Dict:
-        """Get analytics summary"""
+    def get_summary(self, org_id: int, start_time: datetime) -> Dict:
+        """Get analytics summary for organization"""
         # Total requests
         total_requests = self.db.query(func.count(TrafficLog.id))\
+            .filter(TrafficLog.org_id == org_id)\
             .filter(TrafficLog.timestamp >= start_time)\
             .scalar() or 0
         
         # Blocked requests
         blocked_requests = self.db.query(func.count(TrafficLog.id))\
+            .filter(TrafficLog.org_id == org_id)\
             .filter(TrafficLog.timestamp >= start_time)\
             .filter(TrafficLog.was_blocked == 1)\
             .scalar() or 0
         
         # Total threats
         total_threats = self.db.query(func.count(Threat.id))\
+            .filter(Threat.org_id == org_id)\
             .filter(Threat.timestamp >= start_time)\
             .scalar() or 0
         
@@ -79,6 +84,7 @@ class AnalyticsService:
             Threat.type,
             func.count(Threat.id).label('count')
         )\
+        .filter(Threat.org_id == org_id)\
         .filter(Threat.timestamp >= start_time)\
         .group_by(Threat.type)\
         .all()

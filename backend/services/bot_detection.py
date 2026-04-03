@@ -23,17 +23,9 @@ class BotDetectionService:
     
     def __init__(self, db: Session):
         self.db = db
-        self._signature_cache = None
-        self._load_signatures()
+        # Signature cache removed for multi-tenancy (fetch per-org on detect)
     
-    def _load_signatures(self):
-        """Load bot signatures into cache"""
-        self._signature_cache = self.db.query(BotSignature)\
-            .filter(BotSignature.is_active)\
-            .all()
-        logger.info(f"Loaded {len(self._signature_cache)} bot signatures")
-    
-    def detect_bot(self, user_agent: str, ip: str, headers: Dict) -> Dict:
+    def detect_bot(self, org_id: int, user_agent: str, ip: str, headers: Dict) -> Dict:
         """
         Detect if request is from a bot. Returns bot_score (1-99), action from bands.
         Cloudflare-style: low score = automated, high score = human.
@@ -93,8 +85,9 @@ class BotDetectionService:
                 "matched_signature": None,
             }
 
-        # Check against signatures
-        for signature in self._signature_cache:
+        # Check against org-specific signatures (no caching for multi-tenancy)
+        signatures = self.db.query(BotSignature).filter(BotSignature.is_active).all()
+        for signature in signatures:
             try:
                 if re.search(signature.user_agent_pattern, user_agent, re.IGNORECASE):
                     signature.detection_count += 1

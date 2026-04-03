@@ -22,10 +22,10 @@ class MetricsService:
         self.db = db
         self._start_time = time.time()
 
-    def get_realtime_metrics(self) -> dict:
-        """Get real-time metrics"""
-        # Try cache first
-        cache_key = "metrics:realtime"
+    def get_realtime_metrics(self, org_id: int) -> dict:
+        """Get real-time metrics for organization"""
+        # Try cache first (with org_id in key)
+        cache_key = f"metrics:realtime:{org_id}"
         cached = cache_service.get(cache_key)
         if cached:
             return cached
@@ -39,6 +39,7 @@ class MetricsService:
                 func.sum(TrafficLog.was_blocked).label("blocked"),
                 func.avg(TrafficLog.processing_time_ms).label("avg_time"),
             )
+            .filter(TrafficLog.org_id == org_id)
             .filter(TrafficLog.timestamp >= five_min_ago)
             .first()
         )
@@ -54,6 +55,7 @@ class MetricsService:
         # Get threat count
         threat_count = (
             self.db.query(func.count(Threat.id))
+            .filter(Threat.org_id == org_id)
             .filter(Threat.timestamp >= five_min_ago)
             .scalar()
             or 0
@@ -73,17 +75,19 @@ class MetricsService:
         cache_service.set(cache_key, result, ttl=5)
         return result
 
-    def get_historical_metrics(self, start_time: datetime) -> List[Metrics]:
-        """Get historical metrics"""
+    def get_historical_metrics(self, org_id: int, start_time: datetime) -> List[Metrics]:
+        """Get historical metrics for organization"""
         return (
             self.db.query(Metrics)
+            .filter(Metrics.org_id == org_id)
             .filter(Metrics.timestamp >= start_time)
             .order_by(Metrics.timestamp)
             .all()
         )
 
-    def create_metrics_snapshot(self, metrics_data: dict) -> Metrics:
-        """Create a metrics snapshot"""
+    def create_metrics_snapshot(self, org_id: int, metrics_data: dict) -> Metrics:
+        """Create a metrics snapshot for organization"""
+        metrics_data['org_id'] = org_id
         metrics = Metrics(**metrics_data)
         self.db.add(metrics)
         self.db.commit()

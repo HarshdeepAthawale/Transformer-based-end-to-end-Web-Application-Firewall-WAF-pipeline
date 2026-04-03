@@ -12,16 +12,16 @@ class RateLimitConfigService:
     def __init__(self, db: Session):
         self.db = db
 
-    def list_all(self, zone_id: str | None = None, active_only: bool = True) -> List[RateLimitConfig]:
+    def list_all(self, org_id: int, zone_id: str | None = None, active_only: bool = True) -> List[RateLimitConfig]:
         q = self.db.query(RateLimitConfig)
         if zone_id is not None:
             q = q.filter(RateLimitConfig.zone_id == zone_id)
         if active_only:
-            q = q.filter(RateLimitConfig.is_active)
+            q = q.filter(RateLimitConfig.org_id == org_id).filter(RateLimitConfig.is_active)
         return q.order_by(RateLimitConfig.id).all()
 
     def get_by_id(self, config_id: int) -> RateLimitConfig | None:
-        return self.db.query(RateLimitConfig).filter(RateLimitConfig.id == config_id).first()
+        return self.db.query(RateLimitConfig).filter(RateLimitConfig.id == config_id, RateLimitConfig.org_id == org_id).first()
 
     def create(
         self,
@@ -75,7 +75,7 @@ class RateLimitConfigService:
         self.db.refresh(r)
         return r
 
-    def delete(self, config_id: int) -> bool:
+    def delete(self, org_id: int, config_id: int) -> bool:
         r = self.get_by_id(config_id)
         if not r:
             return False
