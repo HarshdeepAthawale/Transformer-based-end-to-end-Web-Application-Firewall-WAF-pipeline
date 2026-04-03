@@ -67,3 +67,6 @@ openai>=1.0.0
 
 # Presentation (for update_pitch_deck.py)
 python-pptx>=0.6.21
+
+# Payment / Billing
+razorpay>=1.4.0

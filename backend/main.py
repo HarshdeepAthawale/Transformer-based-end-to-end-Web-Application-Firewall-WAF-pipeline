@@ -318,6 +318,14 @@ try:
 except ImportError as e:
     logger.warning(f"WAF API routes not available: {e}")
 
+# Billing and subscriptions (Razorpay)
+try:
+    from backend.routes import billing
+    app.include_router(billing.router, prefix="/api/billing", tags=["billing"])
+    logger.info("Registered routes: /api/billing")
+except ImportError as e:
+    logger.warning(f"Billing routes not available: {e}")
+
 # WAF service routes (includes /middleware-metrics)
 try:
     from backend.routes import waf
