@@ -3,6 +3,7 @@
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
+from backend.auth import require_waf_api_auth
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
@@ -122,6 +123,7 @@ class UpdateEndpointRequest(BaseModel):
 async def create_llm_endpoint(
     body: CreateEndpointRequest,
     db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
 ) -> dict[str, Any]:
     ep = create_endpoint(
         db,
@@ -138,6 +140,7 @@ async def update_llm_endpoint(
     endpoint_id: int,
     body: UpdateEndpointRequest,
     db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
 ) -> dict[str, Any]:
     ep = update_endpoint(
         db,
@@ -156,6 +159,7 @@ async def update_llm_endpoint(
 async def delete_llm_endpoint(
     endpoint_id: int,
     db: Session = Depends(get_db),
+    _auth=Depends(require_waf_api_auth),
 ) -> dict[str, Any]:
     if not delete_endpoint(db, endpoint_id):
         raise HTTPException(status_code=404, detail="Endpoint not found")

@@ -4,8 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.models.users import User
-from backend.auth import optional_admin
+from backend.auth import get_current_tenant
 from backend.controllers import audit as ctrl
 
 router = APIRouter()
@@ -17,16 +16,16 @@ async def get_audit_logs(
     action: Optional[str] = None,
     resource_type: Optional[str] = None,
     start_time: Optional[str] = None,
-    current_user: Optional[User] = Depends(optional_admin()),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
-    return ctrl.get_logs(db, limit=limit, action=action, resource_type=resource_type, start_time=start_time)
+    return ctrl.get_logs(db, org_id, limit=limit, action=action, resource_type=resource_type, start_time=start_time)
 
 
 @router.get("/logs/{log_id}")
 async def get_audit_log(
     log_id: int,
-    current_user: Optional[User] = Depends(optional_admin()),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
-    return ctrl.get_log(db, log_id)
+    return ctrl.get_log(db, org_id, log_id)

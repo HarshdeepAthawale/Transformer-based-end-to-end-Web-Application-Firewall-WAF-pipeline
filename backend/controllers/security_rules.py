@@ -8,13 +8,14 @@ from backend.models.security_rules import RuleAction, RulePriority
 
 def get_rules(
     db: Session,
+    org_id: int,
     active_only: bool = True,
     pack_id: int | None = None,
     limit: int | None = None,
     offset: int = 0,
 ) -> dict:
     service = RulesService(db)
-    rules, total = service.get_rules(active_only=active_only, pack_id=pack_id, limit=limit, offset=offset)
+    rules, total = service.get_rules(org_id, active_only=active_only, pack_id=pack_id, limit=limit, offset=offset)
     return {
         "success": True,
         "data": [r.to_dict() for r in rules],
@@ -23,14 +24,15 @@ def get_rules(
     }
 
 
-def get_rule_by_id(db: Session, rule_id: int) -> dict | None:
+def get_rule_by_id(db: Session, org_id: int, rule_id: int) -> dict | None:
     service = RulesService(db)
-    rule = service.get_rule_by_id(rule_id)
+    rule = service.get_rule_by_id(org_id, rule_id)
     return {"success": True, "data": rule.to_dict()} if rule else None
 
 
 def create_rule(
     db: Session,
+    org_id: int,
     *,
     name: str,
     rule_type: str,
@@ -47,6 +49,7 @@ def create_rule(
     act = RuleAction[action.upper()] if hasattr(RuleAction, action.upper()) else RuleAction.BLOCK
     prio = RulePriority[priority.upper()] if hasattr(RulePriority, priority.upper()) else RulePriority.MEDIUM
     rule = service.create_rule(
+        org_id,
         name=name,
         rule_type=rule_type,
         pattern=pattern,
@@ -61,15 +64,15 @@ def create_rule(
     return {"success": True, "data": rule.to_dict(), "timestamp": utc_now().isoformat()}
 
 
-def update_rule(db: Session, rule_id: int, **kwargs) -> dict | None:
+def update_rule(db: Session, org_id: int, rule_id: int, **kwargs) -> dict | None:
     service = RulesService(db)
-    rule = service.update_rule(rule_id, **kwargs)
+    rule = service.update_rule(org_id, rule_id, **kwargs)
     return {"success": True, "data": rule.to_dict(), "timestamp": utc_now().isoformat()} if rule else None
 
 
-def delete_rule(db: Session, rule_id: int) -> bool:
+def delete_rule(db: Session, org_id: int, rule_id: int) -> bool:
     service = RulesService(db)
-    return service.delete_rule(rule_id)
+    return service.delete_rule(org_id, rule_id)
 
 
 def get_owasp_rules(db: Session) -> dict:

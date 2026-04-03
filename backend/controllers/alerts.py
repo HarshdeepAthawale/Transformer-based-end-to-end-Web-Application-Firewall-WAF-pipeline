@@ -6,9 +6,9 @@ from backend.services.alert_service import AlertService
 from backend.core.time_range import parse_time_range
 
 
-def get_active(db: Session) -> dict:
+def get_active(db: Session, org_id: int) -> dict:
     service = AlertService(db)
-    alerts = service.get_active_alerts()
+    alerts = service.get_active_alerts(org_id)
     return {
         "success": True,
         "data": [a.to_dict() for a in alerts],
@@ -16,10 +16,10 @@ def get_active(db: Session) -> dict:
     }
 
 
-def get_history(db: Session, range_str: str) -> dict:
+def get_history(db: Session, org_id: int, range_str: str) -> dict:
     service = AlertService(db)
     start_time, _ = parse_time_range(range_str)
-    alerts = service.get_alert_history(start_time)
+    alerts = service.get_alert_history(org_id, start_time)
     return {
         "success": True,
         "data": [a.to_dict() for a in alerts],
@@ -27,9 +27,9 @@ def get_history(db: Session, range_str: str) -> dict:
     }
 
 
-def dismiss(db: Session, alert_id: int) -> dict:
+def dismiss(db: Session, org_id: int, alert_id: int) -> dict:
     service = AlertService(db)
-    success = service.dismiss_alert(alert_id)
+    success = service.dismiss_alert(org_id, alert_id)
     return {
         "success": success,
         "message": "Alert dismissed" if success else "Alert not found",
@@ -37,9 +37,9 @@ def dismiss(db: Session, alert_id: int) -> dict:
     }
 
 
-def acknowledge(db: Session, alert_id: int) -> dict:
+def acknowledge(db: Session, org_id: int, alert_id: int) -> dict:
     service = AlertService(db)
-    success = service.acknowledge_alert(alert_id)
+    success = service.acknowledge_alert(org_id, alert_id)
     return {
         "success": success,
         "message": "Alert acknowledged" if success else "Alert not found",

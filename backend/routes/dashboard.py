@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from backend.database import get_db
+from backend.auth import get_current_tenant
 from backend.models.security_event import SecurityEvent
 
 router = APIRouter()
@@ -36,6 +37,7 @@ def _aggregate_events(db: Session, start_time, event_types: list[str]) -> list[d
 @router.get("/overview")
 async def get_dashboard_overview(
     range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d"),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
     """Aggregate counts and averages for dashboard cards. No mocks."""
@@ -127,6 +129,7 @@ async def get_dashboard_overview(
 @router.get("/charts")
 async def get_dashboard_charts(
     range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d"),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
     """Time-series series per event type (hourly buckets). Data from DB."""
@@ -158,6 +161,7 @@ async def get_dashboard_events(
     range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d"),
     limit: int = Query(50, ge=1, le=200),
     event_type: Optional[str] = Query(None, description="Filter by event_type"),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
     """Recent security events for dashboard table. Optional event_type filter."""
@@ -181,6 +185,7 @@ async def get_dashboard_unified(
     range: str = Query("24h", description="Time range: 1h, 6h, 24h, 7d, 30d"),
     limit: int = Query(50, ge=1, le=200),
     event_type: Optional[str] = Query(None),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
 ):
     """Single response: overview + charts + recent_events. Same data as separate endpoints."""
