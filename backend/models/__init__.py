@@ -1,6 +1,7 @@
 """
 Database models package
 """
+from backend.models.organization import Organization
 from backend.models.metrics import Metrics
 from backend.models.alerts import Alert
 from backend.models.traffic import TrafficLog
@@ -27,6 +28,7 @@ from backend.models.ssl_certificate import SSLCertificate, SSLSettings
 from backend.models.dns_zone import DNSZone, DNSRecord
 
 __all__ = [
+    "Organization",
     "Metrics",
     "Alert",
     "TrafficLog",

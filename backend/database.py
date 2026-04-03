@@ -62,6 +62,9 @@ def init_db():
     # Migration: add rule_packs and security_rules managed-rules columns
     _migrate_managed_rules_tables()
 
+    # Seed default organization (for multi-tenancy)
+    _seed_default_organization()
+
     # Seed default bot score bands if empty
     _seed_bot_score_bands()
 
@@ -233,6 +236,42 @@ def _seed_admin_user():
             db.close()
     except Exception as e:
         logger.debug(f"Admin user seed skipped: {e}")
+
+
+def _seed_default_organization():
+    """Seed a default organization for existing single-tenant data.
+
+    All existing data needs to belong to some organization. This seeds org_id=1
+    as the "Default Organization" for all pre-multi-tenancy data.
+    """
+    try:
+        from backend.models.organization import Organization
+
+        db = SessionLocal()
+        try:
+            # Check if any org already exists
+            existing = db.query(Organization).first()
+            if existing:
+                logger.info(f"Organization already exists: {existing.name} (id={existing.id})")
+                return existing.id
+
+            # Seed default org
+            default_org = Organization(
+                name="Default Organization",
+                slug="default",
+                plan="starter",
+                is_active=True,
+                owner_email=None,
+            )
+            db.add(default_org)
+            db.commit()
+            logger.info(f"Seeded default organization: id={default_org.id}, name='{default_org.name}'")
+            return default_org.id
+        finally:
+            db.close()
+    except Exception as e:
+        logger.debug(f"Default organization seed skipped: {e}")
+        return 1
 
 
 def _seed_bot_score_bands():
