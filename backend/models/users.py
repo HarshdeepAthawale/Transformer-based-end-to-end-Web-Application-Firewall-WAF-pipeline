@@ -7,6 +7,7 @@ from backend.lib.datetime_utils import utc_now
 import enum
 import hashlib
 import secrets
+from passlib.hash import argon2
 
 
 class UserRole(str, enum.Enum):
@@ -47,14 +48,25 @@ class User(Base):
     api_keys = Column(Text, nullable=True)  # JSON array of API keys
 
     def set_password(self, password: str):
-        """Set password with salt"""
-        self.salt = secrets.token_hex(16)
-        self.password_hash = hashlib.sha256((password + self.salt).encode()).hexdigest()
-    
+        """Set password using argon2 (salt is embedded in hash)"""
+        self.password_hash = argon2.hash(password)
+        self.salt = ""  # argon2 embeds salt; no separate salt needed
+
     def check_password(self, password: str) -> bool:
-        """Check password"""
-        hash = hashlib.sha256((password + self.salt).encode()).hexdigest()
-        return hash == self.password_hash
+        """Check password with backward compatibility for legacy SHA-256 hashes"""
+        # If salt exists, this is a legacy SHA-256 hash
+        if self.salt:
+            sha_hash = hashlib.sha256((password + self.salt).encode()).hexdigest()
+            if sha_hash == self.password_hash:
+                # Auto-upgrade to argon2 on successful login (caller must db.commit())
+                self.set_password(password)
+                return True
+            return False
+        # Otherwise use argon2 verification
+        try:
+            return argon2.verify(password, self.password_hash)
+        except Exception:
+            return False
 
     def to_dict(self):
         """Convert to dictionary (without sensitive data)"""

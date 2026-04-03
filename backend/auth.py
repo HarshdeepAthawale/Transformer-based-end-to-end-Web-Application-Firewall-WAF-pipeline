@@ -15,7 +15,12 @@ from backend.models.users import User, UserRole
 from backend.config import config
 
 # JWT settings (use config so API_AUTH can share)
-JWT_SECRET = getattr(config, "JWT_SECRET", None) or secrets.token_urlsafe(32)
+import os
+JWT_SECRET = getattr(config, "JWT_SECRET", None)
+if not JWT_SECRET:
+    if os.getenv("ENV", "").lower() == "production":
+        raise SystemExit("CRITICAL: JWT_SECRET must be set in production")
+    JWT_SECRET = "dev-only-insecure-secret-change-in-prod"
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY = getattr(config, 'JWT_EXPIRY', 3600)  # 1 hour
 
@@ -23,12 +28,13 @@ security = HTTPBearer()
 optional_security = HTTPBearer(auto_error=False)
 
 
-def create_access_token(user_id: int, username: str, role: UserRole) -> str:
-    """Create JWT access token"""
+def create_access_token(user_id: int, username: str, role: UserRole, org_id: int) -> str:
+    """Create JWT access token with org_id for multi-tenancy"""
     payload = {
         "user_id": user_id,
         "username": username,
         "role": role.value,
+        "org_id": org_id,
         "exp": utc_now() + timedelta(seconds=JWT_EXPIRY),
         "iat": utc_now()
     }
@@ -84,6 +90,16 @@ async def get_current_user_optional(
     if not user or not user.is_active:
         return None
     return user
+
+
+async def get_current_tenant(current_user: User = Depends(get_current_user)) -> int:
+    """Get organization ID from authenticated user — used for multi-tenancy enforcement"""
+    if not current_user.org_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User has no organization assigned"
+        )
+    return current_user.org_id
 
 
 def require_role(required_role: UserRole):

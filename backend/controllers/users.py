@@ -28,8 +28,8 @@ def login(db: Session, username: str, password: str) -> dict:
     if not user.is_active:
         raise PermissionError("User account is inactive")
     user.last_login = utc_now()
-    db.commit()
-    token = create_access_token(user.id, user.username, user.role)
+    db.commit()  # Persist bcrypt auto-upgrade if it happened in check_password()
+    token = create_access_token(user.id, user.username, user.role, user.org_id)
     return {
         "success": True,
         "data": {"token": token, "user": user.to_dict()},
@@ -55,13 +55,14 @@ def create_user(
     role: str = "viewer",
     full_name: str | None = None,
     created_by: str,
+    org_id: int = 1,
 ) -> dict:
     if db.query(User).filter(User.username == username).first():
         raise ValueError("Username already exists")
     if db.query(User).filter(User.email == email).first():
         raise ValueError("Email already exists")
     r = UserRole[role.upper()] if hasattr(UserRole, role.upper()) else UserRole.VIEWER
-    user = User(username=username, email=email, role=r, full_name=full_name, created_by=created_by)
+    user = User(org_id=org_id, username=username, email=email, role=r, full_name=full_name, created_by=created_by)
     user.set_password(password)
     db.add(user)
     db.commit()

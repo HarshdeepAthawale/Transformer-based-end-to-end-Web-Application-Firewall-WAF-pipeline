@@ -38,6 +38,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
 
         username = None
         user_id = None
+        org_id = 1  # Default to org 1 if not in token (backward compatibility)
         try:
             from backend.auth import verify_token
             auth_header = request.headers.get("Authorization")
@@ -47,6 +48,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
                 if payload:
                     username = payload.get("username")
                     user_id = payload.get("user_id")
+                    org_id = payload.get("org_id", 1)
         except Exception:
             pass
 
@@ -66,6 +68,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
 
                 resource_type = _resource_type_for_path(request.url.path)
                 log = AuditLog(
+                    org_id=org_id,
                     user_id=user_id,
                     username=username,
                     ip_address=ip_address,
