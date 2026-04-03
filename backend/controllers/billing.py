@@ -27,7 +27,6 @@ def get_subscription(db: Session, org_id: int) -> dict:
             "timestamp": utc_now().isoformat(),
         }
 
-    plan = svc.get_plan_by_slug("free")  # fallback
     from backend.models.billing_plan import BillingPlan
     plan_obj = db.query(BillingPlan).filter(BillingPlan.id == sub.plan_id).first()
 

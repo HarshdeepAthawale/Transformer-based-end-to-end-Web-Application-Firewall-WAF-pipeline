@@ -1,7 +1,7 @@
 """
 Subscription model - tracks org billing state with Razorpay.
 """
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 

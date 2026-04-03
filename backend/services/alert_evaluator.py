@@ -15,7 +15,6 @@ from backend.models.security_event import SecurityEvent
 from backend.models.alerts import Alert, AlertType, AlertSeverity
 from backend.services.alert_service import AlertService
 from backend.services.notification_service import send_alert_webhook
-from backend.controllers.settings import get_alerting_settings
 from backend.config import config
 from loguru import logger
 
