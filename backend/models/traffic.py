@@ -1,7 +1,7 @@
 """
 Traffic logs database model
 """
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Text
 from backend.database import Base
 from datetime import timezone
 from backend.lib.datetime_utils import utc_now
@@ -12,6 +12,7 @@ class TrafficLog(Base):
     __tablename__ = "traffic_logs"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Request details

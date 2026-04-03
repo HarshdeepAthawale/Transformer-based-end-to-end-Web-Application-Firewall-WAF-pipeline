@@ -1,6 +1,6 @@
 """Firewall-for-AI patterns: prompt-injection and PII (from DB or remote URL)."""
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import ForeignKey, Column, Integer, String, Boolean, DateTime
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 
@@ -11,6 +11,7 @@ class FirewallAIPattern(Base):
     __tablename__ = "firewall_ai_patterns"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     pattern_type = Column(String(50), nullable=False)   # prompt_injection | pii
     pattern_value = Column(String(1000), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)

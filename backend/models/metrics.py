@@ -2,7 +2,7 @@
 Metrics database model
 """
 
-from sqlalchemy import Column, Integer, Float, DateTime
+from sqlalchemy import ForeignKey, Column, Integer, Float, DateTime
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 
@@ -13,6 +13,7 @@ class Metrics(Base):
     __tablename__ = "metrics"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
 
     # Request metrics

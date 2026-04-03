@@ -1,7 +1,7 @@
 """
 Threats database model
 """
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 import enum
@@ -19,6 +19,7 @@ class Threat(Base):
     __tablename__ = "threats"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Threat classification

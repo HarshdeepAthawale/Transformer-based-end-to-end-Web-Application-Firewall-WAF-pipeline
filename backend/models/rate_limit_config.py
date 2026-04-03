@@ -2,7 +2,7 @@
 Rate limit configuration - API-driven config for gateway (Feature 9).
 """
 
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 
@@ -13,6 +13,7 @@ class RateLimitConfig(Base):
     __tablename__ = "rate_limit_config"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     path_prefix = Column(String(500), nullable=False, index=True)  # e.g. /api/
     requests_per_minute = Column(Integer, nullable=False)
     window_seconds = Column(Integer, nullable=False, default=60)

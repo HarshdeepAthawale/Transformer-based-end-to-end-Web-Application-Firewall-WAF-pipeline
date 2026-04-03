@@ -1,7 +1,7 @@
 """
 User authentication and authorization models
 """
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, Enum, Text
+from sqlalchemy import ForeignKey, Column, Integer, String, DateTime, Boolean, Enum, Text
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 import enum
@@ -20,6 +20,7 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # User information
@@ -62,6 +63,7 @@ class User(Base):
         
         return {
             "id": self.id,
+            "org_id": self.org_id,
             "username": self.username,
             "email": self.email,
             "role": self.role.value if self.role else None,

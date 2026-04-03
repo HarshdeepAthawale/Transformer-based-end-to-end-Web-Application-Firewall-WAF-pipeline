@@ -180,6 +180,7 @@ def _seed_firewall_ai_patterns():
             if count == 0:
                 db.add(
                     FirewallAIPattern(
+                        org_id=1,
                         pattern_type="prompt_injection",
                         pattern_value="ignore previous instructions",
                         is_active=True,
@@ -222,6 +223,7 @@ def _seed_admin_user():
             if db.query(User).filter(User.username == username).first() or db.query(User).filter(User.email == email).first():
                 return
             user = User(
+                org_id=1,
                 username=username,
                 email=email,
                 role=UserRole.ADMIN,

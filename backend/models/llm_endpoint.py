@@ -1,6 +1,6 @@
 """LLM endpoints: path patterns and methods for Firewall-for-AI."""
 
-from sqlalchemy import Column, Integer, String, Boolean, DateTime
+from sqlalchemy import ForeignKey, Column, Integer, String, Boolean, DateTime
 from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 
@@ -11,6 +11,7 @@ class LLMEndpoint(Base):
     __tablename__ = "llm_endpoints"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     path_pattern = Column(String(500), nullable=False)  # e.g. /api/chat, /v1/completions (prefix match) or regex
     methods = Column(String(100), nullable=False)       # e.g. POST or POST,PUT
     label = Column(String(100), nullable=False)         # e.g. chat

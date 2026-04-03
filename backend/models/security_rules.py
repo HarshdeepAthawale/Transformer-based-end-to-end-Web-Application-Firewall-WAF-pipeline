@@ -26,6 +26,7 @@ class SecurityRule(Base):
     __tablename__ = "security_rules"
 
     id = Column(Integer, primary_key=True, index=True)
+    org_id = Column(Integer, ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False, index=True)
     timestamp = Column(DateTime, default=utc_now, index=True, nullable=False)
     
     # Rule information
