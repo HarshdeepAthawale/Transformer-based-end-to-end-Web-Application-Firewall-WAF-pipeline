@@ -130,3 +130,6 @@ applications/app3-dvwa/.git/
 applications/*/logs/
 applications/*/*.log
 applications/app1-juice-shop
+
+
+.obsidian
