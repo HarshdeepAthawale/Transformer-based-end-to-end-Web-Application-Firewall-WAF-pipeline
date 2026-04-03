@@ -10,6 +10,7 @@ from backend.config import config
 ALERTING_KEYS = {
     "webhook_url": str,
     "webhook_headers": str,  # JSON object string
+    "webhook_secret": str,  # SECURITY: HMAC signing secret for webhook verification
     "alert_rule_block_rate_threshold": float,
     "alert_rule_block_rate_window_minutes": int,
     "alert_rule_ddos_count_threshold": int,
@@ -27,6 +28,7 @@ ALLOWED_KEYS = {
     "alert_severity_medium": bool,
     "webhook_url": str,
     "webhook_headers": str,
+    "webhook_secret": str,
     "alert_emails": str,
     "alert_rule_block_rate_threshold": float,
     "alert_rule_block_rate_window_minutes": int,
@@ -44,6 +46,7 @@ DEFAULTS = {
     "alert_severity_medium": False,
     "webhook_url": "",
     "webhook_headers": "",
+    "webhook_secret": "",
     "alert_emails": "",
     "alert_rule_block_rate_threshold": getattr(config, "ALERT_RULE_BLOCK_RATE_THRESHOLD", 0.1),
     "alert_rule_block_rate_window_minutes": getattr(config, "ALERT_RULE_BLOCK_RATE_WINDOW_MINUTES", 5),
@@ -97,7 +100,22 @@ def get_alerting_settings(db: Session) -> Dict[str, Any]:
             out[k] = DEFAULTS.get(k)
     # Mask webhook URL for display if desired (e.g. show last 4 chars only)
     if out.get("webhook_url") and len(out["webhook_url"]) > 8:
-        out["webhook_url_masked"] = out["webhook_url"][:4] + "…" + out["webhook_url"][-4:]
+        out["webhook_url_masked"] = out["webhook_url"][:4] + "..." + out["webhook_url"][-4:]
+    # SECURITY: never return the actual webhook_secret; only indicate whether it is set
+    out["webhook_secret_set"] = bool(out.get("webhook_secret"))
+    out.pop("webhook_secret", None)
+    return out
+
+
+def get_alerting_settings_with_secret(db: Session) -> Dict[str, Any]:
+    """Return alerting settings including the raw webhook_secret (for internal use only)."""
+    full = get_settings(db)
+    out = {}
+    for k in ALERTING_KEYS:
+        if k in full:
+            out[k] = full[k]
+        else:
+            out[k] = DEFAULTS.get(k)
     return out
 
 

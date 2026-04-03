@@ -37,10 +37,12 @@ DDOS_EVENT_TYPES = ["ddos_burst", "ddos_blocked", "ddos_size"]
 
 def _get_alerting_config(db: Session) -> Dict[str, Any]:
     """Alerting config: DB settings override env."""
-    cfg = get_alerting_settings(db)
+    from backend.controllers.settings import get_alerting_settings_with_secret
+    cfg = get_alerting_settings_with_secret(db)
     return {
         "webhook_url": (cfg.get("webhook_url") or "").strip()
                        or (getattr(config, "ALERT_WEBHOOK_URL", "") or "").strip(),
+        "webhook_secret": (cfg.get("webhook_secret") or "").strip() or None,
         "webhook_headers": _parse_webhook_headers(
             cfg.get("webhook_headers") or getattr(config, "ALERT_WEBHOOK_HEADERS", "") or ""
         ),
@@ -146,7 +148,8 @@ def _notify_webhook(cfg: Dict[str, Any], alert: Alert) -> None:
     if not url:
         return
     headers = cfg.get("webhook_headers") or {}
-    send_alert_webhook(url, alert.to_dict(), extra_headers=headers)
+    secret = cfg.get("webhook_secret") or None
+    send_alert_webhook(url, alert.to_dict(), extra_headers=headers, webhook_secret=secret)
 
 
 def run_evaluator_once(db: Session, org_id: int) -> None:
