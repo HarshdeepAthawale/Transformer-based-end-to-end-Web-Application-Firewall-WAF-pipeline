@@ -72,9 +72,9 @@ def _parse_webhook_headers(raw: str) -> Dict[str, str]:
         return {}
 
 
-def evaluate_rules(db: Session) -> None:
+def evaluate_rules(db: Session, org_id: int) -> None:
     """
-    Evaluate alert rules: block rate and DDoS count in window.
+    Evaluate alert rules: block rate and DDoS count in window per org.
     On trigger: create alert, send webhook (and email via maybe_send_notifications if desired).
     """
     cfg = _get_alerting_config(db)
@@ -83,17 +83,20 @@ def evaluate_rules(db: Session) -> None:
 
     # Total events in window
     total = db.query(func.count(SecurityEvent.id)).filter(
+        SecurityEvent.org_id == org_id,
         SecurityEvent.timestamp >= start_time
     ).scalar() or 0
 
     # Block count
     block_count = db.query(func.count(SecurityEvent.id)).filter(
+        SecurityEvent.org_id == org_id,
         SecurityEvent.event_type.in_(BLOCK_EVENT_TYPES),
         SecurityEvent.timestamp >= start_time,
     ).scalar() or 0
 
     # DDoS count
     ddos_count = db.query(func.count(SecurityEvent.id)).filter(
+        SecurityEvent.org_id == org_id,
         SecurityEvent.event_type.in_(DDOS_EVENT_TYPES),
         SecurityEvent.timestamp >= start_time,
     ).scalar() or 0
@@ -112,6 +115,7 @@ def evaluate_rules(db: Session) -> None:
             f"({block_count} blocks / {total} requests). Threshold: {threshold:.1%}."
         )
         alert = alert_service.create_alert(
+            org_id=org_id,
             type=AlertType.WARNING,
             severity=AlertSeverity.HIGH,
             title=title,
@@ -127,6 +131,7 @@ def evaluate_rules(db: Session) -> None:
             f"DDoS events in last {window_minutes} min: {ddos_count}. Threshold: {ddos_threshold}."
         )
         alert = alert_service.create_alert(
+            org_id=org_id,
             type=AlertType.CRITICAL,
             severity=AlertSeverity.HIGH,
             title=title,
@@ -144,9 +149,9 @@ def _notify_webhook(cfg: Dict[str, Any], alert: Alert) -> None:
     send_alert_webhook(url, alert.to_dict(), extra_headers=headers)
 
 
-def run_evaluator_once(db: Session) -> None:
-    """Run evaluator once (for use from background task or cron)."""
+def run_evaluator_once(db: Session, org_id: int) -> None:
+    """Run evaluator once for a specific organization (for use from background task or cron)."""
     try:
-        evaluate_rules(db)
+        evaluate_rules(db, org_id)
     except Exception as e:
-        logger.exception(f"Alert evaluator error: {e}")
+        logger.exception(f"Alert evaluator error for org {org_id}: {e}")

@@ -10,12 +10,13 @@ from backend.services.threat_intel_service import ThreatIntelService
 
 def get_feeds(
     db: Session,
+    org_id: int,
     threat_type: Optional[str] = None,
     active_only: bool = True,
     limit: int = 100,
 ) -> dict:
     service = ThreatIntelService(db)
-    threats = service.get_threats(threat_type, active_only, limit)
+    threats = service.get_threats(threat_type, active_only, limit, org_id=org_id)
     return {
         "success": True,
         "data": [t.to_dict() for t in threats],
@@ -25,6 +26,7 @@ def get_feeds(
 
 def add_threat(
     db: Session,
+    org_id: int,
     *,
     threat_type: str,
     value: str,
@@ -41,13 +43,14 @@ def add_threat(
         severity=severity,
         category=category,
         source=source,
+        org_id=org_id,
         description=description,
         expires_at=expires_at,
     )
     return {"success": True, "data": threat.to_dict(), "timestamp": utc_now().isoformat()}
 
 
-def check_ip(db: Session, ip: str) -> dict:
+def check_ip(db: Session, org_id: int, ip: str) -> dict:
     service = ThreatIntelService(db)
-    result = service.check_threat(ip)
+    result = service.check_threat(ip, org_id=org_id)
     return {"success": True, "data": result, "timestamp": utc_now().isoformat()}

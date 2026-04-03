@@ -21,7 +21,8 @@ class ThreatIntelService:
         ip: str,
         path: str = None,
         query_params: Dict = None,
-        body: str = None
+        body: str = None,
+        org_id: int = None
     ) -> Dict:
         """
         Check if IP/path/query/body matches threat intelligence
@@ -34,11 +35,13 @@ class ThreatIntelService:
         }
         """
         # Check IP threats
-        ip_threat = self.db.query(ThreatIntel)\
+        query = self.db.query(ThreatIntel)\
             .filter(ThreatIntel.threat_type == 'ip')\
             .filter(ThreatIntel.value == ip)\
-            .filter(ThreatIntel.is_active)\
-            .first()
+            .filter(ThreatIntel.is_active)
+        if org_id is not None:
+            query = query.filter(ThreatIntel.org_id == org_id)
+        ip_threat = query.first()
         
         if ip_threat:
             # Check if expired
@@ -56,11 +59,13 @@ class ThreatIntelService:
         
         # Check domain/path threats
         if path:
-            domain_threats = self.db.query(ThreatIntel)\
+            query = self.db.query(ThreatIntel)\
                 .filter(ThreatIntel.threat_type == 'domain')\
-                .filter(ThreatIntel.is_active)\
-                .all()
-            
+                .filter(ThreatIntel.is_active)
+            if org_id is not None:
+                query = query.filter(ThreatIntel.org_id == org_id)
+            domain_threats = query.all()
+
             for threat in domain_threats:
                 if threat.value in path:
                     return {
@@ -70,15 +75,17 @@ class ThreatIntelService:
                         'source': threat.source,
                         'description': threat.description or "Path contains known malicious domain"
                     }
-        
+
         # Check signature threats
         if query_params or body:
             combined_text = f"{str(query_params)} {body or ''}".lower()
-            
-            signature_threats = self.db.query(ThreatIntel)\
+
+            query = self.db.query(ThreatIntel)\
                 .filter(ThreatIntel.threat_type == 'signature')\
-                .filter(ThreatIntel.is_active)\
-                .all()
+                .filter(ThreatIntel.is_active)
+            if org_id is not None:
+                query = query.filter(ThreatIntel.org_id == org_id)
+            signature_threats = query.all()
             
             for threat in signature_threats:
                 import re
@@ -110,11 +117,13 @@ class ThreatIntelService:
         severity: str,
         category: str,
         source: str,
+        org_id: int = None,
         description: str = None,
         expires_at: datetime = None
     ) -> ThreatIntel:
         """Add threat intelligence entry"""
         threat = ThreatIntel(
+            org_id=org_id,
             threat_type=threat_type,
             value=value,
             severity=severity,
@@ -125,7 +134,7 @@ class ThreatIntelService:
             first_seen=utc_now(),
             last_seen=utc_now()
         )
-        
+
         self.db.add(threat)
         self.db.commit()
         self.db.refresh(threat)
@@ -135,16 +144,19 @@ class ThreatIntelService:
         self,
         threat_type: str = None,
         active_only: bool = True,
-        limit: int = 100
+        limit: int = 100,
+        org_id: int = None
     ) -> List[ThreatIntel]:
         """Get threat intelligence entries"""
         query = self.db.query(ThreatIntel)
-        
+
+        if org_id is not None:
+            query = query.filter(ThreatIntel.org_id == org_id)
         if threat_type:
             query = query.filter(ThreatIntel.threat_type == threat_type)
         if active_only:
             query = query.filter(ThreatIntel.is_active)
-        
+
         return query.order_by(ThreatIntel.timestamp.desc()).limit(limit).all()
     
     def cleanup_expired(self):
