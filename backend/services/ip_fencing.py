@@ -18,23 +18,24 @@ class IPFencingService:
     def __init__(self, db: Session):
         self.db = db
     
-    def is_ip_blocked(self, ip: str) -> Tuple[bool, Optional[str]]:
+    def is_ip_blocked(self, org_id: int, ip: str) -> Tuple[bool, Optional[str]]:
         """
-        Check if IP is blocked
+        Check if IP is blocked for organization.
         Returns: (is_blocked, reason)
         """
         try:
             ip_obj = ipaddress.ip_address(ip)
         except ValueError:
             return False, None
-        
+
         # Check exact IP match
         exact_match = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.ip == ip)\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .first()
-        
+
         if exact_match:
             # Check if temporary block expired (expires_at may be naive from DB)
             now = utc_now()
@@ -47,14 +48,15 @@ class IPFencingService:
                     self.db.commit()
                     return False, None
             return True, exact_match.reason or "IP is blacklisted"
-        
+
         # Check IP ranges (CIDR)
         ip_ranges = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.is_range)\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .all()
-        
+
         for ip_range in ip_ranges:
             try:
                 network = ipaddress.ip_network(ip_range.ip_range, strict=False)
@@ -62,33 +64,35 @@ class IPFencingService:
                     return True, ip_range.reason or "IP is in blacklisted range"
             except ValueError:
                 continue
-        
+
         return False, None
     
-    def is_ip_whitelisted(self, ip: str) -> bool:
-        """Check if IP is whitelisted"""
+    def is_ip_whitelisted(self, org_id: int, ip: str) -> bool:
+        """Check if IP is whitelisted for organization"""
         try:
             ip_obj = ipaddress.ip_address(ip)
         except ValueError:
             return False
-        
+
         # Check exact IP match
         exact_match = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.ip == ip)\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
             .first()
-        
+
         if exact_match:
             return True
-        
+
         # Check IP ranges
         ip_ranges = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.is_range)\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
             .all()
-        
+
         for ip_range in ip_ranges:
             try:
                 network = ipaddress.ip_network(ip_range.ip_range, strict=False)
@@ -96,7 +100,7 @@ class IPFencingService:
                     return True
             except ValueError:
                 continue
-        
+
         return False
     
     def get_ip_reputation(self, ip: str) -> Optional[IPReputation]:
@@ -236,26 +240,28 @@ class IPFencingService:
         
         self.db.commit()
     
-    def auto_block_ip(self, ip: str, reason: str, duration_hours: int = 24) -> Optional[IPBlacklist]:
-        """Automatically block IP based on reputation"""
+    def auto_block_ip(self, org_id: int, ip: str, reason: str, duration_hours: int = 24) -> Optional[IPBlacklist]:
+        """Automatically block IP based on reputation for organization"""
         reputation = self.get_ip_reputation(ip)
-        
+
         if not reputation or reputation.reputation_score >= 0.3:
             return None  # Don't auto-block if reputation is acceptable
-        
+
         # Check if already blocked
         existing = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.ip == ip)\
             .filter(IPBlacklist.is_active)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .first()
-        
+
         if existing:
             return existing
-        
+
         # Create auto-block
         expires_at = utc_now() + timedelta(hours=duration_hours)
         block = IPBlacklist(
+            org_id=org_id,
             ip=ip,
             list_type=IPListType.BLACKLIST,
             block_type=IPBlockType.AUTO,
@@ -264,28 +270,30 @@ class IPFencingService:
             expires_at=expires_at,
             auto_unblock=True
         )
-        
+
         self.db.add(block)
         self.db.commit()
         self.db.refresh(block)
-        
+
         logger.info(f"Auto-blocked IP {ip} for {duration_hours} hours: {reason}")
         return block
     
     def add_to_blacklist(
         self,
+        org_id: int,
         ip: str,
         reason: str,
         source: str = "manual",
         duration_hours: Optional[int] = None,
         created_by: str = None
     ) -> IPBlacklist:
-        """Add IP to blacklist"""
+        """Add IP to blacklist for organization"""
         expires_at = None
         if duration_hours:
             expires_at = utc_now() + timedelta(hours=duration_hours)
-        
+
         block = IPBlacklist(
+            org_id=org_id,
             ip=ip,
             list_type=IPListType.BLACKLIST,
             block_type=IPBlockType.TEMPORARY if duration_hours else IPBlockType.PERMANENT,
@@ -295,15 +303,16 @@ class IPFencingService:
             auto_unblock=bool(duration_hours),
             created_by=created_by
         )
-        
+
         self.db.add(block)
         self.db.commit()
         self.db.refresh(block)
         return block
-    
-    def add_to_whitelist(self, ip: str, reason: str, created_by: str = None) -> IPBlacklist:
-        """Add IP to whitelist"""
+
+    def add_to_whitelist(self, org_id: int, ip: str, reason: str, created_by: str = None) -> IPBlacklist:
+        """Add IP to whitelist for organization"""
         whitelist = IPBlacklist(
+            org_id=org_id,
             ip=ip,
             list_type=IPListType.WHITELIST,
             block_type=IPBlockType.PERMANENT,
@@ -311,38 +320,41 @@ class IPFencingService:
             source="manual",
             created_by=created_by
         )
-        
+
         self.db.add(whitelist)
         self.db.commit()
         self.db.refresh(whitelist)
         return whitelist
     
-    def remove_from_list(self, ip: str, list_type: IPListType) -> bool:
-        """Remove IP from blacklist or whitelist"""
+    def remove_from_list(self, org_id: int, ip: str, list_type: IPListType) -> bool:
+        """Remove IP from blacklist or whitelist for organization"""
         entries = self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.ip == ip)\
             .filter(IPBlacklist.list_type == list_type)\
             .filter(IPBlacklist.is_active)\
             .all()
-        
+
         for entry in entries:
             entry.is_active = False
-        
+
         self.db.commit()
         return len(entries) > 0
     
-    def get_blacklist(self, limit: int = 100) -> List[IPBlacklist]:
-        """Get active blacklist entries"""
+    def get_blacklist(self, org_id: int, limit: int = 100) -> List[IPBlacklist]:
+        """Get active blacklist entries for organization"""
         return self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.list_type == IPListType.BLACKLIST)\
             .filter(IPBlacklist.is_active)\
             .order_by(IPBlacklist.timestamp.desc())\
             .limit(limit)\
             .all()
-    
-    def get_whitelist(self, limit: int = 100) -> List[IPBlacklist]:
-        """Get active whitelist entries"""
+
+    def get_whitelist(self, org_id: int, limit: int = 100) -> List[IPBlacklist]:
+        """Get active whitelist entries for organization"""
         return self.db.query(IPBlacklist)\
+            .filter(IPBlacklist.org_id == org_id)\
             .filter(IPBlacklist.list_type == IPListType.WHITELIST)\
             .filter(IPBlacklist.is_active)\
             .order_by(IPBlacklist.timestamp.desc())\

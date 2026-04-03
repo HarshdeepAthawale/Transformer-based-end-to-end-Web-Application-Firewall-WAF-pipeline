@@ -18,23 +18,26 @@ class AlertService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_active_alerts(self) -> List[Alert]:
-        """Get active alerts (active and not dismissed)."""
+    def get_active_alerts(self, org_id: int) -> List[Alert]:
+        """Get active alerts (active and not dismissed) for organization."""
         return self.db.query(Alert)\
+            .filter(Alert.org_id == org_id)\
             .filter(Alert.is_active)\
             .filter(~Alert.is_dismissed)\
             .order_by(desc(Alert.timestamp))\
             .all()
     
-    def get_alert_history(self, start_time: datetime) -> List[Alert]:
-        """Get alert history"""
+    def get_alert_history(self, org_id: int, start_time: datetime) -> List[Alert]:
+        """Get alert history for organization"""
         return self.db.query(Alert)\
+            .filter(Alert.org_id == org_id)\
             .filter(Alert.timestamp >= start_time)\
             .order_by(desc(Alert.timestamp))\
             .all()
     
     def create_alert(
         self,
+        org_id: int,
         type: AlertType,
         severity: AlertSeverity,
         title: str,
@@ -46,8 +49,9 @@ class AlertService:
         related_threat_id: int = None,
         actions: List[str] = None
     ) -> Alert:
-        """Create a new alert"""
+        """Create a new alert for organization"""
         alert = Alert(
+            org_id=org_id,
             type=type,
             severity=severity,
             title=title,
@@ -67,9 +71,12 @@ class AlertService:
         self.db.refresh(alert)
         return alert
     
-    def dismiss_alert(self, alert_id: int) -> bool:
-        """Dismiss an alert"""
-        alert = self.db.query(Alert).filter(Alert.id == alert_id).first()
+    def dismiss_alert(self, org_id: int, alert_id: int) -> bool:
+        """Dismiss an alert for organization"""
+        alert = self.db.query(Alert).filter(
+            Alert.id == alert_id,
+            Alert.org_id == org_id
+        ).first()
         if alert:
             alert.is_dismissed = True
             alert.is_active = False
@@ -78,9 +85,12 @@ class AlertService:
             return True
         return False
     
-    def acknowledge_alert(self, alert_id: int) -> bool:
-        """Acknowledge an alert"""
-        alert = self.db.query(Alert).filter(Alert.id == alert_id).first()
+    def acknowledge_alert(self, org_id: int, alert_id: int) -> bool:
+        """Acknowledge an alert for organization"""
+        alert = self.db.query(Alert).filter(
+            Alert.id == alert_id,
+            Alert.org_id == org_id
+        ).first()
         if alert:
             alert.is_acknowledged = True
             alert.acknowledged_at = utc_now()

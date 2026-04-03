@@ -33,7 +33,7 @@ def ip_fencing(db_session):
 
 def test_ip_not_blocked_when_blacklist_empty(ip_fencing):
     """IP should not be blocked when blacklist is empty."""
-    is_blocked, reason = ip_fencing.is_ip_blocked("192.168.1.1")
+    is_blocked, reason = ip_fencing.is_ip_blocked(1, "192.168.1.1")
     assert is_blocked is False
     assert reason is None
 
@@ -52,7 +52,7 @@ def test_ip_blocked_exact_match(ip_fencing, db_session):
     db_session.add(entry)
     db_session.commit()
 
-    is_blocked, reason = ip_fencing.is_ip_blocked("10.0.0.5")
+    is_blocked, reason = ip_fencing.is_ip_blocked(1, "10.0.0.5")
     assert is_blocked is True
     assert reason is not None
 
@@ -72,7 +72,7 @@ def test_ip_blocked_by_cidr_range(ip_fencing, db_session):
     db_session.add(entry)
     db_session.commit()
 
-    is_blocked, _ = ip_fencing.is_ip_blocked("192.168.1.100")
+    is_blocked, _ = ip_fencing.is_ip_blocked(1, "192.168.1.100")
     assert is_blocked is True
 
 
@@ -91,7 +91,7 @@ def test_ip_not_blocked_outside_cidr(ip_fencing, db_session):
     db_session.add(entry)
     db_session.commit()
 
-    is_blocked, _ = ip_fencing.is_ip_blocked("192.168.2.1")
+    is_blocked, _ = ip_fencing.is_ip_blocked(1, "192.168.2.1")
     assert is_blocked is False
 
 
@@ -109,13 +109,13 @@ def test_whitelist_takes_precedence(ip_fencing, db_session):
     db_session.add(entry)
     db_session.commit()
 
-    is_whitelisted = ip_fencing.is_ip_whitelisted("172.16.0.1")
+    is_whitelisted = ip_fencing.is_ip_whitelisted(1, "172.16.0.1")
     assert is_whitelisted is True
 
 
 def test_invalid_ip_returns_false(ip_fencing):
     """Invalid IP format should return not blocked."""
-    is_blocked, _ = ip_fencing.is_ip_blocked("not-an-ip")
+    is_blocked, _ = ip_fencing.is_ip_blocked(1, "not-an-ip")
     assert is_blocked is False
 
 
@@ -134,5 +134,5 @@ def test_expired_temporary_block_not_blocked(ip_fencing, db_session):
     db_session.add(entry)
     db_session.commit()
 
-    is_blocked, _ = ip_fencing.is_ip_blocked("10.0.0.10")
+    is_blocked, _ = ip_fencing.is_ip_blocked(1, "10.0.0.10")
     assert is_blocked is False

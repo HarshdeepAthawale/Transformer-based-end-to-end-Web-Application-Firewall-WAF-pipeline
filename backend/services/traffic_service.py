@@ -15,24 +15,27 @@ class TrafficService:
     def __init__(self, db: Session):
         self.db = db
     
-    def get_recent_traffic(self, limit: int = 50) -> List[TrafficLog]:
-        """Get recent traffic logs"""
+    def get_recent_traffic(self, org_id: int, limit: int = 50) -> List[TrafficLog]:
+        """Get recent traffic logs for organization"""
         return self.db.query(TrafficLog)\
+            .filter(TrafficLog.org_id == org_id)\
             .order_by(desc(TrafficLog.timestamp))\
             .limit(limit)\
             .all()
     
-    def get_traffic_by_range(self, start_time: datetime, limit: int = 3000) -> List[TrafficLog]:
-        """Get traffic logs by time range (capped to avoid overload under load)."""
+    def get_traffic_by_range(self, org_id: int, start_time: datetime, limit: int = 3000) -> List[TrafficLog]:
+        """Get traffic logs by time range for organization (capped to avoid overload)."""
         return self.db.query(TrafficLog)\
+            .filter(TrafficLog.org_id == org_id)\
             .filter(TrafficLog.timestamp >= start_time)\
             .order_by(desc(TrafficLog.timestamp))\
             .limit(limit)\
             .all()
     
-    def get_traffic_by_endpoint(self, endpoint: str, start_time: datetime, limit: int = 2000) -> List[TrafficLog]:
-        """Get traffic logs for specific endpoint (capped)."""
+    def get_traffic_by_endpoint(self, org_id: int, endpoint: str, start_time: datetime, limit: int = 2000) -> List[TrafficLog]:
+        """Get traffic logs for specific endpoint in organization (capped)."""
         return self.db.query(TrafficLog)\
+            .filter(TrafficLog.org_id == org_id)\
             .filter(TrafficLog.endpoint == endpoint)\
             .filter(TrafficLog.timestamp >= start_time)\
             .order_by(desc(TrafficLog.timestamp))\
@@ -41,6 +44,7 @@ class TrafficService:
     
     def create_traffic_log(
         self,
+        org_id: int,
         ip: str,
         method: str,
         endpoint: str,
@@ -55,8 +59,9 @@ class TrafficService:
         country_code: str = None,
         threat_type: str = None
     ) -> TrafficLog:
-        """Create a new traffic log"""
+        """Create a new traffic log for organization"""
         log = TrafficLog(
+            org_id=org_id,
             ip=ip,
             method=method,
             endpoint=endpoint,
@@ -78,6 +83,7 @@ class TrafficService:
 
     def add_traffic_log_from_ingest_event(
         self,
+        org_id: int,
         event_type: str,
         ip: str,
         method: Optional[str] = None,
@@ -111,6 +117,7 @@ class TrafficService:
                 threat_type = event_type[:50]
         anomaly_score = float(attack_score) / 100.0 if attack_score is not None else None
         log = TrafficLog(
+            org_id=org_id,
             ip=ip,
             method=method,
             endpoint=endpoint,

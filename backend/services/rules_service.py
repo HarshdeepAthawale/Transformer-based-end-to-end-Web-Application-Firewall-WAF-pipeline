@@ -14,19 +14,14 @@ from backend.models.rule_packs import RulePack
 
 class RulesService:
     """Service for security rules engine"""
-    
+
     def __init__(self, db: Session):
         self.db = db
-        self._rules_cache = None
-        self._load_rules()
-    
-    def _load_rules(self):
-        """Load active rules into cache"""
-        self._rules_cache, _ = self.get_rules(active_only=True, limit=None, offset=0)
-        logger.info(f"Loaded {len(self._rules_cache)} active security rules")
+        # In-memory cache removed for multi-tenancy (org_id-aware rules per query)
     
     def check_rules(
         self,
+        org_id: int,
         method: str,
         path: str,
         headers: Dict,
@@ -34,7 +29,7 @@ class RulesService:
         body: str = None
     ) -> Dict:
         """
-        Check request against security rules
+        Check request against security rules for organization.
         Returns: {
             'matched': bool,
             'rule_id': int,
@@ -43,7 +38,9 @@ class RulesService:
             'priority': str
         }
         """
-        if not self._rules_cache:
+        # Fetch org-specific rules (no caching for multi-tenancy)
+        rules, _ = self.get_rules(org_id, active_only=True, limit=None, offset=0)
+        if not rules:
             return {
                 'matched': False,
                 'rule_id': None,
@@ -51,15 +48,15 @@ class RulesService:
                 'action': None,
                 'priority': None
             }
-        
+
         # Check rules in priority order
-        for rule in self._rules_cache:
+        for rule in rules:
             if self._rule_matches(rule, method, path, headers, query_params, body):
                 # Update statistics
                 rule.match_count += 1
                 rule.last_matched = utc_now()
                 self.db.commit()
-                
+
                 return {
                     'matched': True,
                     'rule_id': rule.id,
@@ -67,7 +64,7 @@ class RulesService:
                     'action': rule.action.value if rule.action else 'block',
                     'priority': rule.priority.value if rule.priority else 'medium'
                 }
-        
+
         return {
             'matched': False,
             'rule_id': None,
@@ -134,6 +131,7 @@ class RulesService:
     
     def create_rule(
         self,
+        org_id: int,
         name: str,
         rule_type: str,
         pattern: str,
@@ -146,9 +144,10 @@ class RulesService:
         match_conditions: dict = None,
         is_active: bool = True,
     ) -> SecurityRule:
-        """Create security rule"""
+        """Create security rule for organization"""
         match_json = json.dumps(match_conditions) if match_conditions else None
         rule = SecurityRule(
+            org_id=org_id,
             name=name,
             description=description,
             rule_type=rule_type,
@@ -161,27 +160,28 @@ class RulesService:
             created_by=created_by,
             is_active=is_active,
         )
-        
+
         self.db.add(rule)
         self.db.commit()
         self.db.refresh(rule)
-        
-        # Reload cache
-        self._load_rules()
-        
+
         return rule
     
-    def get_rule_by_id(self, rule_id: int) -> SecurityRule | None:
-        """Get a single rule by id."""
-        return self.db.query(SecurityRule).filter(SecurityRule.id == rule_id).first()
+    def get_rule_by_id(self, org_id: int, rule_id: int) -> SecurityRule | None:
+        """Get a single rule by id for organization."""
+        return self.db.query(SecurityRule).filter(
+            SecurityRule.id == rule_id,
+            SecurityRule.org_id == org_id
+        ).first()
     
     def update_rule(
         self,
+        org_id: int,
         rule_id: int,
         **kwargs
     ) -> SecurityRule | None:
-        """Update rule by id. Returns None if not found or system rule."""
-        rule = self.get_rule_by_id(rule_id)
+        """Update rule by id for organization. Returns None if not found or system rule."""
+        rule = self.get_rule_by_id(org_id, rule_id)
         if not rule or rule.is_system_rule:
             return None
         for k, v in list(kwargs.items()):
@@ -197,28 +197,27 @@ class RulesService:
                 setattr(rule, k, v)
         self.db.commit()
         self.db.refresh(rule)
-        self._load_rules()
         return rule
     
-    def delete_rule(self, rule_id: int) -> bool:
-        """Soft-deactivate rule. Returns False if not found or system rule."""
-        rule = self.get_rule_by_id(rule_id)
+    def delete_rule(self, org_id: int, rule_id: int) -> bool:
+        """Soft-deactivate rule for organization. Returns False if not found or system rule."""
+        rule = self.get_rule_by_id(org_id, rule_id)
         if not rule or rule.is_system_rule:
             return False
         rule.is_active = False
         self.db.commit()
-        self._load_rules()
         return True
     
     def get_rules(
         self,
+        org_id: int,
         active_only: bool = True,
         pack_id: int | None = None,
         limit: int | None = None,
         offset: int = 0,
     ) -> tuple[List[SecurityRule], int]:
-        """Get security rules with optional filters. Returns (list, total_count)."""
-        query = self.db.query(SecurityRule)
+        """Get security rules for organization with optional filters. Returns (list, total_count)."""
+        query = self.db.query(SecurityRule).filter(SecurityRule.org_id == org_id)
         if active_only:
             query = query.filter(SecurityRule.is_active)
         if pack_id is not None:
@@ -231,26 +230,28 @@ class RulesService:
             query = query.limit(limit)
         return query.all(), total
     
-    def get_rules_legacy(self, active_only: bool = True) -> List[SecurityRule]:
-        """Legacy: get all rules without pagination (for backward compatibility)."""
-        rules, _ = self.get_rules(active_only=active_only, limit=None, offset=0)
+    def get_rules_legacy(self, org_id: int, active_only: bool = True) -> List[SecurityRule]:
+        """Legacy: get all rules without pagination for organization (backward compatibility)."""
+        rules, _ = self.get_rules(org_id, active_only=active_only, limit=None, offset=0)
         return rules
-    
-    def get_owasp_rules(self) -> List[SecurityRule]:
-        """Get OWASP Top 10 rules"""
+
+    def get_owasp_rules(self, org_id: int) -> List[SecurityRule]:
+        """Get OWASP Top 10 rules for organization"""
         return self.db.query(SecurityRule)\
+            .filter(SecurityRule.org_id == org_id)\
             .filter(SecurityRule.owasp_category.isnot(None))\
             .filter(SecurityRule.is_active)\
             .order_by(SecurityRule.owasp_category)\
             .all()
 
-    def get_rules_list_only(self, active_only: bool = True) -> List[SecurityRule]:
-        """Get rules list only (no total) for backward compatibility."""
-        rules, _ = self.get_rules(active_only=active_only)
+    def get_rules_list_only(self, org_id: int, active_only: bool = True) -> List[SecurityRule]:
+        """Get rules list only (no total) for organization (backward compatibility)."""
+        rules, _ = self.get_rules(org_id, active_only=active_only)
         return rules
 
     def evaluate_managed_rules(
         self,
+        org_id: int,
         method: str,
         path: str,
         headers: Dict,
@@ -258,7 +259,7 @@ class RulesService:
         body: str = None,
     ) -> Dict:
         """
-        Evaluate request against enabled managed (pack) rules only.
+        Evaluate request against enabled managed (pack) rules for organization.
         Returns first match: { matched, rule_id, rule_name, action, pack_id } or no match.
         """
         enabled_packs = self.db.query(RulePack.id).filter(RulePack.enabled).all()
@@ -271,7 +272,7 @@ class RulesService:
 
         managed_rules = (
             self.db.query(SecurityRule)
-            .filter(SecurityRule.rule_pack_id.in_(pack_ids), SecurityRule.is_active)
+            .filter(SecurityRule.org_id == org_id, SecurityRule.rule_pack_id.in_(pack_ids), SecurityRule.is_active)
             .order_by(SecurityRule.priority.desc(), SecurityRule.timestamp.desc())
             .all()
         )
