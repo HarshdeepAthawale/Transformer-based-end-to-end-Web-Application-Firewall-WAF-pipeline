@@ -4,8 +4,8 @@ Authentication and Authorization
 from datetime import timedelta
 from backend.lib.datetime_utils import utc_now
 from typing import Optional, Union
+import os
 import jwt
-import secrets
 from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
 from sqlalchemy.orm import Session
@@ -15,7 +15,6 @@ from backend.models.users import User, UserRole
 from backend.config import config
 
 # JWT settings (use config so API_AUTH can share)
-import os
 JWT_SECRET = getattr(config, "JWT_SECRET", None)
 if not JWT_SECRET:
     if os.getenv("ENV", "").lower() == "production":

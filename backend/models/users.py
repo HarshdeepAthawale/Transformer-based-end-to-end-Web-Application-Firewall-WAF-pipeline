@@ -6,7 +6,6 @@ from backend.database import Base
 from backend.lib.datetime_utils import utc_now
 import enum
 import hashlib
-import secrets
 from passlib.hash import argon2
 
 
