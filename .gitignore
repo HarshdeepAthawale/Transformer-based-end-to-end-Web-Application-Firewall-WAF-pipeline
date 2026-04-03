@@ -28,6 +28,7 @@ build/
 # AI / Editor plans
 .claude/
 .cursor/plans/
+plans/
 
 # Environment variables
 .env
@@ -133,4 +134,3 @@ applications/app1-juice-shop
 
 
 .obsidian
-plans
