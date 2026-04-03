@@ -62,6 +62,19 @@ async def cancel_subscription(
     return ctrl.cancel_subscription(db, org_id)
 
 
+@router.get("/usage")
+async def get_usage(
+    org_id: int = Depends(get_current_tenant),
+    db: Session = Depends(get_db),
+):
+    """Get current month's usage stats for the authenticated org."""
+    from backend.services.usage_service import UsageService
+    from backend.lib.datetime_utils import utc_now as _utc_now
+    svc = UsageService(db)
+    data = svc.get_usage(org_id)
+    return {"success": True, "data": data, "timestamp": _utc_now().isoformat()}
+
+
 @router.post("/seed-plans")
 async def seed_plans(
     db: Session = Depends(get_db),

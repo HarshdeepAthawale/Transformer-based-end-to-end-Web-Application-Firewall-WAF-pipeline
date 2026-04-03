@@ -219,6 +219,14 @@ try:
 except ImportError:
     logger.warning("Audit middleware not available")
 
+# Usage limit enforcement (billing quota)
+try:
+    from backend.middleware.usage_limit_middleware import UsageLimitMiddleware
+
+    app.add_middleware(UsageLimitMiddleware)
+except ImportError:
+    logger.warning("Usage limit middleware not available")
+
 
 # Request timing middleware
 @app.middleware("http")
@@ -320,9 +328,10 @@ except ImportError as e:
 
 # Billing and subscriptions (Razorpay)
 try:
-    from backend.routes import billing
+    from backend.routes import billing, billing_webhooks
     app.include_router(billing.router, prefix="/api/billing", tags=["billing"])
-    logger.info("Registered routes: /api/billing")
+    app.include_router(billing_webhooks.router, prefix="/api/billing/webhooks", tags=["billing-webhooks"])
+    logger.info("Registered routes: /api/billing, /api/billing/webhooks")
 except ImportError as e:
     logger.warning(f"Billing routes not available: {e}")
 
