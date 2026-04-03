@@ -49,6 +49,10 @@ class GatewayConfig:
     RATE_LIMIT_BURST: int = int(os.getenv("RATE_LIMIT_BURST", "20"))
     RATE_LIMIT_FAIL_OPEN: bool = os.getenv("RATE_LIMIT_FAIL_OPEN", "true").lower() == "true"
 
+    # Per-org rate limit config polling (from backend DB)
+    RATE_LIMIT_BACKEND_URL: str = os.getenv("RATE_LIMIT_BACKEND_URL", "http://localhost:3001")
+    RATE_LIMIT_CONFIG_CACHE_TTL_SECONDS: int = int(os.getenv("RATE_LIMIT_CONFIG_CACHE_TTL_SECONDS", "60"))
+
     # IP blacklist (backend syncs to Redis; gateway enforces)
     BLACKLIST_ENABLED: bool = os.getenv("BLACKLIST_ENABLED", "true").lower() == "true"
     BLACKLIST_TENANT_ID: str = os.getenv("BLACKLIST_TENANT_ID", "default")

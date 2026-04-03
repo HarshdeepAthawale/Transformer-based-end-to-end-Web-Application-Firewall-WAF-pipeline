@@ -21,6 +21,7 @@ from gateway.mongo import MongoEventStore
 from gateway.proxy import forward_request
 from gateway.waf_inspect import inspect_request
 from gateway.rate_limit import create_rate_limiter
+from gateway.rate_limit_config import get_rate_limit_configs, get_limit_for_path
 from gateway.ddos_protection import create_ddos_protection
 from gateway.blacklist import create_blacklist_checker
 from gateway.events import report_event, start_event_batcher, stop_event_batcher
@@ -365,7 +366,12 @@ async def gateway_proxy(request: Request, path: str):
     # --- Rate limit check (before body read) ---
     rate_limiter = getattr(request.app.state, "rate_limiter", None)
     if rate_limiter:
-        allowed, retry_after = await rate_limiter.is_allowed(client_ip)
+        # Look up per-org/per-path rate limit config from backend DB
+        zone_id = request.headers.get("x-waf-zone-id", "default")
+        rl_configs = await get_rate_limit_configs(zone_id)
+        matched_config = get_limit_for_path(rl_configs, str(request.url.path))
+        max_req_override = matched_config["requests_per_minute"] if matched_config else None
+        allowed, retry_after = await rate_limiter.is_allowed(client_ip, max_requests_override=max_req_override)
         if not allowed:
             elapsed_ms = (time.perf_counter() - start_time) * 1000
             _log_gateway_event(

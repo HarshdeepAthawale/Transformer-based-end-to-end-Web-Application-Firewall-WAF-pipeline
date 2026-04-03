@@ -53,15 +53,21 @@ class RedisRateLimiter:
     def _key(self, ip: str) -> str:
         return f"rl:ip:{ip}"
 
-    async def is_allowed(self, ip: str) -> Tuple[bool, float]:
+    async def is_allowed(self, ip: str, max_requests_override: int = None) -> Tuple[bool, float]:
         """
         Check if request from IP is allowed.
+
+        Args:
+            ip: Client IP address.
+            max_requests_override: If provided, use this limit instead of self.max_requests.
 
         Returns:
             (allowed, retry_after_seconds)
             If allowed=True, retry_after is 0.
             If allowed=False, retry_after is seconds until window allows next request.
         """
+        effective_limit = max_requests_override if max_requests_override is not None else self.max_requests
+
         if not self._connected or self._redis is None:
             return (True, 0.0) if self.fail_open else (False, self.window_seconds)
 
@@ -79,7 +85,7 @@ class RedisRateLimiter:
 
             count = results[2] if len(results) > 2 else 0
 
-            if count > self.max_requests:
+            if count > effective_limit:
                 # Get oldest timestamp to compute retry_after
                 oldest = await self._redis.zrange(key, 0, 0, withscores=True)
                 if oldest:
