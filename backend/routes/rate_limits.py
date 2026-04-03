@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from backend.database import get_db
-from backend.auth import require_waf_api_auth
+from backend.auth import require_waf_api_auth, get_current_tenant
 from backend.services.rate_limit_config_service import RateLimitConfigService
 
 router = APIRouter()
@@ -44,12 +44,14 @@ async def list_rate_limits(
 @router.post("/")
 async def create_rate_limit(
     body: RateLimitConfigCreate,
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db),
     _auth=Depends(require_waf_api_auth),
 ):
     """Create a rate limit config. Requires auth."""
     svc = RateLimitConfigService(db)
     r = svc.create(
+        org_id=org_id,
         path_prefix=body.path_prefix,
         requests_per_minute=body.requests_per_minute,
         window_seconds=body.window_seconds,
@@ -100,3 +102,35 @@ async def delete_rate_limit(
     if not ok:
         raise HTTPException(status_code=404, detail="Rate limit config not found")
     return Response(status_code=204)
+
+
+@router.get("/effective")
+async def get_effective_limit(
+    path: str = Query(..., description="The API path to check"),
+    org_id: int = Depends(get_current_tenant),
+    db: Session = Depends(get_db),
+):
+    """Get effective rate limit for org on a given path (returns DB config or default)."""
+    svc = RateLimitConfigService(db)
+    config = svc.get_by_org_and_path(org_id, path)
+
+    if config:
+        return {
+            "success": True,
+            "data": {
+                "path": path,
+                "requests_per_minute": config.requests_per_minute,
+                "window_seconds": config.window_seconds,
+                "from_db": True,
+            },
+        }
+    else:
+        return {
+            "success": True,
+            "data": {
+                "path": path,
+                "requests_per_minute": 300,
+                "window_seconds": 60,
+                "from_db": False,
+            },
+        }
