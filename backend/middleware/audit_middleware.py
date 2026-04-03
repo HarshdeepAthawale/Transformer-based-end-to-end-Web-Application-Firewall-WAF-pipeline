@@ -38,7 +38,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
 
         username = None
         user_id = None
-        org_id = 1  # Default to org 1 if not in token (backward compatibility)
+        org_id = None
         try:
             from backend.auth import verify_token
             auth_header = request.headers.get("Authorization")
@@ -48,7 +48,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
                 if payload:
                     username = payload.get("username")
                     user_id = payload.get("user_id")
-                    org_id = payload.get("org_id", 1)
+                    org_id = payload.get("org_id")
         except Exception:
             pass
 
@@ -56,7 +56,7 @@ class AuditMiddleware(BaseHTTPMiddleware):
 
         response = await call_next(request)
 
-        if request.method in ("POST", "PUT", "DELETE", "PATCH"):
+        if request.method in ("POST", "PUT", "DELETE", "PATCH") and org_id is not None:
             db = None
             try:
                 db = SessionLocal()

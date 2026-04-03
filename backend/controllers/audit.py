@@ -10,12 +10,13 @@ from backend.models.audit_log import AuditLog, AuditAction
 
 def get_logs(
     db: Session,
+    org_id: int,
     limit: int = 100,
     action: Optional[str] = None,
     resource_type: Optional[str] = None,
     start_time: Optional[str] = None,
 ) -> dict:
-    query = db.query(AuditLog)
+    query = db.query(AuditLog).filter(AuditLog.org_id == org_id)
     if action:
         try:
             ae = AuditAction[action.upper()]
@@ -38,8 +39,11 @@ def get_logs(
     }
 
 
-def get_log(db: Session, log_id: int) -> dict:
-    log = db.query(AuditLog).filter(AuditLog.id == log_id).first()
+def get_log(db: Session, org_id: int, log_id: int) -> dict:
+    log = db.query(AuditLog).filter(
+        AuditLog.id == log_id,
+        AuditLog.org_id == org_id
+    ).first()
     if not log:
         return {
             "success": False,
