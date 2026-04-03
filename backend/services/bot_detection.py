@@ -198,13 +198,14 @@ class BotDetectionService:
     
     def add_signature(
         self,
+        org_id: int,
         user_agent_pattern: str,
         name: str,
         category: BotCategory,
         action: str = "block",
         is_whitelisted: bool = False
     ) -> BotSignature:
-        """Add bot signature"""
+        """Add bot signature (global, but org_id used for audit logging)"""
         signature = BotSignature(
             user_agent_pattern=user_agent_pattern,
             name=name,
@@ -212,18 +213,15 @@ class BotDetectionService:
             action=action,
             is_whitelisted=is_whitelisted
         )
-        
+
         self.db.add(signature)
         self.db.commit()
         self.db.refresh(signature)
-        
-        # Reload cache
-        self._load_signatures()
-        
+
         return signature
-    
-    def get_signatures(self, active_only: bool = True) -> List[BotSignature]:
-        """Get bot signatures"""
+
+    def get_signatures(self, org_id: int, active_only: bool = True) -> List[BotSignature]:
+        """Get bot signatures (global list, org_id used for audit)"""
         query = self.db.query(BotSignature)
         if active_only:
             query = query.filter(BotSignature.is_active)
@@ -262,7 +260,6 @@ class BotDetectionService:
             sig.is_active = is_active
         self.db.commit()
         self.db.refresh(sig)
-        self._load_signatures()
         return sig
 
     def delete_signature(self, signature_id: int) -> bool:
@@ -272,5 +269,33 @@ class BotDetectionService:
             return False
         self.db.delete(sig)
         self.db.commit()
-        self._load_signatures()
         return True
+
+    def get_bot_stats(self, org_id: int, db: Session, range_str: str) -> dict:
+        """Per-org bot score distribution from SecurityEvent table."""
+        from backend.core.time_range import parse_time_range
+        from backend.models.security_event import SecurityEvent
+
+        start_time, _ = parse_time_range(range_str)
+
+        # Count bot events by action
+        bot_events = db.query(SecurityEvent).filter(
+            SecurityEvent.org_id == org_id,
+            SecurityEvent.event_type.in_(["bot_block", "bot_challenge"]),
+            SecurityEvent.timestamp >= start_time
+        ).all()
+
+        block_count = sum(1 for e in bot_events if e.event_type == "bot_block")
+        challenge_count = sum(1 for e in bot_events if e.event_type == "bot_challenge")
+
+        # Bot score distribution (if scores are logged)
+        bot_scores = [e.bot_score for e in bot_events if hasattr(e, 'bot_score') and e.bot_score is not None]
+        avg_score = sum(bot_scores) / len(bot_scores) if bot_scores else None
+
+        return {
+            "total_bot_events": len(bot_events),
+            "blocked": block_count,
+            "challenged": challenge_count,
+            "avg_bot_score": round(avg_score, 1) if avg_score else None,
+            "time_range": range_str,
+        }

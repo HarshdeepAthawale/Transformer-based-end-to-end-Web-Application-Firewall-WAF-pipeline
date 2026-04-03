@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from loguru import logger
 
 from backend.database import get_db, engine, Base
-from backend.auth import require_waf_api_auth
+from backend.auth import require_waf_api_auth, get_current_tenant
 from backend.services.bot_detection import BotDetectionService
 from backend.services.verified_bots_service import VerifiedBotsService
 from backend.services.bot_score_bands_service import BotScoreBandsService
@@ -178,20 +178,34 @@ class BotSignatureUpdate(BaseModel):
     is_active: bool | None = None
 
 
+@router.get("/stats")
+async def get_bot_stats(
+    range: str = Query("24h", description="Time range: 1h, 24h, 7d, 30d"),
+    org_id: int = Depends(get_current_tenant),
+    db: Session = Depends(get_db_with_bot_tables),
+):
+    """Per-org bot score distribution and stats. Requires auth."""
+    svc = BotDetectionService(db)
+    stats = svc.get_bot_stats(org_id, db, range)
+    return {"success": True, "data": stats}
+
+
 @router.get("/signatures")
 async def list_bot_signatures(
     active_only: bool = Query(True, description="Filter to active only"),
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db_with_bot_tables),
 ):
     """List bot signatures."""
     svc = BotDetectionService(db)
-    sigs = svc.get_signatures(active_only=active_only)
+    sigs = svc.get_signatures(org_id, active_only=active_only)
     return {"success": True, "data": [s.to_dict() for s in sigs]}
 
 
 @router.post("/signatures")
 async def create_bot_signature(
     request: BotSignatureRequest,
+    org_id: int = Depends(get_current_tenant),
     db: Session = Depends(get_db_with_bot_tables),
     _auth=Depends(require_waf_api_auth),
 ):
@@ -199,6 +213,7 @@ async def create_bot_signature(
     svc = BotDetectionService(db)
     cat = BotCategory[request.category.upper()] if hasattr(BotCategory, request.category.upper()) else BotCategory.UNKNOWN
     sig = svc.add_signature(
+        org_id,
         user_agent_pattern=request.user_agent_pattern,
         name=request.name,
         category=cat,

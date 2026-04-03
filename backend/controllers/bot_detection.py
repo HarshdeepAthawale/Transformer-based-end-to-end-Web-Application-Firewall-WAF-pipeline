@@ -6,9 +6,9 @@ from backend.services.bot_detection import BotDetectionService
 from backend.models.bot_signatures import BotCategory
 
 
-def get_signatures(db: Session, active_only: bool) -> dict:
+def get_signatures(db: Session, org_id: int, active_only: bool) -> dict:
     service = BotDetectionService(db)
-    sigs = service.get_signatures(active_only)
+    sigs = service.get_signatures(org_id, active_only)
     return {
         "success": True,
         "data": [s.to_dict() for s in sigs],
@@ -18,6 +18,7 @@ def get_signatures(db: Session, active_only: bool) -> dict:
 
 def add_signature(
     db: Session,
+    org_id: int,
     *,
     user_agent_pattern: str,
     name: str,
@@ -28,6 +29,7 @@ def add_signature(
     service = BotDetectionService(db)
     cat = BotCategory[category.upper()] if hasattr(BotCategory, category.upper()) else BotCategory.UNKNOWN
     sig = service.add_signature(
+        org_id,
         user_agent_pattern=user_agent_pattern,
         name=name,
         category=cat,
