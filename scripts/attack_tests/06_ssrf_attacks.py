@@ -58,7 +58,7 @@ SSRF_ATTACKS = [
     {"name": "URL userinfo bypass", "path": "/api/auth", "query": {"url": "http://127.0.0.1@evil.com/"}},
     {"name": "URL username bypass", "path": "/api/login", "query": {"url": "http://evil.com:80@127.0.0.1/"}},
     {"name": "Double URL encoding", "path": "/api/encode", "query": {"url": "http://127.0.0.1%252f"}},
-    {"name": "Unicode bypass", "path": "/api/unicode", "query": {"url": "http://127。0。0。1/"}},
+    {"name": "Unicode bypass", "path": "/api/unicode", "query": {"url": "http://127001/"}},
     {"name": "Punycode bypass", "path": "/api/puny", "query": {"url": "http://xn--nxasmq5b/"}},
     {"name": "URL shortener", "path": "/api/short", "query": {"url": "https://bit.ly/internal-admin"}},
 

@@ -173,7 +173,7 @@ for app in app1 app2 app3; do
         SERVLET_API="$TOMCAT_DIR/lib/servlet-api.jar"
         if [ -f "$SERVLET_API" ]; then
             javac -cp "$SERVLET_API" "$app/WEB-INF/classes"/*.java -d "$app/WEB-INF/classes"
-            echo "✓ Compiled $app"
+            echo " Compiled $app"
         else
             echo "Warning: servlet-api.jar not found. Creating placeholder servlets..."
             # Create simple HTML pages as fallback
@@ -190,7 +190,7 @@ if [ -d "$TOMCAT_DIR/webapps" ]; then
     cp -r app1 "$TOMCAT_DIR/webapps/"
     cp -r app2 "$TOMCAT_DIR/webapps/"
     cp -r app3 "$TOMCAT_DIR/webapps/"
-    echo "✓ Applications deployed to $TOMCAT_DIR/webapps/"
+    echo " Applications deployed to $TOMCAT_DIR/webapps/"
 else
     echo "Warning: Tomcat webapps directory not found. Applications created in $APPS_DIR"
 fi

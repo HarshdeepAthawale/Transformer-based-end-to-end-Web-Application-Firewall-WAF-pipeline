@@ -95,7 +95,7 @@ def main():
     count = args.count
 
     print("=" * 60)
-    print("  Attack on Web App 1 — WAF capture & block test")
+    print("  Attack on Web App 1  WAF capture & block test")
     print("=" * 60)
     print(f"  Backend (WAF): {base}")
     print(f"  Malicious requests: {count}")

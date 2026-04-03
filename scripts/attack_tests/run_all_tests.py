@@ -29,18 +29,18 @@ TEST_SCRIPTS = [
 
 def print_banner():
     banner = """
-╔══════════════════════════════════════════════════════════════════════════════╗
-║                                                                              ║
-║     ██╗    ██╗ █████╗ ███████╗    ████████╗███████╗███████╗████████╗        ║
-║     ██║    ██║██╔══██╗██╔════╝    ╚══██╔══╝██╔════╝██╔════╝╚══██╔══╝        ║
-║     ██║ █╗ ██║███████║█████╗         ██║   █████╗  ███████╗   ██║           ║
-║     ██║███╗██║██╔══██║██╔══╝         ██║   ██╔══╝  ╚════██║   ██║           ║
-║     ╚███╔███╔╝██║  ██║██║            ██║   ███████╗███████║   ██║           ║
-║      ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝            ╚═╝   ╚══════╝╚══════╝   ╚═╝           ║
-║                                                                              ║
-║           Transformer-based Web Application Firewall Test Suite              ║
-║                                                                              ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+
+                                                                              
+                       
+                     
+                                   
+                                 
+                                    
+                                      
+                                                                              
+           Transformer-based Web Application Firewall Test Suite              
+                                                                              
+
     """
     print(banner)
 
@@ -51,12 +51,12 @@ def check_waf_service():
     try:
         response = requests.get("http://localhost:3001/health", timeout=5)
         if response.status_code == 200:
-            print("\033[92m✓ WAF Backend is running\033[0m")
+            print("\033[92m WAF Backend is running\033[0m")
             return True
     except Exception:
         pass
 
-    print("\033[91m✗ WAF Backend is not available at http://localhost:3001\033[0m")
+    print("\033[91m WAF Backend is not available at http://localhost:3001\033[0m")
     print("  Please start the backend first:")
     print("  docker compose up -d")
     return False
@@ -70,13 +70,13 @@ def check_model_status():
         data = response.json()
         if data.get("data", {}).get("model_loaded"):
             threshold = data.get("data", {}).get("threshold", 0.5)
-            print(f"\033[92m✓ WAF Model is loaded (threshold: {threshold})\033[0m")
+            print(f"\033[92m WAF Model is loaded (threshold: {threshold})\033[0m")
             return True
         else:
-            print("\033[93m⚠ WAF Model not loaded - detection may not work\033[0m")
+            print("\033[93m WAF Model not loaded - detection may not work\033[0m")
             return False
     except Exception as e:
-        print(f"\033[91m✗ Could not check model status: {e}\033[0m")
+        print(f"\033[91m Could not check model status: {e}\033[0m")
         return False
 
 
@@ -89,9 +89,9 @@ def strip_ansi(text: str) -> str:
 
 def run_test(script_path: Path, name: str) -> dict:
     """Run a single test script and capture results"""
-    print(f"\n{'─' * 70}")
+    print(f"\n{'' * 70}")
     print(f"Running: {name}")
-    print(f"{'─' * 70}")
+    print(f"{'' * 70}")
 
     start_time = time.time()
 
@@ -181,9 +181,9 @@ def run_test(script_path: Path, name: str) -> dict:
 def generate_report(results: list):
     """Generate final summary report"""
     print("\n")
-    print("╔" + "═" * 78 + "╗")
-    print("║" + " " * 25 + "FINAL TEST REPORT" + " " * 36 + "║")
-    print("╠" + "═" * 78 + "╣")
+    print("" + "" * 78 + "")
+    print("" + " " * 25 + "FINAL TEST REPORT" + " " * 36 + "")
+    print("" + "" * 78 + "")
 
     total_tests = 0
     total_blocked = 0
@@ -192,9 +192,9 @@ def generate_report(results: list):
     total_time = 0
 
     # Print individual suite results
-    print("║ {:<35} {:>8} {:>8} {:>8} {:>8} ║".format(
+    print(" {:<35} {:>8} {:>8} {:>8} {:>8} ".format(
         "Test Suite", "Total", "Blocked", "Missed", "Rate"))
-    print("╠" + "─" * 78 + "╣")
+    print("" + "" * 78 + "")
 
     for r in results:
         if r.get("success"):
@@ -207,7 +207,7 @@ def generate_report(results: list):
                 fp_rate_pct = fp_count / tested * 100 if tested > 0 else 0
                 rate = 100.0 - fp_rate_pct  # Invert: show "pass rate"
                 color = "\033[92m" if fp_rate_pct < 1.0 else ("\033[93m" if fp_rate_pct < 5.0 else "\033[91m")
-                print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
+                print(" {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ".format(
                     r["name"][:35], r["total"], fp_count, tested - fp_count, color, rate))
                 # Don't add FP test numbers to the attack detection totals
                 total_time += r["elapsed"]
@@ -222,7 +222,7 @@ def generate_report(results: list):
                 else:
                     color = "\033[91m"  # Red
 
-                print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
+                print(" {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ".format(
                     r["name"][:35], r["total"], r["blocked"], r["missed"], color, rate))
 
                 total_tests += r["total"]
@@ -231,10 +231,10 @@ def generate_report(results: list):
                 total_errors += r["errors"]
                 total_time += r["elapsed"]
         else:
-            print("║ {:<35} \033[91m{:>44}\033[0m ║".format(
+            print(" {:<35} \033[91m{:>44}\033[0m ".format(
                 r["name"][:35], f"FAILED: {r.get('error', 'Unknown')}"[:44]))
 
-    print("╠" + "═" * 78 + "╣")
+    print("" + "" * 78 + "")
 
     # Overall summary
     overall_rate = total_blocked / (total_tests - total_errors) * 100 if (total_tests - total_errors) > 0 else 0
@@ -252,30 +252,30 @@ def generate_report(results: list):
         color = "\033[91m"
         status = "NEEDS IMPROVEMENT"
 
-    print("║ {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ║".format(
+    print(" {:<35} {:>8} {:>8} {:>8} {}  {:>5.1f}%\033[0m ".format(
         "OVERALL TOTAL", total_tests, total_blocked, total_missed, color, overall_rate))
-    print("╠" + "═" * 78 + "╣")
-    print("║" + " " * 78 + "║")
-    print("║   Total Attack Payloads Tested: {:>6}                                     ║".format(total_tests))
-    print("║   {}\033[92mBlocked (Detected):         {:>6}\033[0m                                     ║".format("", total_blocked))
-    print("║   {}\033[91mMissed (Not Detected):      {:>6}\033[0m                                     ║".format("", total_missed))
-    print("║   {}\033[93mErrors:                     {:>6}\033[0m                                     ║".format("", total_errors))
-    print("║" + " " * 78 + "║")
-    print("║   Overall Detection Rate: {}{:>6.1f}%\033[0m                                        ║".format(color, overall_rate))
-    print("║   Status: {}{}                                                       \033[0m║".format(color, status.ljust(20)))
-    print("║   Total Test Time: {:>6.1f} seconds                                          ║".format(total_time))
-    print("║" + " " * 78 + "║")
-    print("╚" + "═" * 78 + "╝")
+    print("" + "" * 78 + "")
+    print("" + " " * 78 + "")
+    print("   Total Attack Payloads Tested: {:>6}                                     ".format(total_tests))
+    print("   {}\033[92mBlocked (Detected):         {:>6}\033[0m                                     ".format("", total_blocked))
+    print("   {}\033[91mMissed (Not Detected):      {:>6}\033[0m                                     ".format("", total_missed))
+    print("   {}\033[93mErrors:                     {:>6}\033[0m                                     ".format("", total_errors))
+    print("" + " " * 78 + "")
+    print("   Overall Detection Rate: {}{:>6.1f}%\033[0m                                        ".format(color, overall_rate))
+    print("   Status: {}{}                                                       \033[0m".format(color, status.ljust(20)))
+    print("   Total Test Time: {:>6.1f} seconds                                          ".format(total_time))
+    print("" + " " * 78 + "")
+    print("" + "" * 78 + "")
 
     # Recommendations
     print("\n\033[1mRecommendations:\033[0m")
     if overall_rate < 60:
-        print("  • Consider retraining the model with more attack samples")
-        print("  • Review missed attack patterns and add them to training data")
+        print("   Consider retraining the model with more attack samples")
+        print("   Review missed attack patterns and add them to training data")
     if total_errors > 0:
-        print(f"  • {total_errors} tests had errors - check WAF service stability")
+        print(f"   {total_errors} tests had errors - check WAF service stability")
     if overall_rate >= 80:
-        print("  • WAF is performing well! Continue monitoring for new attack patterns")
+        print("   WAF is performing well! Continue monitoring for new attack patterns")
 
     return overall_rate
 
@@ -325,7 +325,7 @@ def main():
             result = run_test(script_path, display_name)
             results.append(result)
         else:
-            print(f"\n\033[91m✗ Script not found: {script_name}\033[0m")
+            print(f"\n\033[91m Script not found: {script_name}\033[0m")
             results.append({"name": display_name, "success": False, "error": "Script not found"})
 
     # Generate final report

@@ -142,11 +142,11 @@ BENIGN_REQUESTS = [
     {"name": "Complex encoded path", "path": "/api/files/Documents%20and%20Settings/user/My%20Documents/report.pdf", "method": "GET"},
 
     # --- Internationalized Content ---
-    {"name": "Chinese content", "path": "/api/posts", "method": "POST", "body": {"title": "你好世界", "content": "这是一个测试帖子"}},
-    {"name": "Japanese search", "path": "/api/search", "method": "GET", "query": {"q": "東京タワー観光ガイド"}},
+    {"name": "Chinese content", "path": "/api/posts", "method": "POST", "body": {"title": "", "content": ""}},
+    {"name": "Japanese search", "path": "/api/search", "method": "GET", "query": {"q": ""}},
     {"name": "Arabic content", "path": "/api/messages", "method": "POST", "body": {"text": "مرحبا بالعالم"}},
-    {"name": "Korean search", "path": "/api/search", "method": "GET", "query": {"q": "서울 맛집 추천"}},
-    {"name": "Emoji content", "path": "/api/comments", "method": "POST", "body": {"text": "Great product! Love it! 👍🎉✨", "rating": 5}},
+    {"name": "Korean search", "path": "/api/search", "method": "GET", "query": {"q": "  "}},
+    {"name": "Emoji content", "path": "/api/comments", "method": "POST", "body": {"text": "Great product! Love it! ", "rating": 5}},
     {"name": "German umlaut", "path": "/api/users", "method": "POST", "body": {"name": "Müller", "city": "München"}},
     {"name": "French accents", "path": "/api/profile", "method": "PUT", "body": {"name": "François", "bio": "Développeur à Paris"}},
     {"name": "Mixed script", "path": "/api/search", "method": "GET", "query": {"q": "café résumé naïve"}},
@@ -286,7 +286,7 @@ BENIGN_REQUESTS = [
 
 
 def test_payload(request: Dict) -> Dict:
-    """Test a single benign request against WAF — expecting it to NOT be blocked."""
+    """Test a single benign request against WAF  expecting it to NOT be blocked."""
     base_headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         "Accept": "application/json",

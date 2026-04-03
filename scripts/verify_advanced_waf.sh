@@ -3,7 +3,7 @@
 # Verify Advanced WAF Setup
 # Tests the complete AI-powered WAF integration
 
-echo "🔍 Verifying Advanced WAF Setup"
+echo " Verifying Advanced WAF Setup"
 echo "==============================="
 
 # Colors for output
@@ -42,10 +42,10 @@ test_result() {
     TESTS_TOTAL=$((TESTS_TOTAL + 1))
 
     if [[ "$success" == "true" ]]; then
-        log_success "✓ $test_name: $message"
+        log_success " $test_name: $message"
         TESTS_PASSED=$((TESTS_PASSED + 1))
     else
-        log_error "✗ $test_name: $message"
+        log_error " $test_name: $message"
     fi
 }
 
@@ -165,34 +165,34 @@ else
 fi
 
 echo ""
-echo "═══════════════════════════════════════════════"
+echo ""
 echo "                 TEST RESULTS"
-echo "═══════════════════════════════════════════════"
+echo ""
 
 SUCCESS_RATE=$((TESTS_PASSED * 100 / TESTS_TOTAL))
 
 if [[ $SUCCESS_RATE -ge 80 ]]; then
-    log_success "🎉 Overall: $TESTS_PASSED/$TESTS_TOTAL tests passed (${SUCCESS_RATE}%)"
+    log_success " Overall: $TESTS_PASSED/$TESTS_TOTAL tests passed (${SUCCESS_RATE}%)"
     echo ""
-    echo "✅ Advanced WAF is ready for production!"
+    echo " Advanced WAF is ready for production!"
     echo ""
     echo "To start using:"
     echo "1. Start your backend app on port 8080"
     echo "2. Test: curl http://localhost/"
     echo "3. Monitor: curl http://localhost/waf-metrics"
 else
-    log_error "❌ Overall: $TESTS_PASSED/$TESTS_TOTAL tests passed (${SUCCESS_RATE}%)"
+    log_error " Overall: $TESTS_PASSED/$TESTS_TOTAL tests passed (${SUCCESS_RATE}%)"
     echo ""
-    echo "⚠️  Some components need attention. Check the failed tests above."
+    echo "  Some components need attention. Check the failed tests above."
 fi
 
 echo ""
-echo "═══════════════════════════════════════════════"
+echo ""
 echo "              TROUBLESHOOTING"
-echo "═══════════════════════════════════════════════"
-echo "• Check OpenResty: journalctl -u openresty -f"
-echo "• Check WAF service logs in the terminal where it's running"
-echo "• Test components individually:"
+echo ""
+echo " Check OpenResty: journalctl -u openresty -f"
+echo " Check WAF service logs in the terminal where it's running"
+echo " Test components individually:"
 echo "  - curl http://127.0.0.1:8000/health"
 echo "  - curl http://localhost/waf-metrics"
 echo "  - openresty -t -c /usr/local/openresty/nginx/conf/nginx.conf"

@@ -16,7 +16,7 @@ echo "Configuring Tomcat for multiple applications..."
 # Backup original
 if [ ! -f "${SERVER_XML}.backup" ]; then
     cp "$SERVER_XML" "${SERVER_XML}.backup"
-    echo "✓ Backed up original server.xml"
+    echo " Backed up original server.xml"
 fi
 
 # Create a Python script to properly modify the XML
@@ -49,7 +49,7 @@ try:
             if host is not None:
                 host.set('appBase', 'webapps/app1')
             
-            print("✓ Configured service for app1 on port 8080")
+            print(" Configured service for app1 on port 8080")
     
     # Add service for app2 on port 8081
     service2 = root.find(".//Service[@name='Catalina2']")
@@ -61,7 +61,7 @@ try:
                                    connectionTimeout="20000")
         engine2 = ET.SubElement(service2, "Engine", name="Catalina2", defaultHost="localhost")
         host2 = ET.SubElement(engine2, "Host", name="localhost", appBase="webapps/app2")
-        print("✓ Added service for app2 on port 8081")
+        print(" Added service for app2 on port 8081")
     
     # Add service for app3 on port 8082
     service3 = root.find(".//Service[@name='Catalina3']")
@@ -73,11 +73,11 @@ try:
                                    connectionTimeout="20000")
         engine3 = ET.SubElement(service3, "Engine", name="Catalina3", defaultHost="localhost")
         host3 = ET.SubElement(engine3, "Host", name="localhost", appBase="webapps/app3")
-        print("✓ Added service for app3 on port 8082")
+        print(" Added service for app3 on port 8082")
     
     # Write the modified XML
     tree.write(server_xml, encoding='utf-8', xml_declaration=True)
-    print("✓ Tomcat configuration updated")
+    print(" Tomcat configuration updated")
     
 except Exception as e:
     print(f"Error configuring Tomcat: {e}")
@@ -86,7 +86,7 @@ except Exception as e:
 PYTHON_SCRIPT
 
 if [ $? -eq 0 ]; then
-    echo "✓ Tomcat configuration complete"
+    echo " Tomcat configuration complete"
 else
     echo "Note: Using default Tomcat configuration. Applications will be accessible via context paths."
 fi

@@ -35,19 +35,19 @@ wait_for() {
     echo -n "Waiting for $name..."
     while [ $n -lt $max ]; do
         if curl -sfL -o /dev/null "$url" 2>/dev/null; then
-            echo -e " ${GREEN}✓${NC}"
+            echo -e " ${GREEN}${NC}"
             return 0
         fi
         n=$((n + 1))
         sleep 1
         echo -n "."
     done
-    echo -e " ${RED}✗${NC} (timeout)"
+    echo -e " ${RED}${NC} (timeout)"
     return 1
 }
 
 echo "=========================================="
-echo "  WAF Platform – Frontend + Backend + DB"
+echo "  WAF Platform  Frontend + Backend + DB"
 echo "=========================================="
 echo ""
 
@@ -59,13 +59,13 @@ echo ""
 # 1. Backend API (port 3001)
 echo "1. Backend API (port 3001)"
 if check_port 3001; then
-    echo -e "   ${YELLOW}Port 3001 in use – skipping (may already be running)${NC}"
+    echo -e "   ${YELLOW}Port 3001 in use  skipping (may already be running)${NC}"
 else
     PYTHON="${PYTHON:-python}"
     nohup "$PYTHON" scripts/start_api_server.py >> logs/api_server.log 2>&1 &
     echo $! > "$PID_DIR/api_server.pid"
-    echo -e "   ${GREEN}✓${NC} Started (PID: $(cat "$PID_DIR/api_server.pid"))"
-    echo "   (Backend loads DB + WAF model; may take 30–90s)"
+    echo -e "   ${GREEN}${NC} Started (PID: $(cat "$PID_DIR/api_server.pid"))"
+    echo "   (Backend loads DB + WAF model; may take 3090s)"
     sleep 5
     if ! wait_for "http://localhost:3001/health" "Backend" 120; then
         echo -e "   ${RED}Tip: check logs/api_server.log for errors${NC}"
@@ -77,7 +77,7 @@ echo ""
 # 2. Frontend (port 3000)
 echo "2. Frontend (port 3000)"
 if check_port 3000; then
-    echo -e "   ${YELLOW}Port 3000 in use – skipping (may already be running)${NC}"
+    echo -e "   ${YELLOW}Port 3000 in use  skipping (may already be running)${NC}"
 else
     if [ ! -d "frontend/node_modules" ]; then
         echo "   Installing frontend dependencies..."
@@ -89,7 +89,7 @@ else
     NEXT_PID=$(pgrep -f "next dev" | head -1)
     if [ -n "$NEXT_PID" ]; then
         echo "$NEXT_PID" > "$PID_DIR/frontend.pid"
-        echo -e "   ${GREEN}✓${NC} Started (PID: $NEXT_PID)"
+        echo -e "   ${GREEN}${NC} Started (PID: $NEXT_PID)"
     else
         echo -e "   ${YELLOW}Started (PID not captured)${NC}"
     fi

@@ -156,7 +156,7 @@ def _write_json(path: Path, data: List[Dict]):
 
 def main():
     print("=" * 60)
-    print("POPULATE data/malicious/ — Categorized Payload Files")
+    print("POPULATE data/malicious/  Categorized Payload Files")
     print("=" * 60)
 
     # Header injection (CRLF + smuggling + header attacks)

@@ -35,7 +35,7 @@ if ! command_exists python3; then
     exit 1
 fi
 PYTHON_VERSION=$(python3 --version | cut -d' ' -f2)
-echo -e "${GREEN}✓ Python $PYTHON_VERSION found${NC}"
+echo -e "${GREEN} Python $PYTHON_VERSION found${NC}"
 
 # Check Java
 if ! command_exists java; then
@@ -51,7 +51,7 @@ if ! command_exists java; then
     fi
 fi
 JAVA_VERSION=$(java -version 2>&1 | head -n 1)
-echo -e "${GREEN}✓ $JAVA_VERSION${NC}"
+echo -e "${GREEN} $JAVA_VERSION${NC}"
 
 # Check if running as root for system operations
 if [ "$EUID" -eq 0 ]; then
@@ -63,15 +63,15 @@ fi
 echo -e "${YELLOW}Step 2: Setting up Python virtual environment...${NC}"
 if [ ! -d "venv" ]; then
     python3 -m venv venv
-    echo -e "${GREEN}✓ Virtual environment created${NC}"
+    echo -e "${GREEN} Virtual environment created${NC}"
 else
-    echo -e "${GREEN}✓ Virtual environment already exists${NC}"
+    echo -e "${GREEN} Virtual environment already exists${NC}"
 fi
 
 source venv/bin/activate
 pip install --upgrade pip >/dev/null 2>&1
 pip install -r requirements.txt
-echo -e "${GREEN}✓ Python dependencies installed${NC}"
+echo -e "${GREEN} Python dependencies installed${NC}"
 
 echo -e "${YELLOW}Step 3: Installing and configuring Nginx...${NC}"
 if ! command_exists nginx; then
@@ -84,9 +84,9 @@ if ! command_exists nginx; then
         echo -e "${RED}Error: Cannot install Nginx automatically${NC}"
         exit 1
     fi
-    echo -e "${GREEN}✓ Nginx installed${NC}"
+    echo -e "${GREEN} Nginx installed${NC}"
 else
-    echo -e "${GREEN}✓ Nginx already installed${NC}"
+    echo -e "${GREEN} Nginx already installed${NC}"
 fi
 
 # Configure Nginx logging
@@ -105,7 +105,7 @@ if [ -f "$NGINX_CONF" ]; then
         # Update access_log to use detailed format
         $SUDO sed -i 's|access_log.*;|access_log /var/log/nginx/access.log detailed;|g' "$NGINX_CONF"
     fi
-    echo -e "${GREEN}✓ Nginx logging configured${NC}"
+    echo -e "${GREEN} Nginx logging configured${NC}"
 fi
 
 # Start/restart Nginx
@@ -115,7 +115,7 @@ else
     $SUDO systemctl start nginx
     $SUDO systemctl enable nginx
 fi
-echo -e "${GREEN}✓ Nginx started${NC}"
+echo -e "${GREEN} Nginx started${NC}"
 
 echo -e "${YELLOW}Step 4: Installing Apache Tomcat...${NC}"
 TOMCAT_DIR="/opt/tomcat9"
@@ -130,9 +130,9 @@ if [ ! -d "$TOMCAT_DIR" ]; then
     $SUDO chown -R "$USER:$USER" "$TOMCAT_DIR"
     chmod +x "$TOMCAT_DIR/bin"/*.sh
     rm -f "apache-tomcat-${TOMCAT_VERSION}.tar.gz"
-    echo -e "${GREEN}✓ Tomcat installed${NC}"
+    echo -e "${GREEN} Tomcat installed${NC}"
 else
-    echo -e "${GREEN}✓ Tomcat already installed${NC}"
+    echo -e "${GREEN} Tomcat already installed${NC}"
 fi
 
 cd "$PROJECT_DIR"
@@ -157,7 +157,7 @@ if [ -f "$TOMCAT_SERVER_XML" ]; then
     
     # Note: Full server.xml configuration will be handled separately
     # as it requires careful XML editing
-    echo -e "${GREEN}✓ Tomcat configuration prepared${NC}"
+    echo -e "${GREEN} Tomcat configuration prepared${NC}"
 fi
 
 echo -e "${YELLOW}Step 7: Starting Tomcat...${NC}"
@@ -172,9 +172,9 @@ done
 if [ ! -f "$TOMCAT_DIR/bin/catalina.pid" ] || ! pgrep -f "catalina" > /dev/null; then
     "$TOMCAT_DIR/bin/startup.sh" || echo -e "${YELLOW}Warning: Tomcat may already be running${NC}"
     sleep 5
-    echo -e "${GREEN}✓ Tomcat started${NC}"
+    echo -e "${GREEN} Tomcat started${NC}"
 else
-    echo -e "${GREEN}✓ Tomcat already running${NC}"
+    echo -e "${GREEN} Tomcat already running${NC}"
 fi
 
 echo ""

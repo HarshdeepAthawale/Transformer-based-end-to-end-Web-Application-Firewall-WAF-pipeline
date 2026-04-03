@@ -9,7 +9,7 @@ This guide provides step-by-step instructions for setting up the **Advanced WAF 
 - Internet connection for package downloads
 - Python virtual environment with dependencies
 
-## 🚀 Complete Setup Process
+##  Complete Setup Process
 
 ### Step 1: Install OpenResty with Lua Support
 
@@ -19,10 +19,10 @@ sudo ./scripts/setup_openresty_arch.sh
 ```
 
 This script will:
-- ✅ Install OpenResty from AUR (or build from source)
-- ✅ Install required Lua modules (lua-resty-http, lua-cjson)
-- ✅ Create systemd service for OpenResty
-- ✅ Set up configuration directories
+-  Install OpenResty from AUR (or build from source)
+-  Install required Lua modules (lua-resty-http, lua-cjson)
+-  Create systemd service for OpenResty
+-  Set up configuration directories
 
 ### Step 2: Configure Advanced WAF Integration
 
@@ -32,11 +32,11 @@ sudo ./scripts/setup_complete_advanced_waf.sh
 ```
 
 This script will:
-- ✅ Configure OpenResty for WAF integration
-- ✅ Set up Lua scripting for request interception
-- ✅ Configure real-time AI anomaly detection
-- ✅ Set up rate limiting and security headers
-- ✅ Enable comprehensive logging
+-  Configure OpenResty for WAF integration
+-  Set up Lua scripting for request interception
+-  Configure real-time AI anomaly detection
+-  Set up rate limiting and security headers
+-  Enable comprehensive logging
 
 ### Step 3: Verify the Setup
 
@@ -47,7 +47,7 @@ sudo ./scripts/verify_advanced_waf.sh
 
 Expected output should show 80%+ success rate.
 
-## 🔧 Manual Component Setup
+##  Manual Component Setup
 
 If you prefer to set up components individually:
 
@@ -78,7 +78,7 @@ npm start
 # Or any other app on port 8080
 ```
 
-## 🧪 Testing the Advanced WAF
+##  Testing the Advanced WAF
 
 ### Basic Functionality Test
 
@@ -123,7 +123,7 @@ for i in {1..20}; do curl -s http://localhost/ > /dev/null & done
 curl -H "User-Agent: sqlmap/1.6.5" http://localhost/
 ```
 
-## 📊 Monitoring and Logs
+##  Monitoring and Logs
 
 ### Real-time Monitoring
 
@@ -154,7 +154,7 @@ grep "anomaly" /var/log/openresty/access.log
 grep "processing_time" /var/log/openresty/access.log
 ```
 
-## 🔧 Configuration Tuning
+##  Configuration Tuning
 
 ### Adjust Anomaly Detection Threshold
 
@@ -250,7 +250,7 @@ lua_shared_dict waf_cache 10m;
 **3. Database connection pooling**
 Ensure backend apps use connection pooling to handle increased load.
 
-## 📈 Performance Benchmarks
+##  Performance Benchmarks
 
 ### Expected Performance (on typical hardware)
 
@@ -293,7 +293,7 @@ Ensure backend apps use connection pooling to handle increased load.
    - Implement progressive delays
    - Use geo-blocking for known bad actors
 
-## 🎯 Next Steps
+##  Next Steps
 
 ### Phase 7: Real-Time Non-Blocking Detection
 - Implement async anomaly detection
@@ -320,4 +320,4 @@ Ensure backend apps use connection pooling to handle increased load.
 - `/usr/local/openresty/nginx/conf/sites-available/waf-integration` - WAF config
 - `config/config.yaml` - WAF service settings
 
-The advanced WAF setup provides enterprise-grade AI-powered web application protection with real-time anomaly detection, comprehensive logging, and production-ready reliability! 🚀
+The advanced WAF setup provides enterprise-grade AI-powered web application protection with real-time anomaly detection, comprehensive logging, and production-ready reliability! 

@@ -45,9 +45,9 @@ class WAFIntegrationTester:
         self.test_results.append(result)
 
         if success:
-            logger.info(f"✓ {test_name}: {message}")
+            logger.info(f" {test_name}: {message}")
         else:
-            logger.error(f"✗ {test_name}: {message}")
+            logger.error(f" {test_name}: {message}")
             if details:
                 logger.error(f"  Details: {details}")
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Threshold Sweep – test multiple WAF_THRESHOLD values offline.
+Threshold Sweep  test multiple WAF_THRESHOLD values offline.
 
 Loads the WAF model once, then classifies every request from the stress-test
 pools at each threshold and prints a summary table.

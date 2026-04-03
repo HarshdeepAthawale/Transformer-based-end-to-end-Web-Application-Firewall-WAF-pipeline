@@ -130,16 +130,16 @@ Latest test results with fine-tuned model:
 
 | Category | Detection Rate | Status |
 |----------|---------------|--------|
-| SQL Injection | 97.4% | ✅ Excellent |
-| XSS | 96.5% | ✅ Excellent |
-| Command Injection | 100% | ✅ Perfect |
-| Path Traversal | 100% | ✅ Perfect |
-| XXE | 100% | ✅ Perfect |
-| SSRF | 95.3% | ✅ Excellent |
-| Header Injection | 3.3% | ⚠️ Needs improvement |
-| LDAP/XPATH/Template | 75% | ✅ Good |
-| Mixed/Blended | 94.9% | ✅ Excellent |
-| **Overall** | **82.1%** | **✅ EXCELLENT** |
+| SQL Injection | 97.4% |  Excellent |
+| XSS | 96.5% |  Excellent |
+| Command Injection | 100% |  Perfect |
+| Path Traversal | 100% |  Perfect |
+| XXE | 100% |  Perfect |
+| SSRF | 95.3% |  Excellent |
+| Header Injection | 3.3% |  Needs improvement |
+| LDAP/XPATH/Template | 75% |  Good |
+| Mixed/Blended | 94.9% |  Excellent |
+| **Overall** | **82.1%** | ** EXCELLENT** |
 
 ## Archived Scripts
 

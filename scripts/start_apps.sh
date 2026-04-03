@@ -29,4 +29,4 @@ PY="${PROJECT_DIR}/.venv/bin/python"
 
 nohup "$PY" "$PROJECT_DIR/scripts/simple_web_apps.py" >> "$PROJECT_DIR/logs/web_apps.log" 2>&1 &
 echo $! > "$PID_DIR/web_apps.pid"
-echo "  3 web apps started (ports 8080, 8081, 8082) — PID $(cat "$PID_DIR/web_apps.pid")"
+echo "  3 web apps started (ports 8080, 8081, 8082)  PID $(cat "$PID_DIR/web_apps.pid")"

@@ -11,7 +11,7 @@ DURATION="${1:-90}"
 RATE="${2:-4}"
 
 echo "=============================================="
-echo "  WAF Attack Run – 3 App Targets + Charts    "
+echo "  WAF Attack Run  3 App Targets + Charts    "
 echo "=============================================="
 echo ""
 echo "This script sends mixed benign + attack traffic to 3 test endpoints"

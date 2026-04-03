@@ -88,15 +88,15 @@ def generate_traffic(duration_seconds=60, requests_per_second=2):
         duration_seconds: How long to generate traffic
         requests_per_second: How many requests per second
     """
-    print("╔═══════════════════════════════════════════════════════════════════╗")
-    print("║            WAF Live Traffic Generator                             ║")
-    print("╚═══════════════════════════════════════════════════════════════════╝")
+    print("")
+    print("            WAF Live Traffic Generator                             ")
+    print("")
     print(f"\nTarget: {BASE_URL}")
     print(f"Duration: {duration_seconds} seconds")
     print(f"Rate: {requests_per_second} requests/second")
     print(f"Total requests: ~{duration_seconds * requests_per_second}")
     print(f"\nStarted at: {datetime.now().strftime('%H:%M:%S')}")
-    print("═" * 70)
+    print("" * 70)
 
     stats = {
         "total": 0,
@@ -131,13 +131,13 @@ def generate_traffic(duration_seconds=60, requests_per_second=2):
 
             if result.get("error"):
                 stats["errors"] += 1
-                status = f"❌ {result['error']}"
+                status = f" {result['error']}"
             elif result.get("blocked"):
                 stats["blocked"] += 1
-                status = "🛑 BLOCKED"
+                status = " BLOCKED"
             else:
                 stats["allowed"] += 1
-                status = "✅ ALLOWED"
+                status = " ALLOWED"
 
             # Print progress every 10 requests
             if stats["total"] % 10 == 0:
@@ -152,29 +152,29 @@ def generate_traffic(duration_seconds=60, requests_per_second=2):
             time.sleep(request_interval)
 
     except KeyboardInterrupt:
-        print("\n\n⚠️  Traffic generation stopped by user")
+        print("\n\n  Traffic generation stopped by user")
 
     elapsed_time = time.time() - start_time
 
     print("\n" + "=" * 70)
-    print("╔═══════════════════════════════════════════════════════════════════╗")
-    print("║                      TRAFFIC GENERATION SUMMARY                    ║")
-    print("╠═══════════════════════════════════════════════════════════════════╣")
-    print(f"║  Total Requests Sent:     {stats['total']:6d}                              ║")
-    print(f"║  Benign Requests:         {stats['benign']:6d} ({stats['benign']/max(1,stats['total'])*100:5.1f}%)                  ║")
-    print(f"║  Malicious Requests:      {stats['malicious']:6d} ({stats['malicious']/max(1,stats['total'])*100:5.1f}%)                  ║")
-    print("╠═══════════════════════════════════════════════════════════════════╣")
-    print(f"║  Requests Blocked:        {stats['blocked']:6d} ({stats['blocked']/max(1,stats['total'])*100:5.1f}%)                  ║")
-    print(f"║  Requests Allowed:        {stats['allowed']:6d} ({stats['allowed']/max(1,stats['total'])*100:5.1f}%)                  ║")
-    print(f"║  Errors:                  {stats['errors']:6d}                              ║")
-    print("╠═══════════════════════════════════════════════════════════════════╣")
+    print("")
+    print("                      TRAFFIC GENERATION SUMMARY                    ")
+    print("")
+    print(f"  Total Requests Sent:     {stats['total']:6d}                              ")
+    print(f"  Benign Requests:         {stats['benign']:6d} ({stats['benign']/max(1,stats['total'])*100:5.1f}%)                  ")
+    print(f"  Malicious Requests:      {stats['malicious']:6d} ({stats['malicious']/max(1,stats['total'])*100:5.1f}%)                  ")
+    print("")
+    print(f"  Requests Blocked:        {stats['blocked']:6d} ({stats['blocked']/max(1,stats['total'])*100:5.1f}%)                  ")
+    print(f"  Requests Allowed:        {stats['allowed']:6d} ({stats['allowed']/max(1,stats['total'])*100:5.1f}%)                  ")
+    print(f"  Errors:                  {stats['errors']:6d}                              ")
+    print("")
     if stats['malicious'] > 0:
         detection_rate = stats['blocked'] / stats['malicious'] * 100
-        print(f"║  Detection Rate:          {detection_rate:5.1f}%                              ║")
-    print(f"║  Average Rate:            {stats['total']/elapsed_time:5.1f} req/s                         ║")
-    print(f"║  Duration:                {elapsed_time:5.1f} seconds                        ║")
-    print("╚═══════════════════════════════════════════════════════════════════╝")
-    print(f"\n✅ Traffic data is now available in the dashboard at http://localhost:3000")
+        print(f"  Detection Rate:          {detection_rate:5.1f}%                              ")
+    print(f"  Average Rate:            {stats['total']/elapsed_time:5.1f} req/s                         ")
+    print(f"  Duration:                {elapsed_time:5.1f} seconds                        ")
+    print("")
+    print(f"\n Traffic data is now available in the dashboard at http://localhost:3000")
     print(f"   Check the Overview and Traffic pages to see real-time updates!")
 
 
@@ -220,11 +220,11 @@ if __name__ == "__main__":
         total_requests = args.requests
         rate = args.rate if args.rate is not None else 25
         duration = max(1, (total_requests + rate - 1) // rate)
-        print(f"\n💡 Sending {total_requests} requests at {rate} req/s (~{duration}s)\n")
+        print(f"\n Sending {total_requests} requests at {rate} req/s (~{duration}s)\n")
         generate_traffic(duration_seconds=duration, requests_per_second=rate)
     else:
         duration = 60 if args.duration is None else args.duration
         rate = 2 if args.rate is None else args.rate
-        print(f"\n💡 Usage: python3 {sys.argv[0]} [duration_seconds] [requests_per_second]")
+        print(f"\n Usage: python3 {sys.argv[0]} [duration_seconds] [requests_per_second]")
         print(f"   Or:    python3 {sys.argv[0]} --requests 5000 --rate 25\n")
         generate_traffic(duration_seconds=duration, requests_per_second=rate)

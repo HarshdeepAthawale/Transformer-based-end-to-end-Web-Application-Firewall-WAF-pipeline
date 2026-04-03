@@ -169,12 +169,12 @@ pyproject.toml / pytest.ini     # Coverage config
 
 | Criterion | Target |
 |-----------|--------|
-| CI runs on every PR | ✅ |
-| Lint passes (ruff/flake8) | ✅ |
-| Unit tests pass | ✅ |
-| Integration tests pass | ✅ |
+| CI runs on every PR |  |
+| Lint passes (ruff/flake8) |  |
+| Unit tests pass |  |
+| Integration tests pass |  |
 | Coverage | ≥ 60% |
-| Feedback endpoint functional | ✅ |
+| Feedback endpoint functional |  |
 | Header injection payloads added | 20+ |
 
 ---

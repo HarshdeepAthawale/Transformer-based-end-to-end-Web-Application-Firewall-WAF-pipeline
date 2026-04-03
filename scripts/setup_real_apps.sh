@@ -44,15 +44,15 @@ if ! command -v node &> /dev/null; then
 fi
 
 NODE_VERSION=$(node --version)
-echo -e "${GREEN}✓ Node.js $NODE_VERSION found${NC}"
+echo -e "${GREEN} Node.js $NODE_VERSION found${NC}"
 
 # Install dependencies
 if [ ! -d "node_modules" ]; then
     echo "Installing Juice Shop dependencies (this may take a few minutes)..."
     npm install
-    echo -e "${GREEN}✓ Juice Shop dependencies installed${NC}"
+    echo -e "${GREEN} Juice Shop dependencies installed${NC}"
 else
-    echo -e "${GREEN}✓ Juice Shop dependencies already installed${NC}"
+    echo -e "${GREEN} Juice Shop dependencies already installed${NC}"
 fi
 
 # Create startup script
@@ -63,7 +63,7 @@ export PORT=8080
 npm start
 EOF
 chmod +x "$APPS_DIR/app1-juice-shop/start.sh"
-echo -e "${GREEN}✓ Juice Shop startup script created${NC}"
+echo -e "${GREEN} Juice Shop startup script created${NC}"
 
 echo ""
 echo -e "${YELLOW}Step 2: Setting up WebGoat (App 2 - Port 8081)...${NC}"
@@ -76,7 +76,7 @@ if ! command -v java &> /dev/null; then
 fi
 
 JAVA_VERSION=$(java -version 2>&1 | head -1)
-echo -e "${GREEN}✓ $JAVA_VERSION${NC}"
+echo -e "${GREEN} $JAVA_VERSION${NC}"
 
 # Check Maven
 if ! command -v mvn &> /dev/null; then
@@ -84,7 +84,7 @@ if ! command -v mvn &> /dev/null; then
     # WebGoat should have mvnw wrapper
     if [ -f "./mvnw" ]; then
         chmod +x ./mvnw
-        echo -e "${GREEN}✓ Maven wrapper found${NC}"
+        echo -e "${GREEN} Maven wrapper found${NC}"
     else
         echo -e "${RED}Error: Maven wrapper not found. Please install Maven.${NC}"
         exit 1
@@ -99,9 +99,9 @@ if [ ! -f "webgoat-container/target/webgoat-*.jar" ]; then
     else
         mvn clean package -DskipTests
     fi
-    echo -e "${GREEN}✓ WebGoat built${NC}"
+    echo -e "${GREEN} WebGoat built${NC}"
 else
-    echo -e "${GREEN}✓ WebGoat already built${NC}"
+    echo -e "${GREEN} WebGoat already built${NC}"
 fi
 
 # Create startup script
@@ -117,7 +117,7 @@ fi
 java -jar "$JAR_FILE" --server.port=8081 --webgoat.port=8081 --webwolf.port=9091
 EOF
 chmod +x "$APPS_DIR/app2-webgoat/start.sh"
-echo -e "${GREEN}✓ WebGoat startup script created${NC}"
+echo -e "${GREEN} WebGoat startup script created${NC}"
 
 echo ""
 echo -e "${YELLOW}Step 3: Setting up DVWA (App 3 - Port 8082)...${NC}"
@@ -135,14 +135,14 @@ if ! command -v php &> /dev/null; then
 fi
 
 PHP_VERSION=$(php --version | head -1)
-echo -e "${GREEN}✓ $PHP_VERSION${NC}"
+echo -e "${GREEN} $PHP_VERSION${NC}"
 
 # Configure DVWA
 if [ ! -f "config/config.inc.php" ]; then
     cp config/config.inc.php.dist config/config.inc.php
-    echo -e "${GREEN}✓ DVWA config file created${NC}"
+    echo -e "${GREEN} DVWA config file created${NC}"
 else
-    echo -e "${GREEN}✓ DVWA config file exists${NC}"
+    echo -e "${GREEN} DVWA config file exists${NC}"
 fi
 
 # Create startup script for DVWA (using PHP built-in server)
@@ -153,7 +153,7 @@ cd "$(dirname "$0")"
 php -S localhost:8082
 EOF
 chmod +x "$APPS_DIR/app3-dvwa/start.sh"
-echo -e "${GREEN}✓ DVWA startup script created${NC}"
+echo -e "${GREEN} DVWA startup script created${NC}"
 
 echo ""
 echo -e "${GREEN}=========================================="

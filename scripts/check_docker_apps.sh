@@ -20,9 +20,9 @@ for port in 8080 8081 8082; do
         8082) NAME="DVWA" ;;
     esac
     if [ "$CODE" = "200" ] || [ "$CODE" = "302" ]; then
-        echo "  ✓ $NAME ($port): HTTP $CODE"
+        echo "   $NAME ($port): HTTP $CODE"
     else
-        echo "  ⚠ $NAME ($port): HTTP $CODE (may still be starting)"
+        echo "   $NAME ($port): HTTP $CODE (may still be starting)"
     fi
 done
 

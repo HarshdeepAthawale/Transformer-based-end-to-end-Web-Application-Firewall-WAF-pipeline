@@ -18,7 +18,7 @@ class CICDErrorFixer:
 
     def fix_undefined_org_id_in_methods(self) -> int:
         """Find undefined org_id usage and add as parameter"""
-        print("\n🔍 Scanning for undefined org_id in method bodies...")
+        print("\n Scanning for undefined org_id in method bodies...")
 
         fixed_count = 0
 
@@ -38,17 +38,17 @@ class CICDErrorFixer:
                    not re.search(r'def\s+\w+\([^)]*?org_id:\s*int', content):
 
                     # This is a heuristic check - needs manual review usually
-                    print(f"   ⚠️  {service_file.name}: May need org_id parameter review")
+                    print(f"     {service_file.name}: May need org_id parameter review")
 
             except Exception as e:
-                print(f"   ❌ Error processing {service_file}: {e}")
+                print(f"    Error processing {service_file}: {e}")
 
         return fixed_count
 
     def auto_fix_all(self) -> bool:
         """Automatically detect and fix common errors"""
         print("=" * 70)
-        print("🤖 AUTOMATED CI/CD ERROR DETECTION & FIX")
+        print(" AUTOMATED CI/CD ERROR DETECTION & FIX")
         print("=" * 70)
 
         # Run checks
@@ -57,11 +57,11 @@ class CICDErrorFixer:
         # Summary
         print("\n" + "=" * 70)
         if self.fixes_applied:
-            print(f"✅ FIXES APPLIED ({len(self.fixes_applied)}):")
+            print(f" FIXES APPLIED ({len(self.fixes_applied)}):")
             for fix in self.fixes_applied:
                 print(f"   {fix}")
         else:
-            print("ℹ️  No automatic fixes needed")
+            print("ℹ  No automatic fixes needed")
         print("=" * 70)
 
         return len(self.fixes_applied) > 0

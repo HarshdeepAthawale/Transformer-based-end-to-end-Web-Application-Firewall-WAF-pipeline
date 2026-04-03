@@ -6,7 +6,7 @@
 
 ---
 
-## 📋 Task Overview
+##  Task Overview
 
 | # | Task | Priority | Category | Est. Effort |
 |---|------|----------|----------|-------------|
@@ -400,7 +400,7 @@ Expose OpenAPI/Swagger documentation.
 
 ---
 
-## 📊 Progress Tracking
+##  Progress Tracking
 
 ### Completion Checklist
 
@@ -435,7 +435,7 @@ Phase 3 (Scale):
 
 ---
 
-## 🎯 Success Metrics
+##  Success Metrics
 
 | Metric | Current | Target |
 |--------|---------|--------|
@@ -448,7 +448,7 @@ Phase 3 (Scale):
 
 ---
 
-## 📝 Notes
+##  Notes
 
 - Prioritize CI/CD as it enables faster iteration on other tasks
 - Header injection fix may require model retraining

@@ -3,45 +3,45 @@
 
 set -e
 
-echo "════════════════════════════════════════════════════════════════════"
-echo "🔍 PRE-COMMIT CI/CD CHECK"
-echo "════════════════════════════════════════════════════════════════════"
+echo ""
+echo " PRE-COMMIT CI/CD CHECK"
+echo ""
 echo ""
 
 ERRORS=0
 
 # Check 1: Quick syntax check
-echo "1️⃣  Checking Python syntax..."
+echo "  Checking Python syntax..."
 for file in backend/services/*.py; do
     if ! python3 -m py_compile "$file" 2>/dev/null; then
-        echo "   ❌ Syntax error in $file"
+        echo "    Syntax error in $file"
         ERRORS=$((ERRORS + 1))
     fi
 done
 if [ $ERRORS -eq 0 ]; then
-    echo "   ✅ All Python files have valid syntax"
+    echo "    All Python files have valid syntax"
 fi
 
 echo ""
 
 # Check 2: Unit tests
-echo "2️⃣  Running critical tests..."
+echo "  Running critical tests..."
 if python3 -m pytest tests/unit/test_ip_fencing.py tests/unit/test_bot_management.py -q > /dev/null 2>&1; then
-    echo "   ✅ Unit tests PASSED"
+    echo "    Unit tests PASSED"
 else
-    echo "   ❌ Tests failed - run: python3 -m pytest tests/unit/test_ip_fencing.py tests/unit/test_bot_management.py -v"
+    echo "    Tests failed - run: python3 -m pytest tests/unit/test_ip_fencing.py tests/unit/test_bot_management.py -v"
     ERRORS=$((ERRORS + 1))
 fi
 
 echo ""
 
 # Summary
-echo "════════════════════════════════════════════════════════════════════"
+echo ""
 if [ $ERRORS -eq 0 ]; then
-    echo "✅ ALL CHECKS PASSED - Safe to push!"
+    echo " ALL CHECKS PASSED - Safe to push!"
 else
-    echo "❌ $ERRORS CHECK(S) FAILED - Fix before pushing"
+    echo " $ERRORS CHECK(S) FAILED - Fix before pushing"
 fi
-echo "════════════════════════════════════════════════════════════════════"
+echo ""
 
 exit $ERRORS

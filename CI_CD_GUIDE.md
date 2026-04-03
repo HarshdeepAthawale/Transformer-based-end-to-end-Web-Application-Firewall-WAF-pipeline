@@ -1,6 +1,6 @@
 # CI/CD Error Prevention Guide
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Before Every Push:
 ```bash
@@ -8,9 +8,9 @@ bash scripts/pre-commit-check.sh
 ```
 
 This will:
-1. ✅ Check Python syntax
-2. ✅ Run critical unit tests
-3. ✅ Report status
+1.  Check Python syntax
+2.  Run critical unit tests
+3.  Report status
 
 ### Automated Error Fixer (When Needed):
 ```bash
@@ -19,7 +19,7 @@ python3 scripts/cicd_auto_fixer.py
 
 ---
 
-## 📋 Common Errors & Solutions
+##  Common Errors & Solutions
 
 ### Error Type 1: Undefined Variable
 ```
@@ -29,11 +29,11 @@ F821 Undefined name `org_id`
 
 **Fix:**
 ```python
-# ❌ WRONG
+#  WRONG
 def create_rule(self, country_code: str):
     rule = GeoRule(org_id=org_id, ...)
 
-# ✅ CORRECT
+#  CORRECT
 def create_rule(self, org_id: int, country_code: str):
     rule = GeoRule(org_id=org_id, ...)
 ```
@@ -45,16 +45,16 @@ TypeError: service.detect_bot() missing 1 required positional argument: 'org_id'
 
 **Fix:**
 ```python
-# ❌ WRONG
+#  WRONG
 service.detect_bot(user_agent="...", ip="...")
 
-# ✅ CORRECT
+#  CORRECT
 service.detect_bot(org_id=1, user_agent="...", ip="...")
 ```
 
 ---
 
-## ✅ Recommended Workflow
+##  Recommended Workflow
 
 ```bash
 # Before changes
@@ -75,11 +75,11 @@ git push origin master
 
 ---
 
-## 📊 Pre-Commit Checks
+##  Pre-Commit Checks
 
-- ✅ Python syntax validation
-- ✅ Import test
-- ✅ Unit test verification (critical tests)
-- ✅ Summary report
+-  Python syntax validation
+-  Import test
+-  Unit test verification (critical tests)
+-  Summary report
 
 All checks must pass before pushing to GitHub.

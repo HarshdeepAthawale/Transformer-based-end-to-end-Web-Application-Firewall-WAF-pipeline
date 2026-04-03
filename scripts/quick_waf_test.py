@@ -22,15 +22,15 @@ def test_waf_service():
         response = requests.get(f"{waf_url}/health", timeout=5)
         if response.status_code == 200:
             data = response.json()
-            print("✓ Health check passed")
+            print(" Health check passed")
             print(f"  Status: {data.get('status')}")
             print(f"  Model loaded: {data.get('model_loaded')}")
             print(f"  Vocab size: {data.get('vocab_size')}")
         else:
-            print(f"✗ Health check failed: {response.status_code}")
+            print(f" Health check failed: {response.status_code}")
             return False
     except Exception as e:
-        print(f"✗ Health check failed: {e}")
+        print(f" Health check failed: {e}")
         return False
 
     # Test 2: Normal request
@@ -44,14 +44,14 @@ def test_waf_service():
         response = requests.post(f"{waf_url}/check", json=request_data, timeout=10)
         if response.status_code == 200:
             result = response.json()
-            print("✓ Normal request test passed")
+            print(" Normal request test passed")
             print(f"  Anomaly score: {result.get('anomaly_score', 'N/A')}")
             print(f"  Is anomaly: {result.get('is_anomaly', 'N/A')}")
         else:
-            print(f"✗ Normal request test failed: {response.status_code}")
+            print(f" Normal request test failed: {response.status_code}")
             return False
     except Exception as e:
-        print(f"✗ Normal request test failed: {e}")
+        print(f" Normal request test failed: {e}")
         return False
 
     # Test 3: Suspicious request (SQL injection)
@@ -65,14 +65,14 @@ def test_waf_service():
         response = requests.post(f"{waf_url}/check", json=request_data, timeout=10)
         if response.status_code == 200:
             result = response.json()
-            print("✓ SQL injection test passed")
+            print(" SQL injection test passed")
             print(f"  Anomaly score: {result.get('anomaly_score', 'N/A')}")
             print(f"  Is anomaly: {result.get('is_anomaly', 'N/A')}")
         else:
-            print(f"✗ SQL injection test failed: {response.status_code}")
+            print(f" SQL injection test failed: {response.status_code}")
             return False
     except Exception as e:
-        print(f"✗ SQL injection test failed: {e}")
+        print(f" SQL injection test failed: {e}")
         return False
 
     # Test 4: Metrics
@@ -80,17 +80,17 @@ def test_waf_service():
         response = requests.get(f"{waf_url}/metrics", timeout=5)
         if response.status_code == 200:
             metrics = response.json()
-            print("✓ Metrics test passed")
+            print(" Metrics test passed")
             print(f"  Total requests: {metrics.get('total_requests', 'N/A')}")
             print(f"  Anomalies detected: {metrics.get('anomalies_detected', 'N/A')}")
         else:
-            print(f"✗ Metrics test failed: {response.status_code}")
+            print(f" Metrics test failed: {response.status_code}")
             return False
     except Exception as e:
-        print(f"✗ Metrics test failed: {e}")
+        print(f" Metrics test failed: {e}")
         return False
 
-    print("\n✓ All WAF service tests passed!")
+    print("\n All WAF service tests passed!")
     return True
 
 def main():
@@ -123,14 +123,14 @@ def main():
         success = test_waf_service()
 
         if success:
-            print("\n🎉 WAF Integration Phase 6 completed successfully!")
+            print("\n WAF Integration Phase 6 completed successfully!")
             print("\nNext steps:")
             print("1. Set up Nginx reverse proxy: ./scripts/setup_nginx_waf.sh")
             print("2. Configure your web application on port 8080")
             print("3. Test end-to-end: curl http://localhost/")
             print("4. Monitor: curl http://localhost/waf-metrics")
         else:
-            print("\n❌ WAF service tests failed")
+            print("\n WAF service tests failed")
 
         return 0 if success else 1
 

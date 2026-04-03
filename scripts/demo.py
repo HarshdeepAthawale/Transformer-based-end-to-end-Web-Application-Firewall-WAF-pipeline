@@ -107,7 +107,7 @@ def main():
 
             status = "DETECTED" if is_anomaly else "NOT DETECTED"
             match = is_anomaly == scenario["expected"]
-            symbol = "\033[92m✓\033[0m" if match else "\033[91m✗\033[0m"
+            symbol = "\033[92m\033[0m" if match else "\033[91m\033[0m"
 
             print(f"  Result: {status} (Score: {score:.3f}) {symbol}")
 
@@ -143,10 +143,10 @@ def main():
     print("\nDetailed Results:")
     for r in results:
         if "match" in r:
-            s = "\033[92m✓\033[0m" if r["match"] else "\033[91m✗\033[0m"
+            s = "\033[92m\033[0m" if r["match"] else "\033[91m\033[0m"
             print(f"  {s} {r['scenario']}: Detected={r['detected']}, Score={r['score']:.3f}")
         else:
-            print(f"  \033[91m✗\033[0m {r['scenario']}: Error - {r.get('error', 'Unknown')}")
+            print(f"  \033[91m\033[0m {r['scenario']}: Error - {r.get('error', 'Unknown')}")
 
     print()
 

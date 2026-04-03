@@ -324,7 +324,7 @@ def harvest_categorized_data() -> List[Dict[str, Any]]:
     results = []
     data_dir = PROJECT_ROOT / "data" / "malicious"
     if not data_dir.exists():
-        print("  WARNING: data/malicious/ not found — run populate_malicious_data.py first")
+        print("  WARNING: data/malicious/ not found  run populate_malicious_data.py first")
         return results
 
     for json_file in sorted(data_dir.glob("*.json")):
@@ -340,7 +340,7 @@ def harvest_categorized_data() -> List[Dict[str, Any]]:
 
 def main():
     print("=" * 60)
-    print("PAYLOAD HARVESTER — Training Data Generation")
+    print("PAYLOAD HARVESTER  Training Data Generation")
     print("=" * 60)
 
     all_payloads = []
@@ -406,7 +406,7 @@ def main():
     print(f"  Appended to malicious_pool.json (total: {len(combined)} entries)")
 
     print("\n" + "=" * 60)
-    print("DONE — Ready for retraining:")
+    print("DONE  Ready for retraining:")
     print("  python scripts/finetune_waf_model.py --augment --epochs 5")
     print("=" * 60)
 

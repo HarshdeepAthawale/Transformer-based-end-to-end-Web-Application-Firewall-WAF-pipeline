@@ -27,7 +27,7 @@ if [ -d "$PID_DIR" ]; then
                 echo "Stopping $service_name (PID: $pid)..."
                 kill "$pid" 2>/dev/null || true
                 rm "$pid_file"
-                echo -e "  ${GREEN}✓${NC} Stopped"
+                echo -e "  ${GREEN}${NC} Stopped"
             else
                 echo "Service $service_name (PID: $pid) not running"
                 rm "$pid_file"
@@ -41,22 +41,22 @@ echo ""
 echo "Stopping remaining processes..."
 
 # Frontend (Next.js)
-pkill -f "next dev" 2>/dev/null && echo -e "  ${GREEN}✓${NC} Frontend stopped" || echo "  No frontend process found"
+pkill -f "next dev" 2>/dev/null && echo -e "  ${GREEN}${NC} Frontend stopped" || echo "  No frontend process found"
 
 # API Server
-pkill -f "start_api_server.py" 2>/dev/null && echo -e "  ${GREEN}✓${NC} API server stopped" || echo "  No API server process found"
+pkill -f "start_api_server.py" 2>/dev/null && echo -e "  ${GREEN}${NC} API server stopped" || echo "  No API server process found"
 
 # WAF Service
-pkill -f "start_waf_service.py" 2>/dev/null && echo -e "  ${GREEN}✓${NC} WAF service stopped" || echo "  No WAF service process found"
+pkill -f "start_waf_service.py" 2>/dev/null && echo -e "  ${GREEN}${NC} WAF service stopped" || echo "  No WAF service process found"
 
 # Web Apps
-pkill -f "simple_web_apps.py" 2>/dev/null && echo -e "  ${GREEN}✓${NC} Web apps stopped" || echo "  No web apps process found"
+pkill -f "simple_web_apps.py" 2>/dev/null && echo -e "  ${GREEN}${NC} Web apps stopped" || echo "  No web apps process found"
 
 # Tomcat (if running)
 if pgrep -f "catalina" > /dev/null; then
     echo "Stopping Tomcat..."
     /opt/tomcat9/bin/shutdown.sh 2>/dev/null || true
-    echo -e "  ${GREEN}✓${NC} Tomcat stopped"
+    echo -e "  ${GREEN}${NC} Tomcat stopped"
 fi
 
 echo ""

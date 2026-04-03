@@ -75,6 +75,6 @@ STRESS_TEST_BASE_URL=http://localhost:$GATEWAY_PORT python scripts/stress_test_r
 echo ""
 echo "=============================================="
 echo "  View results:"
-echo "  • Dashboard: http://localhost:3000/dos-protection"
-echo "  • API: curl http://localhost:3001/api/events/dos-overview?range=1h"
+echo "   Dashboard: http://localhost:3000/dos-protection"
+echo "   API: curl http://localhost:3001/api/events/dos-overview?range=1h"
 echo "=============================================="

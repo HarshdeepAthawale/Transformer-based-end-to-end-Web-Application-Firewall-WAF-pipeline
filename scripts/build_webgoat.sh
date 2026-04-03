@@ -17,5 +17,5 @@ $JAVA_HOME/bin/java -version
 ./mvnw clean package -DskipTests
 
 echo ""
-echo "✓ WebGoat build complete!"
+echo " WebGoat build complete!"
 echo "JAR location: $(find webgoat-container/target -name "webgoat-*.jar" | head -1)"

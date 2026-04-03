@@ -210,7 +210,7 @@ def main():
         if response.status_code != 200:
             logger.error(f"API health check failed: {response.status_code}")
             return 1
-        logger.info("✓ API is accessible")
+        logger.info(" API is accessible")
     except Exception as e:
         logger.error(f"API is not accessible: {e}")
         logger.error("Make sure the API server is running on the specified URL")
@@ -285,10 +285,10 @@ def main():
     logger.info(f"  Missed: {malicious_total - malicious_blocked} ({(1-block_rate)*100:.1f}%)")
     
     if block_rate < 0.8:
-        logger.warning(f"  ⚠ WARNING: Block rate is below 80%!")
+        logger.warning(f"   WARNING: Block rate is below 80%!")
         logger.warning(f"     Consider optimizing threshold or retraining model")
     else:
-        logger.info(f"  ✓ Good block rate!")
+        logger.info(f"   Good block rate!")
     
     # Normal requests analysis
     normal_allowed = sum(1 for r in normal_results if r.get("allowed", False) and not r.get("blocked_by_waf", False))
@@ -304,10 +304,10 @@ def main():
     logger.info(f"  False Positive Rate: {false_positive_rate*100:.1f}%")
     
     if false_positive_rate > 0.1:
-        logger.warning(f"  ⚠ WARNING: False positive rate is above 10%!")
+        logger.warning(f"   WARNING: False positive rate is above 10%!")
         logger.warning(f"     Consider adjusting threshold")
     else:
-        logger.info(f"  ✓ Low false positive rate!")
+        logger.info(f"   Low false positive rate!")
     
     # Overall metrics
     logger.info("")
@@ -333,7 +333,7 @@ def main():
         json.dump(results, f, indent=2)
     
     logger.info("")
-    logger.info(f"✓ Results saved to {output_file}")
+    logger.info(f" Results saved to {output_file}")
     
     # Final verdict
     logger.info("")
@@ -342,18 +342,18 @@ def main():
     logger.info("="*70)
     
     if block_rate >= 0.8 and false_positive_rate <= 0.1:
-        logger.info("✓✓✓ WAF IS WORKING WELL! ✓✓✓")
+        logger.info(" WAF IS WORKING WELL! ")
         logger.info(f"  Block rate: {block_rate*100:.1f}% (target: 80%+)")
         logger.info(f"  False positive rate: {false_positive_rate*100:.1f}% (target: <10%)")
         return 0
     elif block_rate >= 0.5:
-        logger.warning("⚠ WAF IS PARTIALLY WORKING")
+        logger.warning(" WAF IS PARTIALLY WORKING")
         logger.warning(f"  Block rate: {block_rate*100:.1f}% (target: 80%+)")
         logger.warning(f"  False positive rate: {false_positive_rate*100:.1f}% (target: <10%)")
         logger.warning("  Recommendation: Optimize threshold or retrain model")
         return 1
     else:
-        logger.error("✗✗✗ WAF IS NOT WORKING EFFECTIVELY ✗✗✗")
+        logger.error(" WAF IS NOT WORKING EFFECTIVELY ")
         logger.error(f"  Block rate: {block_rate*100:.1f}% (target: 80%+)")
         logger.error(f"  False positive rate: {false_positive_rate*100:.1f}% (target: <10%)")
         logger.error("  Recommendation: Check model, threshold, or retrain")

@@ -11,7 +11,7 @@ from pathlib import Path
 
 def print_status(message, status=True):
     """Print status message with checkmark or X"""
-    symbol = "✓" if status else "✗"
+    symbol = "" if status else ""
     color = "\033[0;32m" if status else "\033[0;31m"
     reset = "\033[0m"
     print(f"{color}{symbol}{reset} {message}")
@@ -229,10 +229,10 @@ if __name__ == "__main__":
     print("=" * 50)
     
     if all_passed:
-        print("\n✓ All tests passed!")
+        print("\n All tests passed!")
         sys.exit(0)
     else:
-        print("\n✗ Some tests failed!")
+        print("\n Some tests failed!")
         print("\nNote: Some failures may be expected if services are not running.")
         print("Run 'bash scripts/setup_phase1.sh' to set up the environment.")
         sys.exit(1)

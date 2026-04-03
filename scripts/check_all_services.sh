@@ -14,10 +14,10 @@ check_service() {
     local port=$3
     
     if curl -s "$url" > /dev/null 2>&1; then
-        echo "✅ $name: Running (http://localhost:$port)"
+        echo " $name: Running (http://localhost:$port)"
         return 0
     else
-        echo "❌ $name: Not running (port $port)"
+        echo " $name: Not running (port $port)"
         return 1
     fi
 }
