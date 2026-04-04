@@ -212,7 +212,6 @@ class UsageService:
             return 0
 
         flushed = 0
-        month = _current_month()
 
         try:
             # Scan for all usage keys
