@@ -4,6 +4,7 @@ from backend.lib.datetime_utils import utc_now
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
+from backend.lib.db_utils import hour_bucket
 from backend.services.charts_service import ChartsService
 from backend.core.time_range import parse_time_range
 from backend.models.security_event import SecurityEvent
@@ -27,7 +28,7 @@ def _aggregate_security_events(db: Session, org_id: int, start_time, event_types
     """Aggregate security events by hour for chart data."""
     results = (
         db.query(
-            func.strftime("%Y-%m-%d %H:00:00", SecurityEvent.timestamp).label("time"),
+            hour_bucket(SecurityEvent.timestamp).label("time"),
             func.count(SecurityEvent.id).label("count"),
         )
         .filter(

@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 
+from backend.lib.db_utils import hour_bucket
 from backend.database import get_db
 from backend.auth import get_current_tenant
 from backend.models.security_event import SecurityEvent
@@ -18,7 +19,7 @@ def _aggregate_events(db: Session, start_time, event_types: list[str]) -> list[d
     try:
         results = (
             db.query(
-                func.strftime("%Y-%m-%d %H:00:00", SecurityEvent.timestamp).label("time"),
+                hour_bucket(SecurityEvent.timestamp).label("time"),
                 func.count(SecurityEvent.id).label("count"),
             )
             .filter(

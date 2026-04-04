@@ -22,7 +22,7 @@ if DATABASE_URL.startswith("sqlite:///"):
         db_path = Path(__file__).parent.parent / db_path
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
-# Create engine
+# Create engine with production-grade pooling
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(
         DATABASE_URL,
@@ -30,7 +30,14 @@ if DATABASE_URL.startswith("sqlite"):
         echo=False
     )
 else:
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True, echo=False)
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_size=20,
+        max_overflow=10,
+        pool_recycle=3600,
+        echo=False,
+    )
 
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

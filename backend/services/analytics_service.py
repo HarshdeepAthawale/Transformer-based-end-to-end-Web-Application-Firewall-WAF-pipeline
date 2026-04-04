@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import datetime
 from backend.lib.datetime_utils import utc_now
+from backend.lib.db_utils import hour_bucket
 from typing import Dict, List
 
 from backend.models.metrics import Metrics
@@ -29,7 +30,7 @@ class AnalyticsService:
         # Aggregate by hour
         if metric == "requests":
             results = self.db.query(
-                func.strftime('%Y-%m-%d %H:00:00', Metrics.timestamp).label('time'),
+                hour_bucket( Metrics.timestamp).label('time'),
                 func.sum(Metrics.total_requests).label('value')
             )\
             .filter(Metrics.org_id == org_id)\
@@ -39,7 +40,7 @@ class AnalyticsService:
             .all()
         elif metric == "threats":
             results = self.db.query(
-                func.strftime('%Y-%m-%d %H:00:00', Threat.timestamp).label('time'),
+                hour_bucket( Threat.timestamp).label('time'),
                 func.count(Threat.id).label('value')
             )\
             .filter(Threat.org_id == org_id)\

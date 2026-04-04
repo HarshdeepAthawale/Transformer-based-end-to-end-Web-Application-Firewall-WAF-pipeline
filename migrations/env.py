@@ -6,12 +6,15 @@ from sqlalchemy import pool
 from alembic import context
 
 # Import models and Base for autogenerate support
-from backend.database import Base
+from backend.database import Base, DATABASE_URL
 import backend.models  # This imports all model classes
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Override sqlalchemy.url from DATABASE_URL env var at runtime
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

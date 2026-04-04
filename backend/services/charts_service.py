@@ -7,6 +7,7 @@ from sqlalchemy import func
 from datetime import datetime
 from typing import List, Dict
 
+from backend.lib.db_utils import hour_bucket
 from backend.models.metrics import Metrics
 from backend.models.traffic import TrafficLog
 from backend.models.threats import Threat
@@ -23,7 +24,7 @@ class ChartsService:
         # Aggregate by hour
         results = (
             self.db.query(
-                func.strftime("%Y-%m-%d %H:00:00", Metrics.timestamp).label("time"),
+                hour_bucket( Metrics.timestamp).label("time"),
                 func.sum(Metrics.total_requests).label("requests"),
                 func.sum(Metrics.blocked_requests).label("blocked"),
                 func.sum(Metrics.allowed_requests).label("allowed"),
@@ -39,7 +40,7 @@ class ChartsService:
         if not results:
             results = (
                 self.db.query(
-                    func.strftime("%Y-%m-%d %H:00:00", TrafficLog.timestamp).label(
+                    hour_bucket( TrafficLog.timestamp).label(
                         "time"
                     ),
                     func.count(TrafficLog.id).label("requests"),
@@ -67,7 +68,7 @@ class ChartsService:
         # Aggregate by hour and threat type
         results = (
             self.db.query(
-                func.strftime("%Y-%m-%d %H:00:00", Threat.timestamp).label("time"),
+                hour_bucket( Threat.timestamp).label("time"),
                 Threat.type,
                 func.count(Threat.id).label("count"),
             )
