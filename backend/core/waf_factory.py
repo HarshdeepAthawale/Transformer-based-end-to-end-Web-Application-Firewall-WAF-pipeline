@@ -1,7 +1,9 @@
 """
 Centralized WAF service creation from config.
 Uses fine-tuned HuggingFace transformer model for threat detection.
+Set WAF_USE_ONNX=true to use the ONNX Runtime backend (3-5x faster).
 """
+import os
 from pathlib import Path
 from typing import Optional
 from loguru import logger
@@ -59,6 +61,30 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
     if not model_path:
         model_path = str(_project_root() / "models" / "waf-distilbert")
 
+    # ONNX branch — opt-in via WAF_USE_ONNX=true
+    use_onnx = os.environ.get("WAF_USE_ONNX", "false").lower() == "true"
+    if use_onnx:
+        try:
+            from backend.ml.onnx_classifier import ONNXWAFClassifier
+
+            onnx_path = str(_project_root() / "models" / "waf-distilbert.onnx")
+            classifier = ONNXWAFClassifier(
+                model_path=str(model_path),
+                onnx_path=onnx_path,
+                threshold=threshold,
+            )
+            if classifier.is_loaded:
+                _waf_classifier = classifier
+                logger.info(f"ONNX WAF classifier initialized (model={model_path}, onnx={onnx_path})")
+                return _waf_classifier
+            else:
+                logger.warning("ONNX classifier not loaded — falling back to PyTorch")
+        except ImportError:
+            logger.warning("onnxruntime not available — falling back to PyTorch")
+        except Exception as e:
+            logger.warning(f"ONNX init failed ({e}) — falling back to PyTorch")
+
+    # Default PyTorch path
     try:
         from backend.ml.waf_classifier import WAFClassifier
 
