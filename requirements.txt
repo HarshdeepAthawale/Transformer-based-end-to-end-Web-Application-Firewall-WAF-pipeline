@@ -56,6 +56,9 @@ maxminddb>=2.2.0
 # Caching (optional)
 redis>=5.0.0
 
+# Task queue (optional — enables distributed background tasks via WAF_USE_CELERY=true)
+celery[redis]>=5.3.0
+
 # ONNX Runtime (optional — enables 3-5x faster ML inference via WAF_USE_ONNX=true)
 onnxruntime>=1.17.0
 

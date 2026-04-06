@@ -121,8 +121,11 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Could not create WAF service: {e}")
         app.state.waf_service = None
 
-    # Start background workers
+    # Start background workers (thread mode by default; Celery mode if WAF_USE_CELERY=true)
     from backend.tasks.scheduler import start_background_workers
+
+    use_celery = os.getenv("WAF_USE_CELERY", "false").lower() == "true"
+    logger.info(f"Task queue mode: {'celery' if use_celery else 'threads'}")
 
     try:
         start_background_workers()
@@ -159,6 +162,11 @@ async def lifespan(app: FastAPI):
         except Exception:
             pass
     logger.info("Shutting down WAF API Server...")
+    from backend.tasks.scheduler import stop_background_workers
+    try:
+        stop_background_workers()
+    except Exception as e:
+        logger.warning(f"Error stopping background workers: {e}")
     close_db()
     logger.info("Shutdown complete")
 

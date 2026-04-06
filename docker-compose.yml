@@ -103,5 +103,44 @@ services:
       backend:
         condition: service_healthy
 
+  # Celery worker — processes tasks from the 'waf' queue.
+  # Start with: docker compose --profile celery up
+  celery-worker:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: celery -A backend.celery_app worker -Q waf -l info --concurrency 4
+    environment:
+      DATABASE_URL: sqlite:///./data/waf_dashboard.db
+      REDIS_URL: redis://redis:6379
+      WAF_USE_CELERY: "true"
+    volumes:
+      - backend_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    profiles: ["celery"]
+
+  # Celery beat — enqueues periodic tasks on schedule.
+  # Start with: docker compose --profile celery up
+  celery-beat:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: celery -A backend.celery_app beat -l info
+    environment:
+      DATABASE_URL: sqlite:///./data/waf_dashboard.db
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - backend_data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    profiles: ["celery"]
+
 volumes:
   backend_data:
