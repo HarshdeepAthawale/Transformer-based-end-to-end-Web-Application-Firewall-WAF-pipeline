@@ -8,7 +8,6 @@ import time
 import json
 from pathlib import Path
 from typing import Optional, Dict, Any, List
-from urllib.parse import parse_qs, urlparse
 from loguru import logger
 
 from backend.parsing import ParsingPipeline
@@ -161,8 +160,6 @@ class ONNXWAFClassifier:
             return {"label": "unknown", "confidence": 0.0, "is_malicious": False, "error": "Model not loaded"}
 
         try:
-            import numpy as np
-
             enc = self.tokenizer(
                 text,
                 truncation=True,
