@@ -51,7 +51,7 @@ def export(model_path: str, output_path: str) -> None:
             "attention_mask": {0: "batch_size", 1: "seq_len"},
             "logits": {0: "batch_size"},
         },
-        opset_version=14,
+        opset_version=18,
         do_constant_folding=True,
     )
     print("ONNX export complete.")
