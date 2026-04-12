@@ -49,6 +49,9 @@ services:
       WEBSOCKET_ENABLED: "true"
       WAF_ENABLED: "true"
       MANAGED_RULES_FEED_URL: http://backend:3001/api/rules/managed/feed
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@waf.example}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Waf@Admin2026!}
+      JWT_SECRET: ${JWT_SECRET:-waf-jwt-secret-change-in-production-2026}
     volumes:
       - backend_data:/app/data
     depends_on:

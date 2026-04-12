@@ -61,7 +61,7 @@ function LoginForm() {
           return
         }
         try {
-          await usersApi.createUser({
+          await usersApi.register({
             username: email,
             email,
             password,

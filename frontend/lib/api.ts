@@ -880,6 +880,17 @@ export const usersApi = {
       body: JSON.stringify(user),
     }),
 
+  register: (user: {
+    username: string
+    email: string
+    password: string
+    full_name?: string
+  }): Promise<ApiResponse<User>> =>
+    apiRequest('/api/users/register', {
+      method: 'POST',
+      body: JSON.stringify(user),
+    }),
+
   login: (username: string, password: string): Promise<ApiResponse<{ token: string; user: User }>> =>
     apiRequest('/api/users/login', {
       method: 'POST',

@@ -18,6 +18,13 @@ class UserUpdateRequest(BaseModel):
     is_active: Optional[bool] = None
 
 
+class RegisterRequest(BaseModel):
+    username: str
+    email: str
+    password: str
+    full_name: Optional[str] = None
+
+
 class LoginRequest(BaseModel):
     username: str
     password: str

@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models.users import User, UserRole
 from backend.auth import get_current_user, require_role
-from backend.schemas.users import UserCreateRequest, LoginRequest, ApiKeyCreateRequest
+from backend.schemas.users import UserCreateRequest, RegisterRequest, LoginRequest, ApiKeyCreateRequest
 from backend.controllers import users as ctrl
 
 router = APIRouter()
@@ -48,6 +48,24 @@ async def login(payload: LoginRequest, request: Request, db: Session = Depends(g
         raise HTTPException(status_code=401, detail=str(e))
     except PermissionError as e:
         raise HTTPException(status_code=403, detail=str(e))
+
+
+@router.post("/register")
+async def register(payload: RegisterRequest, request: Request, db: Session = Depends(get_db)):
+    """Public self-registration endpoint. New users get 'viewer' role in the default org."""
+    _check_login_rate_limit(request)
+    try:
+        return ctrl.create_user(
+            db,
+            username=payload.username,
+            email=payload.email,
+            password=payload.password,
+            role="viewer",
+            full_name=payload.full_name,
+            created_by="self-registration",
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("")
