@@ -58,7 +58,7 @@ const EVENT_TYPE_OPTIONS = [
 
 /** Merge chart series into one timeline: each bucket has keys seriesName: count. */
 function mergeSeriesIntoTimeline(series: { name: string; data: { time: string; count: number }[] }[]) {
-  const map = new Map<string, Record<string, number>>()
+  const map = new Map<string, { time: string; timeFormatted: string; [key: string]: string | number }>()
   for (const s of series) {
     for (const point of s.data) {
       const t = point.time

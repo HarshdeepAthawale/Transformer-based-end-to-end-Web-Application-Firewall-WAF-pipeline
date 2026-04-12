@@ -36,7 +36,8 @@ COPY data/managed-rules-feed.json /app/backend/data/managed-rules-feed.json
 
 # Create non-root user for security
 RUN adduser --disabled-password --gecos '' appuser && \
-    chown -R appuser:appuser /app
+    chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /app/data
 USER appuser
 
 # Expose port
