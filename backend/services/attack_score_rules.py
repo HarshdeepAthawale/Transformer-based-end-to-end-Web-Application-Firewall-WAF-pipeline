@@ -1,5 +1,5 @@
 """
-Attack Score Rules Engine (Cloudflare-style cf.waf.score rules).
+Attack Score Rules Engine (industry-standard cf.waf.score rules).
 
 Evaluates WAF attack scores against configurable rules to determine
 blocking/challenge/log actions. Supports overall score and sub-category

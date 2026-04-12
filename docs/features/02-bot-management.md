@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature extends the existing bot detection with a numeric **bot score** (1–99, Cloudflare-style: low = automated, high = human), a **verified bots** list (allowlist of known-good bots), and configurable **score bands** that map to actions (allow, challenge, block). The gateway uses the score and bands to decide per request; the frontend provides CRUD for verified bots and score-band configuration. No hardcoded scores or actions—all from DB and config.
+This feature extends the existing bot detection with a numeric **bot score** (1–99, industry-standard: low = automated, high = human), a **verified bots** list (allowlist of known-good bots), and configurable **score bands** that map to actions (allow, challenge, block). The gateway uses the score and bands to decide per request; the frontend provides CRUD for verified bots and score-band configuration. No hardcoded scores or actions—all from DB and config.
 
 ## Objectives
 

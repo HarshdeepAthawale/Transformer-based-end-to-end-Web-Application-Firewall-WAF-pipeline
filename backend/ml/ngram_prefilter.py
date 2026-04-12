@@ -6,7 +6,7 @@ If the request is obviously benign (short, no suspicious patterns) or
 obviously malicious (multiple high-signal attack patterns), we can skip
 the transformer entirely.
 
-Inspired by Cloudflare's WAF ML optimization blog:
+Inspired by our WAF ML optimization blog:
   - Known-malicious ngrams extracted from training data
   - Fast string matching before model inference
   - ~30-50% of requests can be classified without the transformer
@@ -74,7 +74,7 @@ def quick_score(text: str) -> Optional[int]:
         - 95-99: Definitely benign (skip transformer, save time)
         - None: Uncertain, must run full transformer inference
 
-    Scores use Cloudflare convention: lower = more malicious.
+    Scores use WAF convention: lower = more malicious.
     """
     text_lower = text.lower()
 

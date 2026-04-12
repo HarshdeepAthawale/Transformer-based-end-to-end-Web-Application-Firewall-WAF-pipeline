@@ -1,7 +1,7 @@
 """
 Toxic Combination model: multi-signal security incident detection.
 
-Based on Cloudflare's "Toxic Combinations" blog: detects when small signals
+Based on our "Toxic Combinations" blog: detects when small signals
 (bot activity, path anomalies, misconfigurations) converge into incidents.
 """
 

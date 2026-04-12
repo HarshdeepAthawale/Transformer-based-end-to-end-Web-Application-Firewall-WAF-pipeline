@@ -1121,7 +1121,7 @@ export const dnsApi = {
   },
 }
 
-// Toxic Combinations API (Cloudflare-style multi-signal correlation)
+// Toxic Combinations API (industry-standard multi-signal correlation)
 export interface ToxicCombinationData {
   id: number
   pattern_name: string

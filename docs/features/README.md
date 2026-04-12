@@ -1,4 +1,4 @@
-# WAF Feature Specifications (Cloudflare-Competing)
+# WAF Feature Specifications (WAF-Competing)
 
 End-to-end fullstack build specs for 10 features. Each spec is **no mock / no hardcoded**: config and env for all tunables, real DB and external services, real API contracts.
 

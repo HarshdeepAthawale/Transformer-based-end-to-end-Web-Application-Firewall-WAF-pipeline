@@ -1,5 +1,5 @@
 """
-Behavioral Baseline Service (Cloudflare-style Z-score anomaly detection).
+Behavioral Baseline Service (industry-standard Z-score anomaly detection).
 
 Computes rolling 30-day hourly baselines for key metrics and detects
 anomalies when current values exceed 3 standard deviations from baseline.
@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from backend.models.security_event import SecurityEvent
 
 
-# Z-score threshold for anomaly detection (Cloudflare uses 3.0)
+# Z-score threshold for anomaly detection (standard uses 3.0)
 Z_SCORE_THRESHOLD = 3.0
 
 # Number of days for baseline calculation
@@ -88,7 +88,7 @@ class BaselineService:
     ) -> float:
         """
         Compute Z-score: how many standard deviations from the mean.
-        |Z| > 3.0 is considered anomalous (Cloudflare's threshold).
+        |Z| > 3.0 is considered anomalous (our threshold).
         """
         if std_dev == 0:
             return 0.0 if current_value == mean else float("inf")

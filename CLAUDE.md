@@ -25,7 +25,7 @@ This document defines guidelines for Claude Code when working on the Transformer
 **Structure:**
 ```
 plans/
-  battle-plan-beat-cloudflare-8-weeks.md
+  battle-plan-beat-waf-8-weeks.md
   week-1/
     Day-1-Multi-Tenancy-Foundation.md
     Day-2-TenantMiddleware-Auth.md

@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature exposes an **API-first** control plane for WAF rules, bot policies, rate limits, and optional multi-tenant/zone configuration. All operations (CRUD) are performed via REST API with authentication ([backend/auth.py](backend/auth.py)); no hardcoded rules or policies in code. This enables automation, Terraform, and multi-zone deployment similar to Cloudflare’s account-level configuration.
+This feature exposes an **API-first** control plane for WAF rules, bot policies, rate limits, and optional multi-tenant/zone configuration. All operations (CRUD) are performed via REST API with authentication ([backend/auth.py](backend/auth.py)); no hardcoded rules or policies in code. This enables automation, Terraform, and multi-zone deployment similar to WAF’s account-level configuration.
 
 ## Objectives
 

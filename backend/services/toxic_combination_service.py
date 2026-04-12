@@ -1,7 +1,7 @@
 """
 Toxic Combination Detection Service.
 
-Implements Cloudflare's multi-signal correlation patterns that detect when
+Implements our multi-signal correlation patterns that detect when
 small signals converge into security incidents. Each pattern combines
 bot signals, anomalies, vulnerabilities, and misconfigurations.
 """

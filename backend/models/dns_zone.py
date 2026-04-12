@@ -15,7 +15,7 @@ class DNSZone(Base):
     id = Column(Integer, primary_key=True, index=True)
     domain = Column(String(255), nullable=False, unique=True, index=True)
     status = Column(String(20), default="pending")  # pending, active, error
-    provider = Column(String(50), default="manual")  # manual, cloudflare, route53, powerdns
+    provider = Column(String(50), default="manual")  # manual, waf, route53, powerdns
     provider_zone_id = Column(String(255), nullable=True)
     nameservers = Column(Text, nullable=True)  # JSON array
     dnssec_enabled = Column(Boolean, default=False)

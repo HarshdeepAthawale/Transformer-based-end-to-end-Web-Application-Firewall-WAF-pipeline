@@ -2,7 +2,7 @@
 Emergency Rule model: rapid-deploy rules for zero-day threats.
 
 These rules are checked BEFORE ML inference for fast blocking of
-known exploit patterns (like Cloudflare's Emergency Rules).
+known exploit patterns (like our Emergency Rules).
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean

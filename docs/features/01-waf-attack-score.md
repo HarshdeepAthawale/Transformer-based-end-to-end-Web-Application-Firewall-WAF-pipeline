@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature exposes the existing Transformer-based WAF classifier's confidence as a numeric **attack score** (0–100) per request, enabling Cloudflare-style tuning: block or challenge when the score exceeds configurable thresholds. The score is sent with gateway events to the backend, stored for analytics, and displayed in the dashboard so operators can tune sensitivity without hardcoded values.
+This feature exposes the existing Transformer-based WAF classifier's confidence as a numeric **attack score** (0–100) per request, enabling industry-standard tuning: block or challenge when the score exceeds configurable thresholds. The score is sent with gateway events to the backend, stored for analytics, and displayed in the dashboard so operators can tune sensitivity without hardcoded values.
 
 ## Objectives
 

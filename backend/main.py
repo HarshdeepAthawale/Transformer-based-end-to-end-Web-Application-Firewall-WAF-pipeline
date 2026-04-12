@@ -325,7 +325,7 @@ app.include_router(ddos.router, prefix="/api/ddos", tags=["ddos"])
 app.include_router(credential_leak.router, prefix="/api/credential-leak", tags=["credential-leak"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
-# Toxic Combinations (Cloudflare-style multi-signal correlation)
+# Toxic Combinations (industry-standard multi-signal correlation)
 try:
     from backend.routes import toxic_combinations
     app.include_router(toxic_combinations.router, prefix="/api/toxic-combinations", tags=["toxic-combinations"])

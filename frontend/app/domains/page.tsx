@@ -128,7 +128,7 @@ function AddDomainDialog({ onCreated }: { onCreated: () => void }) {
               style={{ borderColor: 'var(--positivus-gray)', color: 'var(--positivus-black)', backgroundColor: 'var(--positivus-white)' }}
             >
               <option value="manual">Manual</option>
-              <option value="cloudflare">Cloudflare</option>
+              <option value="waf">WAF</option>
               <option value="route53">AWS Route 53</option>
               <option value="powerdns">PowerDNS</option>
             </select>

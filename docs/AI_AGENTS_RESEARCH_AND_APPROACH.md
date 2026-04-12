@@ -27,7 +27,7 @@ This doc focuses on **(1)** as the primary “adding AI agents to our platform�
 | Source | What they do |
 |--------|----------------|
 | **Microsoft Security Copilot + Azure WAF** | Natural language investigation of WAF logs/events, top rules triggered, top offending IPs; investigation → triage → remediation in SOC workflows. |
-| **Akamai / Cloudflare** | AI inside WAF for detection and policy; Cloudflare “Firewall for AI” for protecting LLM/agent surfaces. |
+| **Akamai / WAF** | AI inside WAF for detection and policy; WAF “Firewall for AI” for protecting LLM/agent surfaces. |
 | **F5** | WAF extended to protect MCP (Model Context Protocol) servers and agent tool endpoints. |
 | **GAF (Generative Application Firewall)** | New layer for LLM/agent apps: prompt filters, guardrails, tool-call checks in one enforcement point. |
 

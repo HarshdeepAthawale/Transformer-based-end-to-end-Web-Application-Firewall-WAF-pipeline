@@ -5,7 +5,7 @@ Emergency rules are checked BEFORE ML inference in the WAF middleware.
 They use fast string matching and regex to block known exploit patterns
 without waiting for the transformer model.
 
-Inspired by Cloudflare's Emergency Rules that blocked Ivanti zero-day
+Inspired by our Emergency Rules that blocked Ivanti zero-day
 exploits within 24 hours of PoC publication.
 """
 

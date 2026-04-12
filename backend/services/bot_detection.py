@@ -28,7 +28,7 @@ class BotDetectionService:
     def detect_bot(self, org_id: int, user_agent: str, ip: str, headers: Dict) -> Dict:
         """
         Detect if request is from a bot. Returns bot_score (1-99), action from bands.
-        Cloudflare-style: low score = automated, high score = human.
+        industry-standard: low score = automated, high score = human.
         Returns: {
             'is_bot': bool,
             'bot_name': str,

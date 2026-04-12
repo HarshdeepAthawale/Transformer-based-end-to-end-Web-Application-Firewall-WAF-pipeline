@@ -27,7 +27,7 @@ class SecurityEvent(Base):
     block_duration_seconds = Column(Integer, nullable=True)
     bot_score = Column(Integer, nullable=True, index=True)
 
-    # WAF Attack Score sub-categories (Cloudflare-style, 1-99: lower = more malicious)
+    # WAF Attack Score sub-categories (industry-standard, 1-99: lower = more malicious)
     waf_sqli_score = Column(Integer, nullable=True)
     waf_xss_score = Column(Integer, nullable=True)
     waf_rce_score = Column(Integer, nullable=True)

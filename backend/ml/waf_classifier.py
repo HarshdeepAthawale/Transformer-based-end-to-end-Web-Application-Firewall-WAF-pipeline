@@ -28,7 +28,7 @@ ATTACK_CLASSES = {
     7: "other_attack",
 }
 
-# Sub-score field names for the 3 primary categories Cloudflare tracks
+# Sub-score field names for the 3 primary categories WAF tracks
 SUB_SCORE_FIELDS = {
     "sqli": "waf_sqli_score",
     "xss": "waf_xss_score",
@@ -240,7 +240,7 @@ class WAFClassifier:
 
     def _process_multiclass(self, probs: torch.Tensor) -> Dict[str, Any]:
         """
-        Process multi-class output with sub-scores (Cloudflare-style).
+        Process multi-class output with sub-scores (industry-standard).
         Returns per-category scores where lower = more malicious (1-99 scale).
         """
         benign_prob = probs[0].item()
@@ -250,7 +250,7 @@ class WAFClassifier:
         is_malicious = malicious_prob >= self.threshold
 
         # Overall attack score: 1-99 where lower = more malicious
-        # Cloudflare style: score = 100 - (malicious_probability * 100)
+        # WAF style: score = 100 - (malicious_probability * 100)
         attack_score = max(1, min(99, int(round((1.0 - malicious_prob) * 100))))
 
         # Find dominant attack class
