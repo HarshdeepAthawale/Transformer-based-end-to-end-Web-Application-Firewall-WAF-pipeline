@@ -46,7 +46,7 @@ const DASHBOARD_RANGES = [
 ] as const
 
 const EVENT_TYPE_OPTIONS = [
-  { value: '', label: 'All types' },
+  { value: 'all', label: 'All types' },
   { value: 'waf_block', label: 'WAF block' },
   { value: 'rate_limit', label: 'Rate limit' },
   { value: 'ddos_burst', label: 'DDoS' },
@@ -90,7 +90,7 @@ export function UnifiedSecuritySection({ timeRange, onTimeRangeChange }: Unified
   const [data, setData] = useState<DashboardUnifiedData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [eventTypeFilter, setEventTypeFilter] = useState('')
+  const [eventTypeFilter, setEventTypeFilter] = useState('all')
   const { timezone } = useTimezone()
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export function UnifiedSecuritySection({ timeRange, onTimeRangeChange }: Unified
     setLoading(true)
     setError(null)
     dashboardApi
-      .getDashboardUnified(timeRange, 50, eventTypeFilter || undefined)
+      .getDashboardUnified(timeRange, 50, eventTypeFilter === 'all' ? undefined : eventTypeFilter)
       .then((res) => {
         if (!cancelled && res.success && res.data) setData(res.data)
       })

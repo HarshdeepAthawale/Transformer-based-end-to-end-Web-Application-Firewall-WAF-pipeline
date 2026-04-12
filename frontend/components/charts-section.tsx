@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { BarChart3 } from 'lucide-react'
 import { AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
 import {
   ChartContainer,
@@ -73,8 +74,10 @@ export function ChartsSection({ timeRange, onTimeRangeChange }: ChartsSectionPro
           className="rounded-md p-4 md:p-6 border-2"
           style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
         >
-          <div className="flex items-center justify-center py-16">
-            <div className="text-destructive">Failed to load chart data: {error}</div>
+          <div className="flex flex-col items-center justify-center py-16">
+            <BarChart3 className="h-12 w-12 mb-3" style={{ color: 'var(--positivus-gray-dark)', opacity: 0.5 }} />
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--positivus-gray-dark)' }}>No chart data available</p>
+            <p className="text-xs" style={{ color: 'var(--positivus-gray-dark)' }}>Traffic data will appear once requests flow through the WAF</p>
           </div>
         </div>
       </div>

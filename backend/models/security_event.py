@@ -27,6 +27,12 @@ class SecurityEvent(Base):
     block_duration_seconds = Column(Integer, nullable=True)
     bot_score = Column(Integer, nullable=True, index=True)
 
+    # WAF Attack Score sub-categories (Cloudflare-style, 1-99: lower = more malicious)
+    waf_sqli_score = Column(Integer, nullable=True)
+    waf_xss_score = Column(Integer, nullable=True)
+    waf_rce_score = Column(Integer, nullable=True)
+    attack_class = Column(String(30), nullable=True, index=True)  # sqli, xss, rce, path_traversal, etc.
+
     def _serialize_timestamp(self, value):
         """Normalize timestamp for JSON: handle None, string (e.g. from SQLite), or datetime."""
         if value is None:
@@ -49,4 +55,8 @@ class SecurityEvent(Base):
             "attack_score": self.attack_score,
             "block_duration_seconds": self.block_duration_seconds,
             "bot_score": self.bot_score,
+            "waf_sqli_score": self.waf_sqli_score,
+            "waf_xss_score": self.waf_xss_score,
+            "waf_rce_score": self.waf_rce_score,
+            "attack_class": self.attack_class,
         }

@@ -27,7 +27,13 @@ import {
   Cpu,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Plus,
+  Layers,
+  Zap,
+  SearchCheck,
 } from 'lucide-react'
+import { useDomain } from '@/contexts/domain-context'
 
 const SIDEBAR_STORAGE_KEY = 'waf-sidebar-collapsed'
 const SIDEBAR_KEYBOARD_SHORTCUT = 'b'
@@ -131,6 +137,7 @@ export function Sidebar() {
   const menuItems = useMemo((): NavItem[] => {
     const items: NavItem[] = [
       { icon: Home, label: 'Overview', href: '/dashboard' },
+      { icon: Layers, label: 'Domains', href: '/domains' },
       { icon: Bot, label: 'AI Copilot', href: '/copilot' },
       { icon: BarChart3, label: 'Analytics', href: '/analytics' },
       { icon: Eye, label: 'Traffic', href: '/traffic' },
@@ -143,6 +150,8 @@ export function Sidebar() {
       { icon: Globe, label: 'Geo Rules', href: '/geo-rules' },
       { icon: Bot, label: 'Bot Detection', href: '/bot-detection' },
       { icon: FileSearch, label: 'Threat Intel', href: '/threat-intelligence' },
+      { icon: SearchCheck, label: 'Security Insights', href: '/security-insights' },
+      { icon: Zap, label: 'Emergency Rules', href: '/emergency-rules' },
       { icon: ClipboardList, label: 'Security Rules', href: '/security-rules' },
       { icon: Package, label: 'Managed Rules', href: '/managed-rules' },
       { icon: Users, label: 'Users', href: '/users', adminOnly: true },
@@ -185,6 +194,9 @@ export function Sidebar() {
     )
   }
 
+  const { domains, selectedDomain, selectDomain } = useDomain()
+  const [domainDropdownOpen, setDomainDropdownOpen] = useState(false)
+
   const sidebarContent = (
     <>
       <Link
@@ -203,6 +215,78 @@ export function Sidebar() {
           <p className="text-xs whitespace-nowrap" style={{ color: 'var(--positivus-gray-dark)' }}>Dashboard</p>
         </div>
       </Link>
+
+      {/* Domain Selector */}
+      {domains.length > 0 && (
+        <div className="px-4 py-3 shrink-0" style={{ borderBottom: '2px solid var(--positivus-gray)' }}>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setDomainDropdownOpen(!domainDropdownOpen)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-md border-2 text-left transition-colors hover:bg-accent"
+              style={{ borderColor: 'var(--positivus-gray)', backgroundColor: 'var(--positivus-white)' }}
+            >
+              <Globe size={16} style={{ color: 'var(--positivus-green)' }} className="shrink-0" />
+              <span
+                className="flex-1 text-sm font-medium truncate"
+                style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+              >
+                {selectedDomain ? selectedDomain.domain : 'All domains'}
+              </span>
+              <ChevronDown
+                size={14}
+                style={{ color: 'var(--positivus-gray-dark)' }}
+                className={`shrink-0 transition-transform ${domainDropdownOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {domainDropdownOpen && (
+              <div
+                className="absolute left-0 right-0 mt-1 rounded-md border-2 shadow-lg z-50 max-h-64 overflow-y-auto"
+                style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}
+              >
+                <button
+                  type="button"
+                  onClick={() => { selectDomain(null); setDomainDropdownOpen(false) }}
+                  className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent ${!selectedDomain ? 'font-semibold' : ''}`}
+                  style={{ color: 'var(--positivus-black)' }}
+                >
+                  All domains
+                </button>
+                {domains.map((d) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => { selectDomain(d.id); setDomainDropdownOpen(false) }}
+                    className={`w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent flex items-center justify-between ${selectedDomain?.id === d.id ? 'font-semibold' : ''}`}
+                    style={{ color: 'var(--positivus-black)' }}
+                  >
+                    <span className="truncate">{d.domain}</span>
+                    <span
+                      className="text-xs px-1.5 py-0.5 rounded shrink-0 ml-2"
+                      style={{
+                        backgroundColor: d.status === 'active' ? 'var(--positivus-green-bg)' : 'var(--positivus-gray)',
+                        color: d.status === 'active' ? 'var(--positivus-green)' : 'var(--positivus-gray-dark)',
+                      }}
+                    >
+                      {d.status}
+                    </span>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => { setDomainDropdownOpen(false); router.push('/domains') }}
+                  className="w-full text-left px-3 py-2 text-sm transition-colors hover:bg-accent flex items-center gap-2"
+                  style={{ color: 'var(--positivus-green)', borderTop: '1px solid var(--positivus-gray)' }}
+                >
+                  <Plus size={14} />
+                  Add domain
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       <nav ref={navRef} className="flex-1 min-h-0 p-4 space-y-2 overflow-y-auto">
         {menuItems.map((item) => {
           const href = isLogoutItem(item) ? '' : item.href

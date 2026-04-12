@@ -325,6 +325,22 @@ app.include_router(ddos.router, prefix="/api/ddos", tags=["ddos"])
 app.include_router(credential_leak.router, prefix="/api/credential-leak", tags=["credential-leak"])
 app.include_router(dashboard.router, prefix="/api/dashboard", tags=["dashboard"])
 
+# Toxic Combinations (Cloudflare-style multi-signal correlation)
+try:
+    from backend.routes import toxic_combinations
+    app.include_router(toxic_combinations.router, prefix="/api/toxic-combinations", tags=["toxic-combinations"])
+    logger.info("Registered routes: /api/toxic-combinations")
+except ImportError as e:
+    logger.warning(f"Toxic combinations routes not available: {e}")
+
+# Emergency Rules (rapid zero-day response)
+try:
+    from backend.routes import emergency_rules
+    app.include_router(emergency_rules.router, prefix="/api/emergency-rules", tags=["emergency-rules"])
+    logger.info("Registered routes: /api/emergency-rules")
+except ImportError as e:
+    logger.warning(f"Emergency rules routes not available: {e}")
+
 # Feature 9: WAF API (security rules, rate limit config)
 try:
     from backend.routes import security_rules, rate_limits

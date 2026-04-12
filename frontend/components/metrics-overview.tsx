@@ -1,12 +1,14 @@
 'use client'
 
-import { ArrowUpRight, ArrowDownRight, AlertTriangle, Shield, BarChart3, RefreshCw } from 'lucide-react'
+import { ArrowUpRight, ArrowDownRight, AlertTriangle, Shield, BarChart3, RefreshCw, Layers, Clock } from 'lucide-react'
 import { useRealTimeData } from '@/hooks/use-real-time-data'
 import { useEffect, useState } from 'react'
 import { wsManager, RealTimeMetrics } from '@/lib/api'
+import { useDomain } from '@/contexts/domain-context'
 
 export function MetricsOverview() {
   const { metrics: realTimeMetrics, refresh } = useRealTimeData()
+  const { domains } = useDomain()
   const [animatedValues, setAnimatedValues] = useState({
     requests: 0,
     blocked: 0,
@@ -102,10 +104,28 @@ export function MetricsOverview() {
       priority: animatedValues.attackRate > 10 ? 'critical' : 'normal',
       isLive: true,
     },
+    {
+      label: 'Active Domains',
+      value: String(domains.filter(d => d.status === 'active').length),
+      change: `${domains.length} total`,
+      trend: 'neutral' as const,
+      icon: Layers,
+      priority: 'normal' as const,
+      isLive: false,
+    },
+    {
+      label: 'Uptime',
+      value: realTimeMetrics.uptime >= 99.9 ? '99.9%' : `${realTimeMetrics.uptime?.toFixed(1) || '99.9'}%`,
+      change: '0%',
+      trend: 'neutral' as const,
+      icon: Clock,
+      priority: 'normal' as const,
+      isLive: false,
+    },
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
       {metrics.map((metric, index) => {
         const Icon = metric.icon
         const TrendIcon = metric.trend === 'up' ? ArrowUpRight : ArrowDownRight

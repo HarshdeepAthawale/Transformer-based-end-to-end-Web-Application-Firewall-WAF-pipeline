@@ -26,6 +26,8 @@ from backend.models.rate_limit_config import RateLimitConfig
 from backend.models.cache_purge import CachePurgeLog
 from backend.models.ssl_certificate import SSLCertificate, SSLSettings
 from backend.models.dns_zone import DNSZone, DNSRecord
+from backend.models.toxic_combination import ToxicCombination
+from backend.models.emergency_rule import EmergencyRule
 
 __all__ = [
     "Organization",
@@ -63,4 +65,6 @@ __all__ = [
     "SSLSettings",
     "DNSZone",
     "DNSRecord",
+    "ToxicCombination",
+    "EmergencyRule",
 ]

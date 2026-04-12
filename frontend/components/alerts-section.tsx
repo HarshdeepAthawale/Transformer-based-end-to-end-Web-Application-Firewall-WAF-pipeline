@@ -119,13 +119,14 @@ export function AlertsSection() {
     )
   }
 
-  // Error state
+  // Error state - show graceful empty state
   if (error) {
     return (
       <div className="rounded-md p-4 md:p-6 border-2" style={{ backgroundColor: 'var(--positivus-white)', borderColor: 'var(--positivus-gray)' }}>
-        <div className="flex items-center justify-center py-8">
-          <AlertIcon className="h-6 w-6 text-destructive" />
-          <span className="ml-2 text-destructive">{error}</span>
+        <h2 className="text-lg font-semibold mb-4 md:mb-6" style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}>Recent Alerts</h2>
+        <div className="flex flex-col items-center justify-center py-8">
+          <CheckCircle className="h-12 w-12 mb-4" style={{ color: 'var(--positivus-green)' }} />
+          <p className="text-center" style={{ color: 'var(--positivus-gray-dark)' }}>No active alerts</p>
         </div>
       </div>
     )

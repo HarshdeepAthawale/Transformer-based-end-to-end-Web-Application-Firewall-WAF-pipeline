@@ -6,6 +6,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { ThemeProvider } from 'next-themes'
 import { AuthSessionProvider } from '@/components/providers/session-provider'
 import { TimezoneProvider } from '@/contexts/timezone-context'
+import { DomainProvider } from '@/contexts/domain-context'
 import './globals.css'
 
 // Run before first paint so light/dark matches stored preference (avoids flash on settings open)
@@ -66,7 +67,9 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem storageKey="waf-theme">
           <TimezoneProvider>
             <AuthSessionProvider>
-              {children}
+              <DomainProvider>
+                {children}
+              </DomainProvider>
             </AuthSessionProvider>
           </TimezoneProvider>
           <Analytics />

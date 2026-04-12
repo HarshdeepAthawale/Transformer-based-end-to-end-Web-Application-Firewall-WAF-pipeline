@@ -1045,6 +1045,160 @@ export const wafApi = {
     apiRequest('/api/waf/model-info'),
 }
 
+// DNS Zone & Record types
+export interface DNSZoneData {
+  id: number
+  domain: string
+  status: string
+  provider: string
+  provider_zone_id: string | null
+  nameservers: string[] | null
+  dnssec_enabled: boolean
+  created_at: string | null
+  updated_at: string | null
+}
+
+export interface DNSRecordData {
+  id: number
+  zone_id: number
+  name: string
+  record_type: string
+  content: string
+  original_content: string | null
+  ttl: number
+  priority: number | null
+  proxied: boolean
+  provider_record_id: string | null
+  comment: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+// DNS API
+export const dnsApi = {
+  getZones: (): Promise<DNSZoneData[]> =>
+    apiRequest('/api/v1/dns/zones'),
+
+  createZone: (data: { domain: string; provider?: string; dnssec_enabled?: boolean }): Promise<DNSZoneData> =>
+    apiRequest('/api/v1/dns/zones', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  getZone: (zoneId: number): Promise<DNSZoneData> =>
+    apiRequest(`/api/v1/dns/zones/${zoneId}`),
+
+  updateZone: (zoneId: number, data: Record<string, any>): Promise<DNSZoneData> =>
+    apiRequest(`/api/v1/dns/zones/${zoneId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteZone: async (zoneId: number): Promise<void> => {
+    await apiRequest(`/api/v1/dns/zones/${zoneId}`, { method: 'DELETE' })
+  },
+
+  getRecords: (zoneId: number, recordType?: string): Promise<DNSRecordData[]> =>
+    apiRequest(`/api/v1/dns/zones/${zoneId}/records${recordType ? `?record_type=${recordType}` : ''}`),
+
+  createRecord: (zoneId: number, data: {
+    name: string; record_type: string; content: string;
+    ttl?: number; priority?: number; proxied?: boolean; comment?: string;
+  }): Promise<DNSRecordData> =>
+    apiRequest(`/api/v1/dns/zones/${zoneId}/records`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateRecord: (zoneId: number, recordId: number, data: Record<string, any>): Promise<DNSRecordData> =>
+    apiRequest(`/api/v1/dns/zones/${zoneId}/records/${recordId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteRecord: async (zoneId: number, recordId: number): Promise<void> => {
+    await apiRequest(`/api/v1/dns/zones/${zoneId}/records/${recordId}`, { method: 'DELETE' })
+  },
+}
+
+// Toxic Combinations API (Cloudflare-style multi-signal correlation)
+export interface ToxicCombinationData {
+  id: number
+  pattern_name: string
+  severity: string
+  description: string | null
+  affected_host: string | null
+  affected_path: string | null
+  source_ips: string[]
+  signals: { type: string; detail: string }[]
+  event_count: number
+  first_seen: string | null
+  last_seen: string | null
+  status: string
+}
+
+export const toxicCombinationsApi = {
+  getAll: (): Promise<ApiResponse<ToxicCombinationData[]>> =>
+    apiRequest('/api/toxic-combinations'),
+
+  getStats: (): Promise<ApiResponse<{ active_count: number; by_severity: Record<string, number>; by_pattern: Record<string, number> }>> =>
+    apiRequest('/api/toxic-combinations/stats'),
+
+  getById: (id: number): Promise<ApiResponse<ToxicCombinationData>> =>
+    apiRequest(`/api/toxic-combinations/${id}`),
+
+  updateStatus: (id: number, status: string): Promise<ApiResponse<ToxicCombinationData>> =>
+    apiRequest(`/api/toxic-combinations/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
+
+  triggerEvaluation: (windowMinutes: number = 5): Promise<ApiResponse<{ detections_count: number }>> =>
+    apiRequest(`/api/toxic-combinations/evaluate?window_minutes=${windowMinutes}`, { method: 'POST' }),
+}
+
+// Emergency Rules API (rapid zero-day response)
+export interface EmergencyRuleData {
+  id: number
+  name: string
+  description: string | null
+  cves: string[]
+  patterns: { field: string; op: string; value: string }[]
+  action: string
+  enabled: boolean
+  hit_count: number
+  severity: string
+  source: string | null
+  created_at: string | null
+}
+
+export const emergencyRulesApi = {
+  getAll: (): Promise<ApiResponse<EmergencyRuleData[]>> =>
+    apiRequest('/api/emergency-rules'),
+
+  create: (data: Record<string, any>): Promise<ApiResponse<EmergencyRuleData>> =>
+    apiRequest('/api/emergency-rules', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  toggle: (id: number, enabled: boolean): Promise<ApiResponse<EmergencyRuleData>> =>
+    apiRequest(`/api/emergency-rules/${id}/toggle`, {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled }),
+    }),
+
+  delete: async (id: number): Promise<void> => {
+    await apiRequest(`/api/emergency-rules/${id}`, { method: 'DELETE' })
+  },
+
+  getTemplates: (): Promise<ApiResponse<any[]>> =>
+    apiRequest('/api/emergency-rules/templates'),
+
+  deployTemplate: (templateKey: string): Promise<ApiResponse<EmergencyRuleData>> =>
+    apiRequest(`/api/emergency-rules/deploy/${templateKey}`, { method: 'POST' }),
+}
+
 // WebSocket connection management
 export class WebSocketManager {
   private ws: WebSocket | null = null

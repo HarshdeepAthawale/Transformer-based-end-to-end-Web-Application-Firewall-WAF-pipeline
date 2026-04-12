@@ -5,6 +5,7 @@ import { ChevronDown, Search, Settings, Globe } from 'lucide-react'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { NotificationCenter } from '@/components/notification-center'
 import { useTimezone, TIMEZONE_OPTIONS } from '@/contexts/timezone-context'
+import { useDomain } from '@/contexts/domain-context'
 
 interface HeaderProps {
   timeRange?: string
@@ -13,6 +14,7 @@ interface HeaderProps {
 
 export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: HeaderProps) {
   const { timezone, setTimezone } = useTimezone()
+  const { selectedDomain } = useDomain()
   const timeRanges = [
     { label: '1h', value: '1h' },
     { label: '6h', value: '6h' },
@@ -29,12 +31,25 @@ export function Header({ timeRange = '24h', onTimeRangeChange = () => {} }: Head
     >
       <div className="px-6 py-4 flex items-center justify-between gap-4">
         <div className="flex items-center gap-6 flex-1">
-          <h1
-            className="text-2xl font-bold"
-            style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
-          >
-            Dashboard
-          </h1>
+          <div className="flex items-center gap-2">
+            <h1
+              className="text-2xl font-bold"
+              style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+            >
+              Dashboard
+            </h1>
+            {selectedDomain && (
+              <>
+                <span className="text-lg" style={{ color: 'var(--positivus-gray-dark)' }}>/</span>
+                <span
+                  className="text-lg font-medium"
+                  style={{ color: 'var(--positivus-black)', fontFamily: 'var(--font-space-grotesk)' }}
+                >
+                  {selectedDomain.domain}
+                </span>
+              </>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
