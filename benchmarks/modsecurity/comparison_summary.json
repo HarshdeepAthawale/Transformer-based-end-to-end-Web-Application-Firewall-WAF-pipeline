@@ -1,0 +1,13 @@
+{
+  "total_payloads": 876,
+  "total_attacks": 675,
+  "total_benign": 201,
+  "modsec_true_positives": 308,
+  "modsec_false_positives": 16,
+  "ml_true_positives": 665,
+  "ml_false_positives": 51,
+  "modsec_detection_rate": 45.6,
+  "ml_detection_rate": 98.5,
+  "modsec_fpr": 8.0,
+  "ml_fpr": 25.4
+}
