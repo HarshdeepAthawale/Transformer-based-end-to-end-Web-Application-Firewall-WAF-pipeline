@@ -18,7 +18,6 @@ from sqlalchemy.orm import Session
 from loguru import logger
 
 from backend.models.emergency_rule import EmergencyRule
-from backend.lib.datetime_utils import utc_now
 
 
 class EmergencyRuleService:

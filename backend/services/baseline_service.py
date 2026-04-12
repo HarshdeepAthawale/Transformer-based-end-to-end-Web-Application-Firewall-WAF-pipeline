@@ -11,7 +11,6 @@ from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from loguru import logger
 
 from backend.models.security_event import SecurityEvent
 

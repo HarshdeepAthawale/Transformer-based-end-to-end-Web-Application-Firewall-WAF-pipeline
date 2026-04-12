@@ -254,7 +254,6 @@ class WAFClassifier:
         attack_score = max(1, min(99, int(round((1.0 - malicious_prob) * 100))))
 
         # Find dominant attack class
-        attack_probs = probs[1:].tolist()  # exclude benign
         max_attack_idx = int(torch.argmax(probs[1:]).item())
         attack_class = ATTACK_CLASSES.get(max_attack_idx + 1, "other_attack")
 

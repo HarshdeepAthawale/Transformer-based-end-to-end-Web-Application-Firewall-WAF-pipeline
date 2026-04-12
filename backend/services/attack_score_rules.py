@@ -11,7 +11,6 @@ Example rules:
 """
 
 from typing import Any, Optional
-from loguru import logger
 
 
 # Valid score fields that can be referenced in rules

@@ -14,7 +14,6 @@ from typing import Optional
 
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from loguru import logger
 
 from backend.models.security_event import SecurityEvent
 from backend.models.toxic_combination import ToxicCombination
@@ -219,7 +218,7 @@ class ToxicCombinationService:
                     "source_ips": list(ips)[:20],
                     "signals": [
                         {"type": "anomaly", "detail": f"{len(ips)} distributed IPs hitting same endpoint"},
-                        {"type": "vulnerability", "detail": f"Each IP just under rate limit threshold"},
+                        {"type": "vulnerability", "detail": "Each IP just under rate limit threshold"},
                         {"type": "bot", "detail": "Coordinated automation pattern"},
                     ],
                     "event_count": len(ips),
