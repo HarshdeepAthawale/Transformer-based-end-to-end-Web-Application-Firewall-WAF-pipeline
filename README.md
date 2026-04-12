@@ -58,9 +58,38 @@ The model learned *normal* vs *malicious* from real traffic and real attacks in 
 
 ---
 
-## Results
+## Benchmarks
 
-In a live test with **295 requests**, **106 malicious** were blocked (403). The dashboard shows every event and score.
+Tested against **876 real-world payloads** (675 attacks + 201 benign) across 10 attack categories. Head-to-head comparison with ModSecurity CRS v4 (the most widely deployed open-source WAF).
+
+| Metric | Transformer WAF | ModSecurity CRS v4 |
+|---|---|---|
+| **Overall Detection Rate** | 98.5% (665/675) | 45.6% (308/675) |
+| **False Positive Rate** | 25.4% | 8.0% |
+| **Inference Latency (p50)** | ~6ms (ONNX) | ~3ms (regex) |
+
+### Detection by Category
+
+| Category | Transformer WAF | ModSecurity CRS v4 |
+|---|---|---|
+| SQL Injection | 87.2% | 84.6% |
+| XSS | 100.0% | 8.8% |
+| Command Injection | 100.0% | 61.7% |
+| Path Traversal | 100.0% | 90.0% |
+| XXE | 100.0% | 3.7% |
+| SSRF | 100.0% | 51.6% |
+| Header Injection | 99.4% | 26.9% |
+| LDAP/XPath/Template | 100.0% | 60.5% |
+| DoS Patterns | 96.8% | 8.1% |
+| Mixed/Blended | 94.9% | 79.5% |
+
+### Charts
+
+| Confusion Matrix | ROC Curve | Detection by Category |
+|---|---|---|
+| ![Confusion Matrix](benchmarks/results/confusion_matrix.png) | ![ROC Curve](benchmarks/results/roc_curve.png) | ![Detection by Category](benchmarks/results/detection_by_category.png) |
+
+See [`/benchmarks`](benchmarks/) for full methodology, raw data, and reproduction steps.
 
 ---
 
@@ -149,7 +178,7 @@ The system operates as a reverse proxy at Layer 7 (Application Layer), intercept
 
 | Layer | Technologies |
 |-------|--------------|
-| **ML & AI** | PyTorch, Hugging Face Transformers (DistilBERT), scikit-learn |
+| **ML & AI** | PyTorch, Hugging Face Transformers (DistilBERT), ONNX Runtime, scikit-learn |
 | **Model** | DistilBERT (6 layers, 12 heads, 768 hidden units), sigmoid output for anomaly score (0–1) |
 | **Backend** | FastAPI, Uvicorn |
 | **Frontend** | Next.js |
@@ -166,9 +195,10 @@ The system operates as a reverse proxy at Layer 7 (Application Layer), intercept
 | `backend/` | FastAPI API, WAF middleware, ML inference |
 | `frontend/` | Next.js dashboard |
 | `gateway/` | Reverse proxy + WAF inspection |
+| `benchmarks/` | Model evaluation, charts, ModSecurity CRS comparison |
 | `applications/` | Demo apps (Juice Shop, WebGoat, DVWA) for testing |
 | `models/` | Trained DistilBERT model |
-| `scripts/` | Fine-tuning, stress tests, threshold sweeps |
+| `scripts/` | Fine-tuning, stress tests, attack payloads |
 | `docs/` | Phase guides and detailed documentation |
 
 ---
