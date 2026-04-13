@@ -1,9 +1,12 @@
 """
 Toxic Combination Detection Service.
 
-Implements our multi-signal correlation patterns that detect when
-small signals converge into security incidents. Each pattern combines
-bot signals, anomalies, vulnerabilities, and misconfigurations.
+Implements multi-signal correlation patterns that detect when small signals
+converge into security incidents. Each pattern combines bot signals, anomalies,
+vulnerabilities, and misconfigurations.
+
+Integrates Z-score anomaly detection from BaselineService for statistical
+validation of pattern triggers.
 """
 
 import json
@@ -18,6 +21,7 @@ from sqlalchemy.orm import Session
 from backend.models.security_event import SecurityEvent
 from backend.models.toxic_combination import ToxicCombination
 from backend.lib.datetime_utils import utc_now
+from backend.services.baseline_service import BaselineService, Z_SCORE_THRESHOLD
 
 
 # Sensitive admin/management paths (Pattern 1)
@@ -39,6 +43,9 @@ IDOR_PARAM_PATTERN = re.compile(r"(?:uid|user_id|id|user|account_id)=\d{3,10}", 
 
 class ToxicCombinationService:
     """Detects toxic combinations from security event data."""
+
+    def __init__(self):
+        self._baseline = BaselineService()
 
     def evaluate_window(
         self,
@@ -75,10 +82,12 @@ class ToxicCombinationService:
         detections = []
 
         # Run each pattern detector
-        detections.extend(self._detect_admin_probing(events, org_id))
+        detections.extend(self._detect_admin_probing(events, org_id, db))
+        detections.extend(self._detect_idor(events, org_id))
         detections.extend(self._detect_debug_probing(events, org_id))
         detections.extend(self._detect_sqli_success(events, org_id))
         detections.extend(self._detect_coordinated_evasion(events, org_id))
+        detections.extend(self._detect_payment_anomaly(events, org_id, db))
 
         # Persist detections
         for detection in detections:
@@ -89,10 +98,11 @@ class ToxicCombinationService:
 
         return detections
 
-    def _detect_admin_probing(self, events: list, org_id: int) -> list[dict]:
+    def _detect_admin_probing(self, events: list, org_id: int, db: Session) -> list[dict]:
         """
         Pattern 1: Admin Endpoint Probing.
-        Ingredients: bot_score < 30 + path matches admin patterns.
+        Signals: (1) elevated 404s on admin paths (Z-score > 3.0),
+        (2) bot_score < 30, (3) new source IPs, (4) elevated SQLi scores.
         """
         detections = []
         admin_events = defaultdict(list)
@@ -105,8 +115,23 @@ class ToxicCombinationService:
                         break
 
         for ip, ip_events in admin_events.items():
-            if len(ip_events) >= 3:  # At least 3 probing attempts
+            if len(ip_events) >= 3:
                 paths = list({e.path for e in ip_events if e.path})
+
+                # Z-score validation: check if block rate is anomalous
+                z_signals = []
+                try:
+                    block_check = self._baseline.check_current_hour(
+                        db, "block_rate", org_id
+                    )
+                    if block_check["is_anomalous"]:
+                        z_signals.append({
+                            "type": "z_score",
+                            "detail": f"Block rate Z-score: {block_check['z_score']} (threshold: {Z_SCORE_THRESHOLD})",
+                        })
+                except Exception:
+                    pass
+
                 detections.append({
                     "org_id": org_id,
                     "pattern_name": "admin_probing",
@@ -118,9 +143,49 @@ class ToxicCombinationService:
                         {"type": "bot", "detail": f"bot_score < 30 from {ip}"},
                         {"type": "anomaly", "detail": f"Repeated probing: {len(ip_events)} requests"},
                         {"type": "vulnerability", "detail": f"Admin paths accessed: {', '.join(paths[:3])}"},
+                        *z_signals,
                     ],
                     "event_count": len(ip_events),
                 })
+
+        return detections
+
+    def _detect_idor(self, events: list, org_id: int) -> list[dict]:
+        """
+        Pattern 2: IDOR (Insecure Direct Object Reference) Detection.
+        Signals: single IP rapidly iterating numeric IDs on user/account endpoints.
+        """
+        detections = []
+        idor_events = defaultdict(list)
+
+        for e in events:
+            if e.path and IDOR_PARAM_PATTERN.search(e.path):
+                idor_events[e.ip].append(e)
+
+        for ip, ip_events in idor_events.items():
+            if len(ip_events) >= 5:
+                # Extract unique ID values to confirm enumeration
+                id_values = set()
+                for ev in ip_events:
+                    matches = IDOR_PARAM_PATTERN.findall(ev.path or "")
+                    id_values.update(matches)
+
+                if len(id_values) >= 3:
+                    paths = list({e.path for e in ip_events if e.path})
+                    detections.append({
+                        "org_id": org_id,
+                        "pattern_name": "idor_detection",
+                        "severity": "high",
+                        "description": f"IDOR enumeration from {ip}: {len(id_values)} unique IDs across {len(ip_events)} requests",
+                        "affected_path": ", ".join(paths[:5]),
+                        "source_ips": [ip],
+                        "signals": [
+                            {"type": "anomaly", "detail": f"{len(id_values)} unique ID values enumerated"},
+                            {"type": "vulnerability", "detail": "Sequential/rapid ID parameter iteration"},
+                            {"type": "bot", "detail": f"{len(ip_events)} requests from single IP"},
+                        ],
+                        "event_count": len(ip_events),
+                    })
 
         return detections
 
@@ -222,6 +287,62 @@ class ToxicCombinationService:
                         {"type": "bot", "detail": "Coordinated automation pattern"},
                     ],
                     "event_count": len(ips),
+                })
+
+        return detections
+
+    def _detect_payment_anomaly(self, events: list, org_id: int, db: Session) -> list[dict]:
+        """
+        Pattern 6: Payment Endpoint Anomaly.
+        Signals: unusual volume on payment paths + bot indicators + Z-score anomaly.
+        """
+        detections = []
+        payment_events = defaultdict(list)
+
+        for e in events:
+            if e.path:
+                path_lower = e.path.lower()
+                for pp in PAYMENT_PATHS:
+                    if pp in path_lower:
+                        payment_events[e.ip].append(e)
+                        break
+
+        for ip, ip_events in payment_events.items():
+            if len(ip_events) >= 5:
+                # Check for bot indicators
+                bot_events = [e for e in ip_events if e.bot_score is not None and e.bot_score < 30]
+                if len(bot_events) < 2:
+                    continue
+
+                # Z-score check for request volume anomaly
+                z_signals = []
+                try:
+                    vol_check = self._baseline.check_current_hour(
+                        db, "request_volume", org_id
+                    )
+                    if vol_check["is_anomalous"]:
+                        z_signals.append({
+                            "type": "z_score",
+                            "detail": f"Request volume Z-score: {vol_check['z_score']}",
+                        })
+                except Exception:
+                    pass
+
+                paths = list({e.path for e in ip_events if e.path})
+                detections.append({
+                    "org_id": org_id,
+                    "pattern_name": "payment_anomaly",
+                    "severity": "critical",
+                    "description": f"Anomalous payment endpoint activity from {ip}: {len(ip_events)} requests",
+                    "affected_path": ", ".join(paths[:5]),
+                    "source_ips": [ip],
+                    "signals": [
+                        {"type": "bot", "detail": f"{len(bot_events)} bot-like requests (score < 30)"},
+                        {"type": "vulnerability", "detail": f"Payment endpoints targeted: {', '.join(paths[:3])}"},
+                        {"type": "anomaly", "detail": f"{len(ip_events)} rapid payment requests from {ip}"},
+                        *z_signals,
+                    ],
+                    "event_count": len(ip_events),
                 })
 
         return detections

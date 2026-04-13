@@ -2,11 +2,11 @@
 Emergency Rule Service: fast-deploy rules for zero-day threat response.
 
 Emergency rules are checked BEFORE ML inference in the WAF middleware.
-They use fast string matching and regex to block known exploit patterns
-without waiting for the transformer model.
+They use Aho-Corasick multi-pattern string matching and regex to block
+known exploit patterns without waiting for the transformer model.
 
-Inspired by our Emergency Rules that blocked Ivanti zero-day
-exploits within 24 hours of PoC publication.
+Aho-Corasick automaton enables O(n) matching of all string patterns
+simultaneously, vs O(p*n) for naive per-pattern substring search.
 """
 
 import json
@@ -14,6 +14,7 @@ import re
 from datetime import datetime, timezone
 from typing import Optional
 
+import ahocorasick
 from sqlalchemy.orm import Session
 from loguru import logger
 
@@ -26,9 +27,12 @@ class EmergencyRuleService:
     def __init__(self):
         self._rules_cache: list[dict] = []
         self._cache_loaded = False
+        # Per-field Aho-Corasick automatons: field -> automaton
+        # Each automaton value: (rule_idx, pattern_idx) for AND-logic tracking
+        self._automatons: dict[str, ahocorasick.Automaton] = {}
 
     def load_rules(self, db: Session) -> None:
-        """Load enabled emergency rules into memory cache."""
+        """Load enabled emergency rules into memory cache and rebuild automatons."""
         now = datetime.now(timezone.utc)
         rules = (
             db.query(EmergencyRule)
@@ -53,7 +57,39 @@ class EmergencyRuleService:
                 "severity": rule.severity,
             })
         self._cache_loaded = True
+        self._rebuild_automatons()
         logger.info(f"Loaded {len(self._rules_cache)} emergency rules into cache")
+
+    def _rebuild_automatons(self) -> None:
+        """
+        Build per-field Aho-Corasick automatons from all 'contains' patterns.
+
+        Each entry in the automaton maps a lowercased string value to the set of
+        (rule_idx, pattern_idx) pairs that require it, so a single O(n) scan
+        over the field text resolves all string patterns for that field.
+        """
+        # Collect: field -> {lowercased_value -> set of (rule_idx, pat_idx)}
+        field_patterns: dict[str, dict[str, set]] = {}
+
+        for rule_idx, rule in enumerate(self._rules_cache):
+            for pat_idx, pattern in enumerate(rule["patterns"]):
+                if pattern.get("op") != "contains":
+                    continue
+                field = pattern.get("field", "")
+                value = pattern.get("value", "").lower()
+                if not value:
+                    continue
+                field_patterns.setdefault(field, {}).setdefault(value, set()).add(
+                    (rule_idx, pat_idx)
+                )
+
+        self._automatons = {}
+        for field, value_map in field_patterns.items():
+            A = ahocorasick.Automaton()
+            for keyword, pairs in value_map.items():
+                A.add_word(keyword, (keyword, pairs))
+            A.make_automaton()
+            self._automatons[field] = A
 
     def check_request(
         self,
@@ -68,6 +104,9 @@ class EmergencyRuleService:
 
         Returns matching rule info if blocked, None if allowed.
         This runs BEFORE ML inference for fast blocking.
+
+        Uses Aho-Corasick for O(n) multi-pattern 'contains' matching,
+        falling back to regex/equals/starts_with for non-string patterns.
         """
         if not self._rules_cache:
             return None
@@ -80,8 +119,16 @@ class EmergencyRuleService:
             "headers": headers or {},
         }
 
-        for rule in self._rules_cache:
-            if self._matches_rule(request_data, rule["patterns"]):
+        # Pre-compute which (rule_idx, pat_idx) pairs are satisfied by
+        # Aho-Corasick string matching.  One scan per field that has an automaton.
+        ac_matched: set[tuple[int, int]] = set()
+        for field, automaton in self._automatons.items():
+            target = self._get_field(request_data, field).lower()
+            for _, (_keyword, pairs) in automaton.iter(target):
+                ac_matched.update(pairs)
+
+        for rule_idx, rule in enumerate(self._rules_cache):
+            if self._matches_rule(request_data, rule["patterns"], rule_idx, ac_matched):
                 return {
                     "blocked": True,
                     "rule_id": rule["id"],
@@ -92,52 +139,66 @@ class EmergencyRuleService:
 
         return None
 
-    def _matches_rule(self, request_data: dict, patterns: list[dict]) -> bool:
+    def _get_field(self, request_data: dict, field: str) -> str:
+        """Extract the string value for a named field from a request_data dict."""
+        if field == "path":
+            return request_data["path"]
+        elif field == "query":
+            return request_data["query"]
+        elif field == "body":
+            return request_data["body"]
+        elif field == "method":
+            return request_data["method"]
+        elif field.startswith("header:"):
+            header_name = field.split(":", 1)[1]
+            return request_data["headers"].get(header_name, "")
+        return ""
+
+    def _matches_rule(
+        self,
+        request_data: dict,
+        patterns: list[dict],
+        rule_idx: int,
+        ac_matched: set[tuple[int, int]],
+    ) -> bool:
         """
-        Check if a request matches ALL patterns in a rule.
-        All patterns must match for the rule to trigger (AND logic).
+        Check if a request matches ALL patterns in a rule (AND logic).
+
+        'contains' patterns are resolved from the pre-computed ac_matched set
+        (Aho-Corasick). Other operators (regex, equals, starts_with) are
+        evaluated per-pattern.
         """
         if not patterns:
             return False
 
-        for pattern in patterns:
+        for pat_idx, pattern in enumerate(patterns):
             field = pattern.get("field", "")
             op = pattern.get("op", "")
             value = pattern.get("value", "")
 
-            # Get the field value from request
-            if field == "path":
-                target = request_data["path"]
-            elif field == "query":
-                target = request_data["query"]
-            elif field == "body":
-                target = request_data["body"]
-            elif field == "method":
-                target = request_data["method"]
-            elif field.startswith("header:"):
-                header_name = field.split(":", 1)[1]
-                target = request_data["headers"].get(header_name, "")
-            else:
-                continue
-
-            # Apply operator
             if op == "contains":
-                if value.lower() not in target.lower():
-                    return False
-            elif op == "regex":
-                try:
-                    if not re.search(value, target, re.IGNORECASE):
-                        return False
-                except re.error:
-                    return False
-            elif op == "equals":
-                if target.lower() != value.lower():
-                    return False
-            elif op == "starts_with":
-                if not target.lower().startswith(value.lower()):
+                # Resolved via Aho-Corasick pre-scan
+                if (rule_idx, pat_idx) not in ac_matched:
                     return False
             else:
-                return False
+                target = self._get_field(request_data, field)
+                if not target and not field:
+                    return False
+
+                if op == "regex":
+                    try:
+                        if not re.search(value, target, re.IGNORECASE):
+                            return False
+                    except re.error:
+                        return False
+                elif op == "equals":
+                    if target.lower() != value.lower():
+                        return False
+                elif op == "starts_with":
+                    if not target.lower().startswith(value.lower()):
+                        return False
+                else:
+                    return False
 
         return True
 
