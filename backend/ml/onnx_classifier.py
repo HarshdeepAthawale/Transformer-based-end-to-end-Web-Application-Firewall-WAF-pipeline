@@ -12,6 +12,24 @@ from loguru import logger
 
 from backend.parsing import ParsingPipeline
 
+# Multi-class attack categories (index -> label)
+ATTACK_CLASSES = {
+    0: "benign",
+    1: "sqli",
+    2: "xss",
+    3: "rce",
+    4: "path_traversal",
+    5: "xxe",
+    6: "ssrf",
+    7: "other_attack",
+}
+
+SUB_SCORE_FIELDS = {
+    "sqli": "waf_sqli_score",
+    "xss": "waf_xss_score",
+    "rce": "waf_rce_score",
+}
+
 
 class ONNXWAFClassifier:
     """
@@ -26,13 +44,18 @@ class ONNXWAFClassifier:
 
     def __init__(
         self,
-        model_path: str = "models/waf-distilbert",
+        model_path: str = "models/waf-distilbert-multiclass",
         onnx_path: Optional[str] = None,
         threshold: float = 0.5,
     ):
         self.model_path = Path(model_path)
-        # Default ONNX file lives next to the model dir
-        self.onnx_path = Path(onnx_path) if onnx_path else self.model_path.parent / "waf-distilbert.onnx"
+        # Default ONNX file: check inside model dir first, then next to it
+        if onnx_path:
+            self.onnx_path = Path(onnx_path)
+        elif (Path(model_path) / "model.onnx").exists():
+            self.onnx_path = Path(model_path) / "model.onnx"
+        else:
+            self.onnx_path = self.model_path.parent / "waf-distilbert.onnx"
         self.threshold = threshold
         self.tokenizer = None
         self.session = None
@@ -83,9 +106,13 @@ class ONNXWAFClassifier:
             )
 
             self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path))
+            # Detect num_labels from ONNX output shape
+            out_shape = self.session.get_outputs()[0].shape
+            self._num_labels = out_shape[-1] if len(out_shape) == 2 and isinstance(out_shape[-1], int) else 2
+            self._is_multiclass = self._num_labels > 2
             self._loaded = True
             active_provider = self.session.get_providers()[0]
-            logger.info(f"ONNX WAF model loaded — provider: {active_provider}")
+            logger.info(f"ONNX WAF model loaded — provider: {active_provider}, num_labels={self._num_labels}")
             return True
 
         except ImportError:
@@ -155,6 +182,58 @@ class ONNXWAFClassifier:
     # Public API — identical signatures to WAFClassifier
     # ------------------------------------------------------------------
 
+    def _process_multiclass(self, probs) -> Dict[str, Any]:
+        """Process multi-class output (8 classes) into WAF result dict."""
+        import numpy as np
+
+        benign_prob = float(probs[0])
+        malicious_prob = 1.0 - benign_prob
+        is_malicious = malicious_prob >= self.threshold
+
+        attack_score = max(1, min(99, int(round((1.0 - malicious_prob) * 100))))
+
+        max_attack_idx = int(np.argmax(probs[1:]))
+        attack_class = ATTACK_CLASSES.get(max_attack_idx + 1, "other_attack")
+
+        label = attack_class if is_malicious else "benign"
+        confidence = malicious_prob if is_malicious else benign_prob
+
+        result = {
+            "label": label,
+            "confidence": round(confidence, 4),
+            "is_malicious": is_malicious,
+            "malicious_score": round(malicious_prob, 4),
+            "benign_score": round(benign_prob, 4),
+            "attack_score": attack_score,
+            "attack_class": attack_class if is_malicious else None,
+        }
+
+        for class_name, field_name in SUB_SCORE_FIELDS.items():
+            class_idx = [k for k, v in ATTACK_CLASSES.items() if v == class_name]
+            if class_idx:
+                prob = float(probs[class_idx[0]])
+                result[field_name] = max(1, min(99, int(round((1.0 - prob) * 100))))
+
+        return result
+
+    def _process_binary(self, probs) -> Dict[str, Any]:
+        """Process binary output (benign vs malicious)."""
+        benign_prob = float(probs[0])
+        malicious_prob = float(probs[1])
+        is_malicious = malicious_prob >= self.threshold
+        label = "malicious" if is_malicious else "benign"
+        confidence = malicious_prob if is_malicious else benign_prob
+        attack_score = max(0, min(100, int(round(malicious_prob * 100))))
+
+        return {
+            "label": label,
+            "confidence": round(confidence, 4),
+            "is_malicious": is_malicious,
+            "malicious_score": round(malicious_prob, 4),
+            "benign_score": round(benign_prob, 4),
+            "attack_score": attack_score,
+        }
+
     def classify(self, text: str) -> Dict[str, Any]:
         if not self._loaded:
             return {"label": "unknown", "confidence": 0.0, "is_malicious": False, "error": "Model not loaded"}
@@ -168,21 +247,21 @@ class ONNXWAFClassifier:
             )
             probs = self._run_inference(enc["input_ids"], enc["attention_mask"])
 
-            benign_prob = float(probs[0][0])
-            malicious_prob = float(probs[0][1])
-            is_malicious = malicious_prob >= self.threshold
-            label = "malicious" if is_malicious else "benign"
-            confidence = malicious_prob if is_malicious else benign_prob
-            attack_score = max(0, min(100, int(round(malicious_prob * 100))))
+            # Apply isotonic regression calibration if available
+            if self._is_multiclass:
+                try:
+                    from backend.ml.calibration import calibrate_probabilities
+                    cal_probs = calibrate_probabilities(
+                        probs[0].tolist(), str(self.model_path),
+                        label_names=list(ATTACK_CLASSES.values()),
+                    )
+                    probs[0] = cal_probs
+                except Exception:
+                    pass
 
-            return {
-                "label": label,
-                "confidence": round(confidence, 4),
-                "is_malicious": is_malicious,
-                "malicious_score": round(malicious_prob, 4),
-                "benign_score": round(benign_prob, 4),
-                "attack_score": attack_score,
-            }
+            if self._is_multiclass:
+                return self._process_multiclass(probs[0])
+            return self._process_binary(probs[0])
         except Exception as e:
             logger.error(f"ONNX classification error: {e}")
             return {"label": "error", "confidence": 0.0, "is_malicious": False, "error": str(e)}
@@ -205,18 +284,10 @@ class ONNXWAFClassifier:
                 probs = self._run_inference(enc["input_ids"], enc["attention_mask"])
 
                 for prob in probs:
-                    benign_prob = float(prob[0])
-                    malicious_prob = float(prob[1])
-                    is_malicious = malicious_prob >= self.threshold
-                    attack_score = max(0, min(100, int(round(malicious_prob * 100))))
-                    results.append({
-                        "label": "malicious" if is_malicious else "benign",
-                        "confidence": round(malicious_prob if is_malicious else benign_prob, 4),
-                        "is_malicious": is_malicious,
-                        "malicious_score": round(malicious_prob, 4),
-                        "benign_score": round(benign_prob, 4),
-                        "attack_score": attack_score,
-                    })
+                    if self._is_multiclass:
+                        results.append(self._process_multiclass(prob))
+                    else:
+                        results.append(self._process_binary(prob))
             except Exception as e:
                 logger.error(f"ONNX batch classification error: {e}")
                 results.extend([{"label": "error", "confidence": 0.0, "is_malicious": False, "error": str(e)}] * len(batch))
@@ -279,7 +350,7 @@ class ONNXWAFClassifier:
 
         attack_score = classification.get("attack_score") or max(0, min(100, int(round(malicious_score * 100))))
 
-        return {
+        result = {
             "is_anomaly": is_anomaly,
             "anomaly_score": malicious_score,
             "threshold": self.threshold,
@@ -290,6 +361,13 @@ class ONNXWAFClassifier:
             "benign_score": classification.get("benign_score", 0.0),
             "attack_score": attack_score,
         }
+
+        # Forward multi-class sub-scores if available
+        for field in ("attack_class", "waf_sqli_score", "waf_xss_score", "waf_rce_score"):
+            if field in classification:
+                result[field] = classification[field]
+
+        return result
 
     def get_metrics(self) -> Dict[str, Any]:
         with self._metrics_lock:

@@ -118,7 +118,7 @@ def get_model_info(waf_service: Any = None) -> Dict:
     svc = waf_service or get_waf_service()
     root = _project_root()
     # HuggingFace transformer model path
-    model_dir = root / "models" / "waf-distilbert"
+    model_dir = root / "models" / "waf-distilbert-multiclass"
     model_file = model_dir / "model.safetensors"
     config_file = model_dir / "config.json"
     tokenizer_file = model_dir / "tokenizer.json"

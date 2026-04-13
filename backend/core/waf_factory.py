@@ -26,7 +26,7 @@ def is_model_available(model_path: Optional[str] = None) -> bool:
     if not model_path:
         model_path = getattr(config, "WAF_MODEL_PATH", None)
     if not model_path:
-        model_path = str(_project_root() / "models" / "waf-distilbert")
+        model_path = str(_project_root() / "models" / "waf-distilbert-multiclass")
     p = Path(model_path)
     if not p.is_dir():
         return False
@@ -59,7 +59,7 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
     if not model_path:
         model_path = getattr(config, "WAF_MODEL_PATH", None)
     if not model_path:
-        model_path = str(_project_root() / "models" / "waf-distilbert")
+        model_path = str(_project_root() / "models" / "waf-distilbert-multiclass")
 
     # ONNX branch — opt-in via WAF_USE_ONNX=true
     use_onnx = os.environ.get("WAF_USE_ONNX", "false").lower() == "true"
@@ -67,7 +67,12 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
         try:
             from backend.ml.onnx_classifier import ONNXWAFClassifier
 
-            onnx_path = str(_project_root() / "models" / "waf-distilbert.onnx")
+            # Check for ONNX model inside the model dir first, then legacy path
+            model_dir = Path(model_path)
+            if (model_dir / "model.onnx").exists():
+                onnx_path = str(model_dir / "model.onnx")
+            else:
+                onnx_path = str(_project_root() / "models" / "waf-distilbert.onnx")
             classifier = ONNXWAFClassifier(
                 model_path=str(model_path),
                 onnx_path=onnx_path,

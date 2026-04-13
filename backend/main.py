@@ -111,7 +111,7 @@ async def lifespan(app: FastAPI):
                 if not model_ok:
                     logger.critical(
                         "WAF_ENABLED=true and WAF_REQUIRE_MODEL=true but model is missing. "
-                        "Ensure models/waf-distilbert exists with config.json, tokenizer.json, and model weights. "
+                        "Ensure models/waf-distilbert-multiclass exists with config.json, tokenizer.json, and model weights. "
                         "Exiting."
                     )
                     raise SystemExit(1)
@@ -143,7 +143,7 @@ async def lifespan(app: FastAPI):
 
                 learning_scheduler = LearningScheduler(
                     log_path=log_path,
-                    model_path=os.getenv("WAF_MODEL_PATH", "models/waf-distilbert"),
+                    model_path=os.getenv("WAF_MODEL_PATH", "models/waf-distilbert-multiclass"),
                     update_interval_hours=int(os.getenv("LEARNING_UPDATE_INTERVAL_HOURS", "24")),
                 )
                 learning_scheduler.start()

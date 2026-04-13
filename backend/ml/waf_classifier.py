@@ -46,7 +46,7 @@ class WAFClassifier:
 
     def __init__(
         self,
-        model_path: str = "models/waf-distilbert",
+        model_path: str = "models/waf-distilbert-multiclass",
         threshold: float = 0.5,
         device: Optional[str] = None,
     ):
@@ -192,6 +192,19 @@ class WAFClassifier:
                 outputs = self.model(**inputs)
                 probs = torch.softmax(outputs.logits, dim=-1)
 
+            # Apply isotonic regression calibration if available
+            if self._is_multiclass:
+                try:
+                    from backend.ml.calibration import calibrate_probabilities
+                    raw_list = probs[0].tolist()
+                    cal_list = calibrate_probabilities(
+                        raw_list, str(self.model_path),
+                        label_names=list(ATTACK_CLASSES.values()),
+                    )
+                    probs[0] = torch.tensor(cal_list, device=self.device)
+                except Exception:
+                    pass  # Fall back to raw probabilities
+
             if self._is_multiclass:
                 result = self._process_multiclass(probs[0])
             else:
@@ -314,20 +327,11 @@ class WAFClassifier:
                     outputs = self.model(**inputs)
                     probs = torch.softmax(outputs.logits, dim=-1)
 
-                for j, prob in enumerate(probs):
-                    malicious_prob = prob[1].item()
-                    benign_prob = prob[0].item()
-                    is_malicious = malicious_prob >= self.threshold
-
-                    attack_score = max(0, min(100, int(round(malicious_prob * 100))))
-                    results.append({
-                        "label": "malicious" if is_malicious else "benign",
-                        "confidence": round(malicious_prob if is_malicious else benign_prob, 4),
-                        "is_malicious": is_malicious,
-                        "malicious_score": round(malicious_prob, 4),
-                        "benign_score": round(benign_prob, 4),
-                        "attack_score": attack_score,
-                    })
+                for prob in probs:
+                    if self._is_multiclass:
+                        results.append(self._process_multiclass(prob))
+                    else:
+                        results.append(self._process_binary(prob))
             except Exception as e:
                 logger.error(f"Batch classification error: {e}")
                 results.extend([{"label": "error", "confidence": 0.0, "is_malicious": False, "error": str(e)}] * len(batch))

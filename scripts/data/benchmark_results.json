@@ -1,0 +1,147 @@
+{
+  "timestamp": "2026-04-06T14:19:36.626351",
+  "host": "localhost:3001",
+  "results": [
+    {
+      "scenario": "health_throughput",
+      "total_requests": 50850,
+      "successful": 50850,
+      "failed": 0,
+      "status_counts": {
+        "200": 50850
+      },
+      "throughput_rps": 1693.86,
+      "latency_avg_ms": 29.51,
+      "latency_p50_ms": 24.54,
+      "latency_p95_ms": 79.2,
+      "latency_p99_ms": 91.72,
+      "latency_max_ms": 140.35,
+      "elapsed_s": 30.02,
+      "notes": [
+        "Target: P99 < 100ms, success rate > 99%"
+      ]
+    },
+    {
+      "scenario": "api_throughput",
+      "total_requests": 100,
+      "successful": 0,
+      "failed": 100,
+      "status_counts": {
+        "0": 100
+      },
+      "throughput_rps": 3.21,
+      "latency_avg_ms": 15585.18,
+      "latency_p50_ms": 15997.31,
+      "latency_p95_ms": 16002.3,
+      "latency_p99_ms": 16003.46,
+      "latency_max_ms": 16003.46,
+      "elapsed_s": 31.18,
+      "notes": [
+        "Target: P99 < 200ms, success rate > 95%"
+      ]
+    },
+    {
+      "scenario": "waf_inference",
+      "total_requests": 2000,
+      "successful": 0,
+      "failed": 2000,
+      "status_counts": {
+        "0": 2000
+      },
+      "throughput_rps": 3.12,
+      "latency_avg_ms": 15999.96,
+      "latency_p50_ms": 16000.09,
+      "latency_p95_ms": 16012.56,
+      "latency_p99_ms": 16016.18,
+      "latency_max_ms": 16018.72,
+      "elapsed_s": 640.0,
+      "notes": [
+        "Sent ~1000 benign + ~1000 malicious requests. WAF blocked 0 requests (403).",
+        "WAF_ENABLED=false means all pass 200; with model loaded expect 403 on malicious"
+      ]
+    },
+    {
+      "scenario": "connection_stress",
+      "total_requests": 500,
+      "successful": 0,
+      "failed": 500,
+      "status_counts": {
+        "0": 258,
+        "429": 242
+      },
+      "throughput_rps": 9.84,
+      "latency_avg_ms": 10009.9,
+      "latency_p50_ms": 15980.01,
+      "latency_p95_ms": 16006.47,
+      "latency_p99_ms": 16007.53,
+      "latency_max_ms": 16008.13,
+      "elapsed_s": 50.82,
+      "notes": [
+        "Concurrency=100, total=500. DB pool_size=20, max_overflow=10. 500 errors (pool exhaustion indicator): 0",
+        "Target: 0 x 500, P99 < 500ms, success rate > 95%",
+        "WARNING: no auth token \u2014 401s are expected, not pool failures"
+      ]
+    },
+    {
+      "scenario": "multi_tenant",
+      "total_requests": 2332,
+      "successful": 108,
+      "failed": 2224,
+      "status_counts": {
+        "404": 59,
+        "200": 108,
+        "429": 2165
+      },
+      "throughput_rps": 77.51,
+      "latency_avg_ms": 641.39,
+      "latency_p50_ms": 582.47,
+      "latency_p95_ms": 1210.21,
+      "latency_p99_ms": 1489.73,
+      "latency_max_ms": 2487.15,
+      "elapsed_s": 30.09,
+      "notes": [
+        "Simulated 50 concurrent tenants for 30s. All scoped by org_id from JWT. Cross-tenant leak would manifest as 403 or mismatched data (manual review required).",
+        "Target: success rate > 95%, no 500 errors"
+      ]
+    },
+    {
+      "scenario": "rate_limit",
+      "total_requests": 400,
+      "successful": 0,
+      "failed": 400,
+      "status_counts": {
+        "403": 400
+      },
+      "throughput_rps": 30.87,
+      "latency_avg_ms": 7037.97,
+      "latency_p50_ms": 7386.59,
+      "latency_p95_ms": 12545.26,
+      "latency_p99_ms": 12860.69,
+      "latency_max_ms": 12924.68,
+      "elapsed_s": 12.96,
+      "notes": [
+        "Fired 400 requests to http://localhost:3001/test/endpoint as fast as possible. Got 0 x 429 (rate limited), 400 x 200/403.",
+        "Target: at least 1 x 429 within the burst (limit=300 req/min)"
+      ]
+    },
+    {
+      "scenario": "ml_benchmark",
+      "total_requests": 0,
+      "successful": 0,
+      "failed": 0,
+      "status_counts": {},
+      "throughput_rps": 0.0,
+      "latency_avg_ms": 0,
+      "latency_p50_ms": 0.0,
+      "latency_p95_ms": 0.0,
+      "latency_p99_ms": 0.0,
+      "latency_max_ms": 0,
+      "elapsed_s": 0.0,
+      "notes": [
+        "PyTorch  100x: 17802.4ms (178.02ms/req)",
+        "ONNX model not loaded (models/waf-distilbert/model.onnx missing) \u2014 skipped",
+        "Export first: WAF_USE_ONNX=true python scripts/export_onnx.py"
+      ]
+    }
+  ]
+}
