@@ -194,6 +194,11 @@ class Config:
     DNS_POWERDNS_API_KEY: str = os.getenv("DNS_POWERDNS_API_KEY", "")
     DNS_GATEWAY_IP: str = os.getenv("DNS_GATEWAY_IP", "")
 
+    # ML inference tuning
+    WAF_MAX_SEQ_LEN: int = int(os.getenv("WAF_MAX_SEQ_LEN", "256"))
+    WAF_CACHE_TTL: int = int(os.getenv("WAF_CACHE_TTL", "300"))
+    WAF_USE_QUANTIZED: bool = os.getenv("WAF_USE_QUANTIZED", "false").lower() == "true"
+
     # Redis (for cache purge pub/sub, blacklist sync, etc.)
     REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379")
 
