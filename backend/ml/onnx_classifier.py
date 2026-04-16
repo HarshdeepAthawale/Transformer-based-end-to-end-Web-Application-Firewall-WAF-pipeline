@@ -223,7 +223,9 @@ class ONNXWAFClassifier:
         is_malicious = malicious_prob >= self.threshold
         label = "malicious" if is_malicious else "benign"
         confidence = malicious_prob if is_malicious else benign_prob
-        attack_score = max(0, min(100, int(round(malicious_prob * 100))))
+        # SECURITY: WAF convention -- lower score = more malicious (1-99 scale)
+        # Consistent with _process_multiclass and industry WAF scoring
+        attack_score = max(1, min(99, int(round((1.0 - malicious_prob) * 100))))
 
         return {
             "label": label,
