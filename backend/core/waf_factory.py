@@ -56,6 +56,7 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
 
     # Get config values
     threshold = getattr(config, "WAF_THRESHOLD", 0.5)
+    max_seq_len = getattr(config, "WAF_MAX_SEQ_LEN", 256)
     if not model_path:
         model_path = getattr(config, "WAF_MODEL_PATH", None)
     if not model_path:
@@ -63,13 +64,19 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
 
     # ONNX branch — opt-in via WAF_USE_ONNX=true
     use_onnx = os.environ.get("WAF_USE_ONNX", "false").lower() == "true"
+    use_quantized = getattr(config, "WAF_USE_QUANTIZED", False)
     if use_onnx:
         try:
             from backend.ml.onnx_classifier import ONNXWAFClassifier
 
-            # Check for ONNX model inside the model dir first, then legacy path
             model_dir = Path(model_path)
-            if (model_dir / "model.onnx").exists():
+
+            # Fallback chain: INT8 quantized -> FP32 ONNX -> legacy path
+            onnx_path = None
+            if use_quantized and (model_dir / "model_int8.onnx").exists():
+                onnx_path = str(model_dir / "model_int8.onnx")
+                logger.info("Using INT8 quantized ONNX model")
+            elif (model_dir / "model.onnx").exists():
                 onnx_path = str(model_dir / "model.onnx")
             else:
                 onnx_path = str(_project_root() / "models" / "waf-distilbert.onnx")
@@ -77,6 +84,7 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
                 model_path=str(model_path),
                 onnx_path=onnx_path,
                 threshold=threshold,
+                max_seq_len=max_seq_len,
             )
             if classifier.is_loaded:
                 _waf_classifier = classifier
@@ -96,6 +104,7 @@ def create_waf_service(model_path: Optional[str] = None, force_reload: bool = Fa
         classifier = WAFClassifier(
             model_path=str(model_path),
             threshold=threshold,
+            max_seq_len=max_seq_len,
         )
 
         if classifier.is_loaded:

@@ -47,8 +47,10 @@ class ONNXWAFClassifier:
         model_path: str = "models/waf-distilbert-multiclass",
         onnx_path: Optional[str] = None,
         threshold: float = 0.5,
+        max_seq_len: int = 256,
     ):
         self.model_path = Path(model_path)
+        self.max_seq_len = max_seq_len
         # Default ONNX file: check inside model dir first, then next to it
         if onnx_path:
             self.onnx_path = Path(onnx_path)
@@ -105,7 +107,7 @@ class ONNXWAFClassifier:
                 providers=providers,
             )
 
-            self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path))
+            self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path), use_fast=True)
             # Detect num_labels from ONNX output shape
             out_shape = self.session.get_outputs()[0].shape
             self._num_labels = out_shape[-1] if len(out_shape) == 2 and isinstance(out_shape[-1], int) else 2
@@ -242,7 +244,7 @@ class ONNXWAFClassifier:
             enc = self.tokenizer(
                 text,
                 truncation=True,
-                max_length=512,
+                max_length=self.max_seq_len,
                 return_tensors="np",
             )
             probs = self._run_inference(enc["input_ids"], enc["attention_mask"])
@@ -277,7 +279,7 @@ class ONNXWAFClassifier:
                 enc = self.tokenizer(
                     batch,
                     truncation=True,
-                    max_length=512,
+                    max_length=self.max_seq_len,
                     padding=True,
                     return_tensors="np",
                 )

@@ -31,7 +31,7 @@ def export(model_path: str, output_path: str) -> None:
 
     # Dummy input — batch=1, seq_len=16
     sample_text = "GET /login HTTP/1.1\nUser-Agent: test"
-    enc = tokenizer(sample_text, return_tensors="pt", max_length=512, truncation=True)
+    enc = tokenizer(sample_text, return_tensors="pt", max_length=256, truncation=True)
     # DistilBERT does not use token_type_ids
     enc.pop("token_type_ids", None)
     dummy_input_ids = enc["input_ids"]
@@ -90,7 +90,7 @@ def export(model_path: str, output_path: str) -> None:
         t0 = time.perf_counter()
         with torch.no_grad():
             for t in texts:
-                enc_t = tokenizer(t, return_tensors="pt", max_length=512, truncation=True)
+                enc_t = tokenizer(t, return_tensors="pt", max_length=256, truncation=True)
                 enc_t.pop("token_type_ids", None)
                 model(**enc_t)
         pt_ms = (time.perf_counter() - t0) * 1000
@@ -98,7 +98,7 @@ def export(model_path: str, output_path: str) -> None:
         # ONNX latency
         t0 = time.perf_counter()
         for t in texts:
-            enc_t = tokenizer(t, return_tensors="np", max_length=512, truncation=True)
+            enc_t = tokenizer(t, return_tensors="np", max_length=256, truncation=True)
             session.run(["logits"], {
                 "input_ids": enc_t["input_ids"].astype("int64"),
                 "attention_mask": enc_t["attention_mask"].astype("int64"),

@@ -13,6 +13,7 @@ import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from loguru import logger
 
+from backend.ml.inference_cache import InferenceCache, cache_key
 from backend.parsing import ParsingPipeline
 
 # Multi-class attack categories (index -> label)
@@ -49,6 +50,7 @@ class WAFClassifier:
         model_path: str = "models/waf-distilbert-multiclass",
         threshold: float = 0.5,
         device: Optional[str] = None,
+        max_seq_len: int = 256,
     ):
         """
         Initialize the WAF classifier.
@@ -57,9 +59,11 @@ class WAFClassifier:
             model_path: Path to the fine-tuned model directory
             threshold: Confidence threshold for malicious classification
             device: Device to use ('cuda', 'cpu', or None for auto)
+            max_seq_len: Maximum token sequence length (default 256, tunable)
         """
         self.model_path = Path(model_path)
         self.threshold = threshold
+        self.max_seq_len = max_seq_len
         self.model = None
         self.tokenizer = None
         self.device = None
@@ -76,10 +80,8 @@ class WAFClassifier:
         }
         self._metrics_lock = threading.Lock()
 
-        # LRU inference cache (fingerprint -> result)
-        self._cache: Dict[str, Dict[str, Any]] = {}
-        self._cache_maxsize = 10000
-        self._cache_order: List[str] = []  # Track insertion order for LRU
+        # Two-tier inference cache (L1 in-process + L2 Redis)
+        self._cache = InferenceCache(l1_maxsize=10000)
 
         # Parsing pipeline for request normalization
         self._pipeline = ParsingPipeline(
@@ -106,7 +108,7 @@ class WAFClassifier:
 
         try:
             logger.info(f"Loading WAF model from {self.model_path}")
-            self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path))
+            self.tokenizer = AutoTokenizer.from_pretrained(str(self.model_path), use_fast=True)
             self.model = AutoModelForSequenceClassification.from_pretrained(str(self.model_path))
             self.model.to(self.device)
             self.model.eval()
@@ -142,13 +144,13 @@ class WAFClassifier:
                 "error": "Model not loaded",
             }
 
-        # LRU cache lookup
-        import hashlib
-        cache_key = hashlib.blake2b(text.encode("utf-8", errors="replace"), digest_size=16).hexdigest()
-        if cache_key in self._cache:
+        # Two-tier cache lookup (L1 in-process + L2 Redis)
+        ck = cache_key(text)
+        cached = self._cache.get(ck)
+        if cached is not None:
             with self._metrics_lock:
                 self._metrics["cache_hits"] += 1
-            return self._cache[cache_key]
+            return cached
 
         # Ngram pre-filter: skip transformer for obvious cases
         try:
@@ -167,7 +169,7 @@ class WAFClassifier:
                     "attack_score": prefilter_score,
                     "prefiltered": True,
                 }
-                self._cache_put(cache_key, result)
+                self._cache.put(ck, result)
                 return result
         except ImportError:
             pass
@@ -180,7 +182,7 @@ class WAFClassifier:
             inputs = self.tokenizer(
                 text,
                 truncation=True,
-                max_length=512,
+                max_length=self.max_seq_len,
                 return_tensors="pt",
             ).to(self.device)
 
@@ -210,8 +212,8 @@ class WAFClassifier:
             else:
                 result = self._process_binary(probs[0])
 
-            # Store in cache
-            self._cache_put(cache_key, result)
+            # Store in two-tier cache
+            self._cache.put(ck, result)
             return result
 
         except Exception as e:
@@ -222,16 +224,6 @@ class WAFClassifier:
                 "is_malicious": False,
                 "error": str(e),
             }
-
-    def _cache_put(self, key: str, value: Dict[str, Any]) -> None:
-        """Add an entry to the LRU cache, evicting oldest if over limit."""
-        if key in self._cache:
-            return
-        self._cache[key] = value
-        self._cache_order.append(key)
-        while len(self._cache) > self._cache_maxsize:
-            oldest = self._cache_order.pop(0)
-            self._cache.pop(oldest, None)
 
     def _process_binary(self, probs: torch.Tensor) -> Dict[str, Any]:
         """Process binary classification output (benign vs malicious)."""
@@ -315,7 +307,7 @@ class WAFClassifier:
                 inputs = self.tokenizer(
                     batch,
                     truncation=True,
-                    max_length=512,
+                    max_length=self.max_seq_len,
                     padding=True,
                     return_tensors="pt",
                 ).to(self.device)
@@ -431,7 +423,6 @@ class WAFClassifier:
         if body:
             lines.append("")
             if isinstance(body, dict):
-                import json
                 lines.append(json.dumps(body))
             elif isinstance(body, str):
                 lines.append(body)
@@ -544,6 +535,7 @@ class WAFClassifier:
             cache_total = cache_hits + cache_misses
             cache_hit_ratio = (cache_hits / cache_total * 100) if cache_total > 0 else 0.0
 
+            cache_metrics = self._cache.metrics()
             return {
                 "total_requests": total,
                 "anomalies_detected": self._metrics["anomalies_detected"],
@@ -554,8 +546,9 @@ class WAFClassifier:
                 "cache_hits": cache_hits,
                 "cache_misses": cache_misses,
                 "cache_hit_ratio": round(cache_hit_ratio, 1),
-                "cache_size": len(self._cache),
+                "cache_size": cache_metrics["l1_cache_size"],
                 "prefilter_skips": self._metrics["prefilter_skips"],
+                **cache_metrics,
             }
 
     def update_threshold(self, threshold: float) -> None:
