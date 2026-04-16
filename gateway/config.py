@@ -126,6 +126,9 @@ class GatewayConfig:
     EDGE_CACHE_COALESCE_ENABLED: bool = os.getenv("EDGE_CACHE_COALESCE_ENABLED", "true").lower() == "true"
     EDGE_CACHE_COALESCE_TIMEOUT: float = float(os.getenv("EDGE_CACHE_COALESCE_TIMEOUT", "30.0"))
 
+    # Phase pipeline (FL2-inspired modular architecture)
+    GATEWAY_USE_PIPELINE: bool = os.getenv("GATEWAY_USE_PIPELINE", "false").lower() == "true"
+
     # HTTPS rewrite
     HTTPS_REWRITE_ENABLED: bool = os.getenv("HTTPS_REWRITE_ENABLED", "false").lower() == "true"
     SSL_SETTINGS_CACHE_TTL: int = int(os.getenv("SSL_SETTINGS_CACHE_TTL", "300"))

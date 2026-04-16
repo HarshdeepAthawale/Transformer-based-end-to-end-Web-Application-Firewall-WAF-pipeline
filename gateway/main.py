@@ -137,6 +137,43 @@ async def lifespan(app: FastAPI):
         except Exception as exc:
             logger.error(f"Failed to initialize WAF classifier: {exc}")
 
+    # Phase pipeline (FL2-inspired modular architecture)
+    if gateway_config.GATEWAY_USE_PIPELINE:
+        try:
+            from gateway.pipeline import PipelineOrchestrator, PipelineMetrics
+            from gateway.pipeline.phases import (
+                IPBlacklistPhase, EdgeCachePhase, RateLimitPhase,
+                DDoSProtectionPhase, BotDetectionPhase, UploadScanPhase,
+                FirewallAIPhase, CredentialLeakPhase, ManagedRulesPhase,
+                WAFMLPhase,
+            )
+
+            pipeline_metrics = PipelineMetrics()
+            phases = [
+                IPBlacklistPhase(getattr(app.state, "blacklist_checker", None)),
+                EdgeCachePhase(getattr(app.state, "edge_cache", None)),
+                RateLimitPhase(getattr(app.state, "rate_limiter", None)),
+                DDoSProtectionPhase(getattr(app.state, "ddos_protection", None)),
+                BotDetectionPhase(),
+                UploadScanPhase(),
+                FirewallAIPhase(),
+                CredentialLeakPhase(),
+                ManagedRulesPhase(),
+                WAFMLPhase(app.state.waf_service),
+            ]
+            app.state.pipeline = PipelineOrchestrator(phases, pipeline_metrics)
+            app.state.pipeline_metrics = pipeline_metrics
+            logger.info(
+                f"Phase pipeline enabled with {len(phases)} phases"
+            )
+        except Exception as exc:
+            logger.error(f"Failed to initialize phase pipeline: {exc}")
+            app.state.pipeline = None
+            app.state.pipeline_metrics = None
+    else:
+        app.state.pipeline = None
+        app.state.pipeline_metrics = None
+
     yield
 
     # Shutdown
@@ -297,6 +334,128 @@ def _log_gateway_event(
     report_event(event_payload)
 
 
+async def _pipeline_proxy(request: Request, pipeline) -> Response:
+    """FL2-inspired modular phase pipeline path."""
+    from gateway.pipeline.context import PhaseContext
+
+    ctx = PhaseContext(
+        client_ip=_get_client_ip(request),
+        method=request.method,
+        path=request.url.path,
+        query_string=str(request.url.query) if request.url.query else "",
+        headers=dict(request.headers),
+        content_type=request.headers.get("content-type", ""),
+        org_id=request.headers.get("x-waf-zone-id", "default"),
+    )
+
+    ctx = await pipeline.run(request, ctx)
+
+    # Short circuit: return block/challenge response
+    if ctx.final_verdict in ("block", "challenge"):
+        elapsed_ms = (time.perf_counter() - ctx.start_time) * 1000
+        waf_data = ctx.phase_results.get("waf_ml")
+        _log_gateway_event(
+            request,
+            request_id=ctx.request_id,
+            client_ip=ctx.client_ip,
+            decision="block",
+            anomaly_score=waf_data.data.get("anomaly_score") if waf_data else None,
+            attack_score=waf_data.data.get("attack_score") if waf_data else None,
+            total_latency_ms=elapsed_ms,
+            blocked_by=ctx.blocking_phase,
+        )
+        return pipeline.build_block_response(ctx)
+
+    # Cache hit
+    if ctx.final_verdict == "cache_hit":
+        cache_result = ctx.phase_results.get("edge_cache")
+        if cache_result and cache_result.data.get("body") is not None:
+            resp = Response(
+                content=cache_result.data["body"],
+                status_code=cache_result.data.get("status_code", 200),
+                headers=cache_result.data.get("headers", {}),
+            )
+            resp.headers["X-Cache"] = cache_result.data.get("cache_status", "HIT")
+            resp.headers["X-Request-ID"] = ctx.request_id
+            return resp
+
+    # Forward to upstream
+    response = await forward_request(
+        client=request.app.state.http_client,
+        request=request,
+        body_bytes=ctx.body_bytes if ctx.body_bytes else None,
+    )
+
+    # Log event
+    elapsed_ms = (time.perf_counter() - ctx.start_time) * 1000
+    waf_data = ctx.phase_results.get("waf_ml")
+    _log_gateway_event(
+        request,
+        request_id=ctx.request_id,
+        client_ip=ctx.client_ip,
+        decision=ctx.final_verdict,
+        anomaly_score=waf_data.data.get("anomaly_score") if waf_data else None,
+        attack_score=waf_data.data.get("attack_score") if waf_data else None,
+        waf_latency_ms=waf_data.data.get("waf_latency_ms") if waf_data else None,
+        upstream_status=response.status_code,
+        total_latency_ms=elapsed_ms,
+    )
+
+    # Add observability headers
+    pipeline.add_observability_headers(response, ctx)
+    if waf_data and waf_data.data.get("attack_score") is not None:
+        response.headers["X-WAF-Mode"] = gateway_config.WAF_MODE
+
+    # Store in edge cache on miss
+    edge_cache = getattr(request.app.state, "edge_cache", None)
+    if ctx.cache_ctx and edge_cache and request.method in ("GET", "HEAD"):
+        try:
+            resp_body = getattr(response, "body", None) or getattr(response, "_content", None) or b""
+            if isinstance(resp_body, bytes) and edge_cache.is_cacheable_response(
+                response.status_code, dict(response.headers)
+            ):
+                await edge_cache.store_response(
+                    ctx.cache_ctx[0],
+                    response.status_code,
+                    resp_body,
+                    dict(response.headers),
+                    request.url.path,
+                    request.method,
+                    ctx.cache_ctx[1],
+                )
+                response.headers["X-Cache"] = "MISS"
+        except Exception as e:
+            logger.debug(f"Edge cache store failed: {e}")
+
+    return response
+
+
+@app.get("/gateway/phase-metrics")
+async def phase_metrics(request: Request):
+    """Per-phase pipeline metrics for dashboard consumption."""
+    metrics = getattr(request.app.state, "pipeline_metrics", None)
+    if metrics is None:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "Pipeline not enabled. Set GATEWAY_USE_PIPELINE=true"},
+        )
+    return metrics.snapshot()
+
+
+@app.get("/gateway/phase-metrics/prometheus")
+async def phase_metrics_prometheus(request: Request):
+    """Per-phase metrics in Prometheus text exposition format."""
+    from fastapi.responses import PlainTextResponse
+
+    metrics = getattr(request.app.state, "pipeline_metrics", None)
+    if metrics is None:
+        return PlainTextResponse(content="# Pipeline not enabled\n")
+    return PlainTextResponse(
+        content=metrics.prometheus_lines(),
+        media_type="text/plain; version=0.0.4; charset=utf-8",
+    )
+
+
 @app.api_route(
     "/{path:path}",
     methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
@@ -304,10 +463,16 @@ def _log_gateway_event(
 async def gateway_proxy(request: Request, path: str):
     """
     Catch-all route: rate limit -> DDoS check -> WAF inspect -> forward to upstream.
+    When GATEWAY_USE_PIPELINE=true, uses FL2-inspired modular phase pipeline.
     """
     # Skip WAF for gateway internal endpoints
     if request.url.path.startswith("/gateway/"):
         return JSONResponse(status_code=404, content={"detail": "Not found"})
+
+    # FL2-inspired pipeline path (feature-flagged)
+    pipeline = getattr(request.app.state, "pipeline", None)
+    if pipeline is not None:
+        return await _pipeline_proxy(request, pipeline)
 
     start_time = time.perf_counter()
     request_id = str(uuid.uuid4())
